@@ -31,7 +31,20 @@ namespace Api.Features.Locations
 
         public class Validator : AbstractValidator<Req>
         {
-            public Validator() => RuleFor(l => l.Body.Name).Length(8, 64);
+            private readonly Context _context;
+
+            public Validator(Context context)
+            {
+                _context = context;
+
+                RuleFor(l => l.Body.Name).MaximumLength(64);
+                RuleFor(l => l).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+            }
+
+            private bool HaveUniqueName(Req req) =>
+                _context.Locations
+                    .Where(l => l.Id != req.Id)
+                    .All(l => l.Name != req.Body.Name);
         }
 
         [HttpPut(Routes.Locations.Update)]
@@ -46,21 +59,12 @@ namespace Api.Features.Locations
             CancellationToken ct = new())
         {
             var existingLocation = await _context.Locations.FindAsync(new object[] { req.Id }, ct);
-
             if (existingLocation is null) return BadRequest("Location does not exist");
-
-            if (_context.Locations
-                .Where(l => l.Id != req.Id)
-                .Any(l => l.Name == req.Body.Name))
-            {
-                return BadRequest("Location with the same name already exists");
-            }
 
             existingLocation.Name = req.Body.Name;
             await _context.SaveChangesAsync(ct);
 
             return NoContent();
-
         }
     }
 }

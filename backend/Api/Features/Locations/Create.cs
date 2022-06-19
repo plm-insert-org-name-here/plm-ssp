@@ -18,26 +18,34 @@ namespace Api.Features.Locations
         private readonly Context _context;
         private readonly IMapper _mapper;
 
-        public Create(Context context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
         public class Req
         {
             public string Name { get; set; } = default!;
-        }
-
-        public class Validator : AbstractValidator<Req>
-        {
-            public Validator() => RuleFor(l => l.Name).Length(3, 64);
         }
 
         public class Res
         {
             public int Id { get; set; }
             public string Name { get; set; } = default!;
+        }
+
+        public Create(Context context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        public class Validator : AbstractValidator<Req>
+        {
+            private readonly Context _context;
+            public Validator(Context context)
+            {
+                _context = context;
+
+                RuleFor(l => l.Name).MaximumLength(64);
+                RuleFor(l => l).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+            }
+            private bool HaveUniqueName(Req req) => _context.Locations.All(l => l.Name != req.Name);
         }
 
         private class MappingProfile : Profile
@@ -57,11 +65,6 @@ namespace Api.Features.Locations
         ]
         public override async Task<ActionResult<Res>> HandleAsync(Req req, CancellationToken ct = new())
         {
-            if (_context.Locations.Any(l => l.Name == req.Name))
-            {
-                return BadRequest("Location with the same name already exists");
-            }
-
             var location = new Location
             {
                 Name = req.Name
@@ -71,7 +74,6 @@ namespace Api.Features.Locations
             await _context.SaveChangesAsync(ct);
 
             return CreatedAtRoute(nameof(Routes.Locations.GetById), new { location.Id }, _mapper.Map<Res>(location));
-
         }
     }
 }
