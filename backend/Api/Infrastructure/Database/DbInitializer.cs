@@ -1,0 +1,75 @@
+using Api.Domain.Entities;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+
+namespace Api.Infrastructure.Database
+{
+    public static class DbInitializer
+    {
+
+        private static Location[] InitialLocations =
+        {
+            new()
+            {
+                Name = "New Location 1"
+            },
+            new()
+            {
+                Name = "New Location 2"
+            },
+            new()
+            {
+                Name = "New Location 3"
+            },
+            new()
+            {
+                Name = "New Location 4"
+            },
+            new()
+            {
+                Name = "New Location 5"
+            },
+            new()
+            {
+                Name = "New Location 6"
+            }
+        };
+
+        private static Detector[] InitialDetectors =
+        {
+            new()
+            {
+                Name = "New Detector 1",
+                MacAddress = "1234567890AB"
+            },
+            new()
+            {
+                Name = "New Detector 2",
+                MacAddress = "12AB34CD56EF"
+            },
+            new()
+            {
+                Name = "New Detector 3",
+                MacAddress = "123123123123"
+            }
+        };
+
+        public static void Initialize(IServiceScope scope)
+        {
+            using var context = scope.ServiceProvider.GetRequiredService<Context>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger>();
+
+            if (context.Database.CanConnect()) return;
+
+            logger.Debug("Database does not exist. Creating and initializing database from scratch...");
+
+            context.Database.EnsureCreated();
+
+            context.Locations.AddRange(InitialLocations);
+            context.Detectors.AddRange(InitialDetectors);
+
+            context.SaveChanges();
+            logger.Debug("Database initialization finished");
+        }
+    }
+}
