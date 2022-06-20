@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,10 +7,10 @@ using Ardalis.ApiEndpoints;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 
-namespace Api.Features.Locations
+namespace Api.Features.Detectors
 {
     public class GetById : EndpointBaseAsync
         .WithRequest<int>
@@ -29,30 +28,32 @@ namespace Api.Features.Locations
         public class Res
         {
             public string Name { get; set; } = default!;
+            public string MacAddress { get; set; } = default!;
         }
 
         class MappingProfile : Profile
         {
-            public MappingProfile() => CreateProjection<Location, Res>();
+            public MappingProfile() => CreateProjection<Detector, Res>();
         }
 
-        [HttpGet(Routes.Locations.GetById, Name = Routes.Locations.GetById)]
+        [HttpGet(Routes.Detectors.GetById, Name = Routes.Detectors.GetById)]
         [SwaggerOperation(
-            Summary = "Get location by id",
-            Description = "Get location by id",
-            OperationId = "Locations.GetById",
-            Tags = new[] { "Locations" })
+            Summary = "Get detector by id",
+            Description = "Get detector by id",
+            OperationId = "Detectors.GetById",
+            Tags = new[] { "Detectors" })
         ]
         public override async Task<ActionResult<Res>> HandleAsync(int id, CancellationToken ct = new())
         {
-             var result = await _context.Locations
+            var result = await _context.Detectors
                 .Where(l => l.Id == id)
                 .ProjectTo<Res>(_mapperConfig)
                 .SingleOrDefaultAsync(ct);
 
-             if (result is null) return NotFound();
+            if (result is null) return NotFound();
 
-             return result;
+            return result;
         }
     }
+
 }

@@ -11,5 +11,14 @@ namespace Api
             public const string Delete = "locations/{id:int}";
         }
 
+        public static class Detectors
+        {
+            public const string GetAll = "detectors";
+            public const string GetById = "detectors/{id:int}";
+            public const string Create = "detectors";
+            public const string Update = "detectors/{id:int}";
+            public const string Delete = "detectors/{id:int}";
+        }
+
     }
 }

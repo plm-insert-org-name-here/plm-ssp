@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Entities;
@@ -9,7 +8,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Api.Features.Locations
+namespace Api.Features.Detectors
 {
     public class Create : EndpointBaseAsync
         .WithRequest<Create.Req>
@@ -18,62 +17,61 @@ namespace Api.Features.Locations
         private readonly Context _context;
         private readonly IMapper _mapper;
 
-        public class Req
-        {
-            public string Name { get; set; } = default!;
-        }
-
-        public class Res
-        {
-            public int Id { get; set; }
-            public string Name { get; set; } = default!;
-        }
-
         public Create(Context context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
+        public class Req
+        {
+            public string MacAddress { get; set; } = default!;
+        }
+
+        public class Res
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = default!;
+            public string MacAddress { get; set; } = default!;
+        }
+
         public class Validator : AbstractValidator<Req>
         {
-            private readonly Context _context;
-            public Validator(Context context)
+            public Validator()
             {
-                _context = context;
-
-                RuleFor(l => l.Name).MaximumLength(64);
-                RuleFor(l => l).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+                RuleFor(d => d.MacAddress).Matches("[0-9a-fA-F]{12}")
+                    .WithMessage("'MacAddress' must contain a valid MAC address without the separator colons");
             }
-            private bool HaveUniqueName(Req req) => _context.Locations.All(l => l.Name != req.Name);
         }
 
         private class MappingProfile : Profile
         {
             public MappingProfile()
             {
-                CreateMap<Location, Res>();
+                CreateMap<Detector, Res>();
             }
         }
 
-        [HttpPost(Routes.Locations.Create)]
+        [HttpPost(Routes.Detectors.Create)]
         [SwaggerOperation(
-            Summary = "Create new location",
-            Description = "Create new location",
-            OperationId = "Locations.Create",
-            Tags = new[] { "Locations" })
+            Summary = "Create new detector",
+            Description = "Create new detector",
+            OperationId = "Detectors.Create",
+            Tags = new[] { "Detectors" })
         ]
         public override async Task<ActionResult<Res>> HandleAsync(Req req, CancellationToken ct = new())
         {
-            var location = new Location
+            var detector = new Detector
             {
-                Name = req.Name
+                Name = req.MacAddress,
+                MacAddress = req.MacAddress
             };
 
-            await _context.Locations.AddAsync(location, ct);
+            await _context.Detectors.AddAsync(detector, ct);
             await _context.SaveChangesAsync(ct);
 
-            return CreatedAtRoute(Routes.Locations.GetById, new { location.Id }, _mapper.Map<Res>(location));
+            return CreatedAtRoute(Routes.Detectors.GetById, new { detector.Id }, _mapper.Map<Res>(detector));
+
         }
     }
 }

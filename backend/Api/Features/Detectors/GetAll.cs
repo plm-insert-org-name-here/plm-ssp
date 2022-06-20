@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Api.Features.Locations
+namespace Api.Features.Detectors
 {
-    public class GetAll : EndpointBaseAsync.WithoutRequest.WithResult<List<GetAll.Res>>
+    public class GetAll : EndpointBaseAsync
+        .WithoutRequest
+        .WithResult<List<GetAll.Res>>
     {
         private readonly Context _context;
         private readonly IConfigurationProvider _mapperConfig;
@@ -26,24 +28,24 @@ namespace Api.Features.Locations
         public class Res
         {
             public string Name { get; set; } = default!;
+            public string MacAddress { get; set; } = default!;
         }
 
         private class MappingProfile : Profile
         {
-            public MappingProfile() => CreateProjection<Location, Res>();
+            public MappingProfile() => CreateProjection<Detector, Res>();
         }
 
-        [HttpGet(Routes.Locations.GetAll)]
+        [HttpGet(Routes.Detectors.GetAll)]
         [SwaggerOperation(
-            Summary = "Get all locations",
-            Description = "Get all locations",
-            OperationId = "Locations.GetAll",
-            Tags = new[] { "Locations" })
+            Summary = "Get all detectors",
+            Description = "Get all detectors",
+            OperationId = "Detectors.GetAll",
+            Tags = new[] { "Detectors" })
         ]
         public override Task<List<Res>> HandleAsync(CancellationToken ct = new())
         {
-            return _context.Locations.ProjectTo<Res>(_mapperConfig).ToListAsync(ct);
+            return _context.Detectors.ProjectTo<Res>(_mapperConfig).ToListAsync(ct);
         }
     }
-
 }

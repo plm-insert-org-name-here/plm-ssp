@@ -23,7 +23,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Features\Detectors" />
       <Folder Include="Features\Events" />
       <Folder Include="Features\Jobs" />
       <Folder Include="Features\Tasks" />
