@@ -25,10 +25,7 @@ namespace Api.Features.Detectors
             [FromRoute(Name = "id")] public int Id { get; set; }
             [FromBody] public ReqBody Body { get; set; } = default!;
 
-            public class ReqBody
-            {
-                public string Name { get; set; } = default!;
-            }
+            public record ReqBody(string Name);
         }
 
         public class Validator : AbstractValidator<Req>

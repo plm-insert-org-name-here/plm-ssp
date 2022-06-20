@@ -26,10 +26,7 @@ namespace Api.Features.Locations
             _mapperConfig = mapperConfig;
         }
 
-        public class Res
-        {
-            public string Name { get; set; } = default!;
-        }
+        public record Res(string Name);
 
         class MappingProfile : Profile
         {

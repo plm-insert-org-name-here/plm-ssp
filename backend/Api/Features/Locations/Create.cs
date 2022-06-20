@@ -18,16 +18,8 @@ namespace Api.Features.Locations
         private readonly Context _context;
         private readonly IMapper _mapper;
 
-        public class Req
-        {
-            public string Name { get; set; } = default!;
-        }
-
-        public class Res
-        {
-            public int Id { get; set; }
-            public string Name { get; set; } = default!;
-        }
+        public record Req(string Name);
+        public record Res(int Id, string Name);
 
         public Create(Context context, IMapper mapper)
         {

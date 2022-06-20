@@ -23,17 +23,8 @@ namespace Api.Features.Detectors
             _mapper = mapper;
         }
 
-        public class Req
-        {
-            public string MacAddress { get; set; } = default!;
-        }
-
-        public class Res
-        {
-            public int Id { get; set; }
-            public string Name { get; set; } = default!;
-            public string MacAddress { get; set; } = default!;
-        }
+        public record Req(string MacAddress);
+        public record Res(int Id, string Name, string MacAddress);
 
         public class Validator : AbstractValidator<Req>
         {
