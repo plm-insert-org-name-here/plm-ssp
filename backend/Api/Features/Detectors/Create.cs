@@ -55,7 +55,8 @@ namespace Api.Features.Detectors
             var detector = new Detector
             {
                 Name = req.MacAddress,
-                MacAddress = req.MacAddress
+                MacAddress = req.MacAddress,
+                State = DetectorState.Standby
             };
 
             await _context.Detectors.AddAsync(detector, ct);

@@ -25,7 +25,7 @@ namespace Api.Features.Detectors
             _mapperConfig = mapperConfig;
         }
 
-        public record Res(string Name, string MacAddress);
+        public record Res(string Name, string MacAddress, DetectorState state);
 
         class MappingProfile : Profile
         {
