@@ -33,14 +33,14 @@ namespace Api.Features.Detectors
             {
                 _context = context;
 
-                RuleFor(r => r.Id).Must(BeInOffState).WithMessage("Detector must be in OFF state");
+                RuleFor(r => r.Id).Must(BeInOffState).WithMessage("Detector must be exist and be in OFF state");
             }
 
             private bool BeInOffState(int id)
             {
+                // TODO(rg): the detector query is duplicated (here and in the action method). Figure out what to do about that
                 var detector = _context.Detectors.SingleOrDefault(d => d.Id == id);
 
-                // TODO: should not be possible, so throw an exception maybe?
                 if (detector is null) return false;
 
                 return detector.State is DetectorState.Off;
@@ -57,8 +57,7 @@ namespace Api.Features.Detectors
         public override async Task<ActionResult> HandleAsync([FromRoute] Req req, CancellationToken ct = new())
         {
             var existingDetector = await _context.Detectors.Where(l => l.Id == req.Id).SingleOrDefaultAsync(ct);
-
-            if (existingDetector is null) return BadRequest("Detector not found");
+            // NOTE(rg): already checked for null in the validator
 
             _context.Detectors.Remove(existingDetector);
             await _context.SaveChangesAsync(ct);

@@ -23,10 +23,7 @@ namespace Api.Features.Detectors
 
             [FromBody] public ReqBody Body { get; set; } = default!;
 
-            public class ReqBody
-            {
-                public DetectorCommandType Command { get; set; }
-            }
+            public record ReqBody(DetectorCommandType Command);
         }
 
         public SendCommand(Context context, DetectorCommandQueues queues)
