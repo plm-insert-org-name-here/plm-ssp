@@ -60,7 +60,7 @@ namespace Api.Services.DetectorController
             }
             catch (FormatException _)
             {
-                _logger.Warning("Connection attempt by detector with invalid MAC address");
+                _logger.Warning("Connection attempt by detector with invalid MAC address: '{Mac}'", detectorAddressString);
                 await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid MAC address",
                     CancellationToken.None);
                 return null;
@@ -87,7 +87,7 @@ namespace Api.Services.DetectorController
                         // TODO(rg): use BlockingConnection<T> or smth
                         queue.EnqueueEvent.WaitOne(_options.PingMilliseconds);
                         const DetectorCommandType ping = DetectorCommandType.Ping;
-                        _logger.Information("Sending '{Ping}' to detector (id: {Id})", ping, detector.Id);
+                        _logger.Debug("Sending '{Ping}' to detector (id: {Id})", ping, detector.Id);
                         var pingResult = await SendCommandWithVerificationAsync(webSocket, ping);
                         if (!pingResult)
                         {
@@ -98,7 +98,7 @@ namespace Api.Services.DetectorController
 
                     var command = queue.Dequeue();
 
-                    _logger.Information("Sending '{Cmd}' to detector (id: {Id})", command, detector.Id);
+                    _logger.Debug("Sending '{Cmd}' to detector (id: {Id})", command, detector.Id);
                     var result = await SendCommandWithVerificationAsync(webSocket, command);
                     if (!result) continue;
 
@@ -136,9 +136,9 @@ namespace Api.Services.DetectorController
             var result = expectedResponse == response;
 
             if (result)
-                _logger.Information("Got expected response: '{Resp}'", expectedResponse);
+                _logger.Debug("Got expected response: '{Resp}'", expectedResponse);
             else
-                _logger.Warning("Unexpected response: '{Unex}' (Expected '{Ex}')", response, expectedResponse);
+                _logger.Debug("Unexpected response: '{Unex}' (Expected '{Ex}')", response, expectedResponse);
 
             return result;
         }
@@ -156,7 +156,7 @@ namespace Api.Services.DetectorController
             }
             catch (OperationCanceledException ex)
             {
-                _logger.Warning("DetectorController.Send timed out. Message: {Message}", ex.Message);
+                _logger.Debug("DetectorController.Send timed out. Message: {Message}", ex.Message);
                 throw new WebSocketException(WebSocketError.Faulted);
             }
         }
@@ -183,7 +183,7 @@ namespace Api.Services.DetectorController
             }
             catch (OperationCanceledException ex)
             {
-                _logger.Warning("DetectorController.Receive timed out. Message: {Message}", ex.Message);
+                _logger.Debug("DetectorController.Receive timed out. Message: {Message}", ex.Message);
                 throw new WebSocketException(WebSocketError.Faulted);
             }
         }

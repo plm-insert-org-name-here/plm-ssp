@@ -34,7 +34,7 @@ namespace Api.Services.DetectorController
             }
             catch (ArgumentException _)
             {
-                _logger.Warning("Command queue for detector (id: {Id}) already exists", key);
+                _logger.Debug("Command queue for detector (id: {Id}) already exists", key);
             }
 
             return queue;

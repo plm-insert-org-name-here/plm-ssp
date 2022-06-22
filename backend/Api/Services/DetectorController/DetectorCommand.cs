@@ -19,6 +19,7 @@ namespace Api.Services.DetectorController
             {
                 case DetectorCommandType.StartStreaming:
                 case DetectorCommandType.StopStreaming:
+                case DetectorCommandType.TakeSnapshot:
                     return "Ok";
                 case DetectorCommandType.Ping:
                     return "Pong";
@@ -36,6 +37,7 @@ namespace Api.Services.DetectorController
     public enum DetectorCommandType {
         StartStreaming,
         StopStreaming,
+        TakeSnapshot,
         Ping,
     }
 }
