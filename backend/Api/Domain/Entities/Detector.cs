@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Net.NetworkInformation;
-using System.Threading;
 
 namespace Api.Domain.Entities
 {

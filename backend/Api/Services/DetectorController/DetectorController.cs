@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.WebSockets;
@@ -8,8 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
-using LanguageExt.Common;
-using static LanguageExt.Prelude;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;

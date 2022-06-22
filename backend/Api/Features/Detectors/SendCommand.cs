@@ -1,16 +1,12 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Services.DetectorController;
 using Ardalis.ApiEndpoints;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
-using Task = System.Threading.Tasks.Task;
 
 namespace Api.Features.Detectors
 {

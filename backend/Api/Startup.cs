@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
-using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Services.DetectorController;
-using Api.Services.DetectorImageProcessor;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

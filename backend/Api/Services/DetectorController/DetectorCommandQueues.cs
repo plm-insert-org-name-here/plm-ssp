@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Api.Domain.Entities;
 using Serilog;
 
 namespace Api.Services.DetectorController
