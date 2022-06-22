@@ -70,6 +70,7 @@ namespace Api.Services.DetectorController
         private async Task DisconnectDetector(Detector detector)
         {
             _logger.Information("Detector (id: {Id}) disconnected", detector.Id);
+            _queues.RemoveQueue(detector.Id);
             detector.State = DetectorState.Off;
             await _context.SaveChangesAsync();
         }
