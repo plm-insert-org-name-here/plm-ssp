@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using Api.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -40,17 +41,17 @@ namespace Api.Infrastructure.Database
             new()
             {
                 Name = "New Detector 1",
-                MacAddress = "1234567890AB"
+                MacAddress = PhysicalAddress.Parse("1234567890AB")
             },
             new()
             {
                 Name = "New Detector 2",
-                MacAddress = "12AB34CD56EF"
+                MacAddress = PhysicalAddress.Parse("12AB34CD56EF")
             },
             new()
             {
                 Name = "New Detector 3",
-                MacAddress = "123123123123"
+                MacAddress = PhysicalAddress.Parse("123123123123")
             }
         };
 

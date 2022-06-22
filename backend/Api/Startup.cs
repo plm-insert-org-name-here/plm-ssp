@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
+using Api.Services.DetectorController;
+using Api.Services.DetectorImageProcessor;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +25,10 @@ namespace Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
+                .AddJsonOptions(opts =>
+                {
+                    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                })
                 .AddFluentValidation(configuration =>
                 {
                     configuration.RegisterValidatorsFromAssemblyContaining<Startup>();
@@ -35,6 +42,8 @@ namespace Api
                 configuration.EnableAnnotations();
                 configuration.CustomSchemaIds(x => x.FullName);
             });
+
+            services.AddDetectorControllerWebSocket();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
@@ -54,6 +63,9 @@ namespace Api
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseWebSockets();
+            app.UseDetectorControllerWebSocket();
 
             app.UseEndpoints(builder => builder.MapControllers());
         }
