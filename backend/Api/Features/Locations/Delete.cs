@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
@@ -27,9 +28,14 @@ namespace Api.Features.Locations
         ]
         public override async Task<ActionResult> HandleAsync(int id, CancellationToken ct = new())
         {
-            var existingLocation = await _context.Locations.Where(l => l.Id == id).SingleOrDefaultAsync(ct);
+            var existingLocation = await _context.Locations
+                .Where(l => l.Id == id)
+                .Include(l => l.Detector)
+                .SingleOrDefaultAsync(ct);
 
-            if (existingLocation is null) return BadRequest("Location not found");
+            if (existingLocation is null) return NotFound();
+            if (existingLocation.Detector?.State == DetectorState.Running)
+                return BadRequest("The detector attached to the location is busy");
 
             _context.Locations.Remove(existingLocation);
             await _context.SaveChangesAsync(ct);

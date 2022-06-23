@@ -58,7 +58,7 @@ namespace Api.Features.Detectors
             CancellationToken ct = new())
         {
             var existingDetector = await _context.Detectors.FindAsync(new object[] { req.Id }, ct);
-            if (existingDetector is null) return BadRequest("Detector does not exist");
+            if (existingDetector is null) return NotFound();
 
             existingDetector.Name = req.Body.Name;
             await _context.SaveChangesAsync(ct);

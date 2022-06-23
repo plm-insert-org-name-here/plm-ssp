@@ -18,6 +18,8 @@ namespace Api
             public const string Update = "detectors/{id:int}";
             public const string Delete = "detectors/{id:int}";
             public const string SendCommand = "detectors/{id:int}/command";
+            public const string Attach = "detectors/{id:int}/attach";
+            public const string Detach = "detectors/{id:int}/detach";
             public const string Controller = "/detectors/controller";
         }
     }

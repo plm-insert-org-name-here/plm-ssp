@@ -58,7 +58,7 @@ namespace Api.Features.Locations
             CancellationToken ct = new())
         {
             var existingLocation = await _context.Locations.FindAsync(new object[] { req.Id }, ct);
-            if (existingLocation is null) return BadRequest("Location does not exist");
+            if (existingLocation is null) return NotFound();
 
             existingLocation.Name = req.Body.Name;
             await _context.SaveChangesAsync(ct);
