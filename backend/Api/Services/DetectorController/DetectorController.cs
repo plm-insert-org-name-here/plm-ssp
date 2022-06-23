@@ -20,17 +20,20 @@ namespace Api.Services.DetectorController
         private readonly DetectorControllerOptions _options;
         private readonly Context _context;
         private readonly DetectorCommandQueues _queues;
+        private readonly DetectorSnapshotCache _snapshotCache;
 
         public DetectorController(
             IConfiguration configuration,
             DetectorControllerOptions options,
             ILogger logger,
             Context context,
-            DetectorCommandQueues queues)
+            DetectorCommandQueues queues,
+            DetectorSnapshotCache snapshotCache)
         {
             _logger = logger;
             _context = context;
             _queues = queues;
+            _snapshotCache = snapshotCache;
 
             // not sure if this works in the ctor
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-6.0#bind-hierarchical-configuration-data-using-the-options-pattern
@@ -117,6 +120,12 @@ namespace Api.Services.DetectorController
                             await _context.SaveChangesAsync();
                             break;
                         }
+                        case DetectorCommandType.TakeSnapshot:
+                        {
+                            var snapshot = await ReceiveSnapshotAsync(webSocket);
+                            _snapshotCache.Set(detector.Id, snapshot);
+                            break;
+                        }
                     }
                 }
             }
@@ -160,6 +169,47 @@ namespace Api.Services.DetectorController
                 _logger.Debug("DetectorController.Send timed out. Message: {Message}", ex.Message);
                 throw new WebSocketException(WebSocketError.Faulted);
             }
+        }
+
+        private async Task<byte[]> ReceiveSnapshotAsync(WebSocket webSocket)
+        {
+            var image = new byte[_options.SnapshotBufferSize];
+            var tempBuffer = new byte[_options.SnapshotBufferSize];
+            var imageSize = 0;
+
+            while (true)
+            {
+                try
+                {
+                    var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(tempBuffer),
+                        new CancellationTokenSource(_options.TimeoutMilliseconds).Token);
+
+                    _logger.Warning("Result: {@Res}", result);
+                    if (webSocket.State == WebSocketState.CloseReceived)
+                    {
+                        await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null,
+                            new CancellationTokenSource(_options.TimeoutMilliseconds).Token);
+                        throw new WebSocketException(WebSocketError.Success);
+                    }
+
+                    var size = result.Count;
+
+                    // TODO: handle overflow?
+                    Array.Copy(tempBuffer, 0, image, imageSize, size);
+                    imageSize += size;
+
+                    if (result.EndOfMessage)
+                    {
+                        return image.Take(imageSize).ToArray();
+                    }
+                }
+                catch (OperationCanceledException ex)
+                {
+                    _logger.Warning("DetectorController.ReceiveSnapshot timed out. Message: {Message}", ex.Message);
+                    throw new WebSocketException(WebSocketError.Faulted);
+                }
+            }
+
         }
 
         private async Task<string> ReceiveTextAsync(WebSocket webSocket)

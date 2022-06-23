@@ -5,11 +5,32 @@ import asyncio
 import websockets
 import ssl
 import logging
+import cv2
+from time import sleep
 
 # logger = logging.getLogger("asyncio")
 
-def get_response(req):
-    if req == 'Ping':
+def get_snapshot():
+    camera = cv2.VideoCapture(0)
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+    # Capture a couple frames before taking the snapshot to make sure
+    # the camera exposure or whatever is stabilized
+    for _ in range(10):
+        camera.read()
+
+    s, image = camera.read()
+    if not s:
+        raise Exception('Cannot acquire image')
+    success, image_bmp = cv2.imencode(".bmp", image)
+    if not success:
+        raise Exception('Cannot encode to BMP')
+
+    return bytes(image_bmp)
+
+def get_response(cmd):
+    if cmd == 'Ping':
         return 'Pong'
     else:
         return 'Ok'
@@ -22,6 +43,8 @@ async def hello():
             try:
                 cmd = await websocket.recv()
                 await websocket.send(get_response(cmd))
+                if cmd == "TakeSnapshot":
+                    await websocket.send(get_snapshot())
 
             except websockets.exceptions.ConnectionClosedError as ex:
                 print(ex)

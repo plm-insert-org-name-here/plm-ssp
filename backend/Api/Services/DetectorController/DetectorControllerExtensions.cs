@@ -16,6 +16,7 @@ namespace Api.Services.DetectorController
         public static IServiceCollection AddDetectorControllerWebSocket(this IServiceCollection services)
         {
             services.AddSingleton<DetectorCommandQueues>();
+            services.AddSingleton<DetectorSnapshotCache>();
             services.AddScoped<DetectorController>();
             services.AddScoped<DetectorControllerOptions>();
 
