@@ -20,7 +20,7 @@ namespace Api.Services.DetectorController
         private readonly DetectorControllerOptions _options;
         private readonly Context _context;
         private readonly DetectorCommandQueues _queues;
-        private readonly DetectorSnapshotCache _snapshotCache;
+        private readonly LocationSnapshotCache _snapshotCache;
 
         public DetectorController(
             IConfiguration configuration,
@@ -28,7 +28,7 @@ namespace Api.Services.DetectorController
             ILogger logger,
             Context context,
             DetectorCommandQueues queues,
-            DetectorSnapshotCache snapshotCache)
+            LocationSnapshotCache snapshotCache)
         {
             _logger = logger;
             _context = context;
@@ -61,7 +61,7 @@ namespace Api.Services.DetectorController
             {
                 return PhysicalAddress.Parse(detectorAddressString);
             }
-            catch (FormatException _)
+            catch (FormatException)
             {
                 _logger.Warning("Connection attempt by detector with invalid MAC address: '{Mac}'", detectorAddressString);
                 await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid MAC address",
@@ -102,37 +102,68 @@ namespace Api.Services.DetectorController
 
                     var command = queue.Dequeue();
 
-                    _logger.Debug("Sending '{Cmd}' to detector (id: {Id})", command, detector.Id);
-                    var result = await SendCommandWithVerificationAsync(webSocket, command);
+                    var result = await CheckPreconditions(detector, command);
                     if (!result) continue;
 
-                    switch (command.Type)
-                    {
-                        case DetectorCommandType.StartStreaming:
-                        {
-                            detector.State = DetectorState.Running;
-                            await _context.SaveChangesAsync();
-                            break;
-                        }
-                        case DetectorCommandType.StopStreaming:
-                        {
-                            detector.State = DetectorState.Standby;
-                            await _context.SaveChangesAsync();
-                            break;
-                        }
-                        case DetectorCommandType.TakeSnapshot:
-                        {
-                            var snapshot = await ReceiveSnapshotAsync(webSocket);
-                            _snapshotCache.Set(detector.Id, snapshot);
-                            break;
-                        }
-                    }
+                    _logger.Debug("Sending '{Cmd}' to detector (id: {Id})", command, detector.Id);
+                    result = await SendCommandWithVerificationAsync(webSocket, command);
+                    if (!result) continue;
+
+                    await PerformStateChanges(webSocket, detector, command);
                 }
             }
             catch (WebSocketException ex)
             {
                 _logger.Information("Lost connection to detector (id: {Id}). WebSocket error code: {@WsErr}",
                     detector.Id, ex.WebSocketErrorCode);
+            }
+        }
+
+        private async Task<bool> CheckPreconditions(Detector detector, DetectorCommand command)
+        {
+            var actualDetector = await _context.Detectors
+                .Where(d => d.Id == detector.Id)
+                .Include(d => d.Location)
+                .SingleOrDefaultAsync();
+
+            if (command.Type == DetectorCommandType.TakeSnapshot)
+            {
+                _logger.Warning("Detector: {@D}", detector);
+                _logger.Warning("Actual detector: {@AD}", actualDetector);
+                return detector.Location is not null;
+            }
+
+            return true;
+        }
+
+        private async Task PerformStateChanges(WebSocket webSocket, Detector detector, DetectorCommand command)
+        {
+            switch (command.Type)
+            {
+                case DetectorCommandType.StartStreaming:
+                {
+                    detector.State = DetectorState.Running;
+                    await _context.SaveChangesAsync();
+                    break;
+                }
+                case DetectorCommandType.StopStreaming:
+                {
+                    detector.State = DetectorState.Standby;
+                    await _context.SaveChangesAsync();
+                    break;
+                }
+                case DetectorCommandType.TakeSnapshot:
+                {
+                    var snapshot = await ReceiveSnapshotAsync(webSocket);
+                    if (detector.Location is null)
+                    {
+                        // NOTE(rg): this is currently possible, e.g. if the Location was deleted
+                        // after CheckPreconditions returned
+                        break;
+                    }
+                    _snapshotCache.Set(detector.Location.Id, snapshot);
+                    break;
+                }
             }
         }
 
@@ -243,7 +274,10 @@ namespace Api.Services.DetectorController
         private async Task<Detector> RegisterDetector(PhysicalAddress macAddress)
         {
             var existingDetector =
-                await _context.Detectors.Where(d => d.MacAddress.Equals(macAddress)).SingleOrDefaultAsync();
+                await _context.Detectors
+                    .Where(d => d.MacAddress.Equals(macAddress))
+                    .Include(d => d.Location)
+                    .SingleOrDefaultAsync();
             if (existingDetector is not null)
             {
                 _logger.Information("Detector (id: {Id}) connected", existingDetector.Id);

@@ -32,7 +32,7 @@ namespace Api.Services.DetectorController
             {
                 _queues.Add(key, queue);
             }
-            catch (ArgumentException _)
+            catch (ArgumentException)
             {
                 _logger.Debug("Command queue for detector (id: {Id}) already exists", key);
             }

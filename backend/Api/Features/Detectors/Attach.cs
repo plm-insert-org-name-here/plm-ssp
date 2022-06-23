@@ -5,6 +5,7 @@ using Api.Infrastructure.Database;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Features.Detectors

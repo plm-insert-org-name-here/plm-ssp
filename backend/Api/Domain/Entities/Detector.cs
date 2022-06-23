@@ -2,7 +2,7 @@ using System.Net.NetworkInformation;
 
 namespace Api.Domain.Entities
 {
-    public class Detector : IBaseEntity
+    public class Detector : BaseEntity
     {
         public string Name { get; set; } = default!;
         public PhysicalAddress MacAddress { get; set; } = default!;

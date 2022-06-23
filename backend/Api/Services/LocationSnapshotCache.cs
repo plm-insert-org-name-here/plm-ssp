@@ -1,11 +1,18 @@
 using System.Collections.Generic;
-namespace Api.Services.DetectorController
+
+namespace Api.Services
 {
-    public class DetectorSnapshotCache
+    public class LocationSnapshotCache
     {
         private readonly Dictionary<int, byte[]> _snapshots = new();
 
-        public byte[] this[int index] => _snapshots[index];
+        public byte[]? Get(int id)
+        {
+            if (_snapshots.ContainsKey(id))
+                return _snapshots[id];
+
+            return null;
+        }
 
         public void Set(int id, byte[] newSnapshot)
         {
@@ -19,6 +26,5 @@ namespace Api.Services.DetectorController
         {
             return _snapshots.Remove(id);
         }
-
     }
 }

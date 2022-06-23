@@ -29,7 +29,6 @@
 
     <ItemGroup>
       <Folder Include="Features\Events" />
-      <Folder Include="Features\Jobs" />
       <Folder Include="Features\Tasks" />
       <Folder Include="Features\Templates" />
     </ItemGroup>

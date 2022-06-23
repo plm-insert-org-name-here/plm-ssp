@@ -22,5 +22,10 @@ namespace Api
             public const string Detach = "detectors/{id:int}/detach";
             public const string Controller = "/detectors/controller";
         }
+
+        public static class Jobs
+        {
+            public const string Create = "jobs";
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Api.Infrastructure.Database;
+using Api.Services;
 using Api.Services.DetectorController;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -41,12 +42,17 @@ namespace Api
                 configuration.CustomSchemaIds(x => x.FullName);
             });
 
+            services.AddSingleton<LocationSnapshotCache>();
             services.AddDetectorControllerWebSocket();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
             IConfigurationProvider mapperConfiguration)
         {
+            // TODO(rg): set all Detectors to OFF state
+            // if the backend is abruptly terminated, the states should be reset;
+            // the detectors will reconnect, at which point the states will be restored
+
             if (env.IsDevelopment())
             {
                 app.InitializeDatabase();
