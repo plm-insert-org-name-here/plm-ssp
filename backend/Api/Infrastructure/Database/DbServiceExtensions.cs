@@ -28,7 +28,11 @@ namespace Api.Infrastructure.Database
         public static void InitializeDatabase(this IApplicationBuilder app)
         {
             var scope = app.ApplicationServices.CreateScope();
+
             DbInitializer.Initialize(scope);
+            DbInitializer.ResetDetectorStates(scope);
         }
+
+
     }
 }

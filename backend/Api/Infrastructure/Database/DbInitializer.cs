@@ -1,5 +1,6 @@
 using System.Net.NetworkInformation;
 using Api.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -7,7 +8,6 @@ namespace Api.Infrastructure.Database
 {
     public static class DbInitializer
     {
-
         private static Location[] InitialLocations =
         {
             new()
@@ -57,7 +57,7 @@ namespace Api.Infrastructure.Database
 
         public static void Initialize(IServiceScope scope)
         {
-            using var context = scope.ServiceProvider.GetRequiredService<Context>();
+            var context = scope.ServiceProvider.GetRequiredService<Context>();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger>();
 
             if (context.Database.CanConnect()) return;
@@ -71,6 +71,17 @@ namespace Api.Infrastructure.Database
 
             context.SaveChanges();
             logger.Debug("Database initialization finished");
+        }
+
+        public static void ResetDetectorStates(IServiceScope scope)
+        {
+            var context = scope.ServiceProvider.GetRequiredService<Context>();
+
+            // NOTE(rg): Raw SQL for efficient bulk update
+            // https://docs.microsoft.com/en-us/ef/core/performance/efficient-updating
+            // Proper support for bulk updates is coming in 7.0:
+            // https://docs.microsoft.com/en-us/ef/core/what-is-new/ef-core-7.0/plan#bulk-updates
+            context.Database.ExecuteSqlRaw("UPDATE Detectors SET State = 0");
         }
     }
 }

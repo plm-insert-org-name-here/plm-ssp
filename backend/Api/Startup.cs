@@ -49,10 +49,6 @@ namespace Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
             IConfigurationProvider mapperConfiguration)
         {
-            // TODO(rg): set all Detectors to OFF state
-            // if the backend is abruptly terminated, the states should be reset;
-            // the detectors will reconnect, at which point the states will be restored
-
             if (env.IsDevelopment())
             {
                 app.InitializeDatabase();
