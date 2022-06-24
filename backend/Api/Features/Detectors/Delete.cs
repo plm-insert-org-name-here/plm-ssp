@@ -11,7 +11,9 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Features.Detectors
 {
-    public class Delete : EndpointBaseAsync.WithRequest<Delete.Req>.WithActionResult
+    public class Delete : EndpointBaseAsync
+        .WithRequest<Delete.Req>
+        .WithActionResult
     {
         private readonly Context _context;
 
@@ -22,7 +24,7 @@ namespace Api.Features.Detectors
 
         public class Req
         {
-            [FromRoute( Name = "id")] public int Id { get; set; }
+            [FromRoute(Name = "id")] public int Id { get; set; }
         }
 
         public class Validator : AbstractValidator<Req>

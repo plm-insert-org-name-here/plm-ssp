@@ -5,6 +5,7 @@ using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Services;
 using Ardalis.ApiEndpoints;
+using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,24 +15,37 @@ namespace Api.Features.Jobs
 {
     public class Create : EndpointBaseAsync
         .WithRequest<Create.Req>
-        .WithActionResult
+        .WithActionResult<Create.Res>
     {
         private readonly Context _context;
         private readonly LocationSnapshotCache _snapshotCache;
+        private readonly IMapper _mapper;
 
-        public Create(Context context, LocationSnapshotCache snapshotCache)
+
+        public Create(Context context, LocationSnapshotCache snapshotCache, IMapper mapper)
         {
             _context = context;
             _snapshotCache = snapshotCache;
+            _mapper = mapper;
         }
 
         public record Req(string Name, JobType Type, int LocationId);
+
+        public record Res(int Id, string Name, JobType Type, int LocationId);
 
         public class Validator : AbstractValidator<Req>
         {
             public Validator()
             {
                 RuleFor(j => j.Name).MaximumLength(64);
+            }
+        }
+
+        private class MappingProfile : Profile
+        {
+            public MappingProfile()
+            {
+                CreateMap<Job, Res>();
             }
         }
 
@@ -42,7 +56,7 @@ namespace Api.Features.Jobs
             OperationId = "Jobs.Create",
             Tags = new[] { "Jobs" })
         ]
-        public override async Task<ActionResult> HandleAsync(Req req, CancellationToken ct = new())
+        public override async Task<ActionResult<Res>> HandleAsync(Req req, CancellationToken ct = new())
         {
             var location = await _context.Locations
                 .Where(l => l.Id == req.LocationId)
@@ -58,9 +72,18 @@ namespace Api.Features.Jobs
             if (snapshot is null)
                 return BadRequest("No snapshot has been yet taken on the location");
 
-            // TODO(rg)
+            var job = new Job
+            {
+                Name = req.Name,
+                Type = req.Type,
+                Location = location,
+                Snapshot = snapshot
+            };
 
-            return NoContent();
+            await _context.Jobs.AddAsync(job, ct);
+            await _context.SaveChangesAsync(ct);
+
+            return CreatedAtRoute(Routes.Jobs.GetById, new { job.Id }, _mapper.Map<Res>(job));
         }
     }
 }
