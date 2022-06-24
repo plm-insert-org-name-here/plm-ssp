@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +10,7 @@ namespace Api.Infrastructure.Database
     {
         public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<Context>(options =>
+            Action<DbContextOptionsBuilder> dbOptions = options =>
             {
                 options.EnableSensitiveDataLogging();
 
@@ -17,7 +18,11 @@ namespace Api.Infrastructure.Database
                 var serverVersion = ServerVersion.AutoDetect(connString);
 
                 options.UseMySql(connString, serverVersion);
-            });
+
+            };
+
+            services.AddDbContext<Context>(dbOptions, optionsLifetime: ServiceLifetime.Singleton);
+            services.AddDbContextFactory<Context>(dbOptions);
         }
 
         public static void InitializeDatabase(this IApplicationBuilder app)

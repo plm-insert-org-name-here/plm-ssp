@@ -13,13 +13,13 @@ namespace Api.Infrastructure.Database
         {
         }
 
-        public DbSet<Detector> Detectors { get; set; } = default!;
-        public DbSet<Event> Events { get; set; } = default!;
-        public DbSet<Job> Jobs { get; set; } = default!;
-        public DbSet<Location> Locations { get; set; } = default!;
-        public DbSet<Task> Tasks { get; set; } = default!;
-        public DbSet<TaskResult> TaskResults { get; set; } = default!;
-        public DbSet<Template> Templates { get; set; } = default!;
+        public DbSet<Detector> Detectors => Set<Detector>();
+        public DbSet<Event> Events => Set<Event>();
+        public DbSet<Job> Jobs => Set<Job>();
+        public DbSet<Location> Locations => Set<Location>();
+        public DbSet<Task> Tasks => Set<Task>();
+        public DbSet<TaskResult> TaskResults => Set<TaskResult>();
+        public DbSet<Template> Templates => Set<Template>();
 
     }
 }

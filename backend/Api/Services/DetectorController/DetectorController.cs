@@ -18,7 +18,7 @@ namespace Api.Services.DetectorController
     {
         private readonly ILogger _logger;
         private readonly DetectorControllerOptions _options;
-        private readonly Context _context;
+        private readonly IDbContextFactory<Context> _contextFactory;
         private readonly DetectorCommandQueues _queues;
         private readonly LocationSnapshotCache _snapshotCache;
 
@@ -26,14 +26,14 @@ namespace Api.Services.DetectorController
             IConfiguration configuration,
             DetectorControllerOptions options,
             ILogger logger,
-            Context context,
             DetectorCommandQueues queues,
-            LocationSnapshotCache snapshotCache)
+            LocationSnapshotCache snapshotCache,
+            IDbContextFactory<Context> contextFactory)
         {
             _logger = logger;
-            _context = context;
             _queues = queues;
             _snapshotCache = snapshotCache;
+            _contextFactory = contextFactory;
 
             // not sure if this works in the ctor
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-6.0#bind-hierarchical-configuration-data-using-the-options-pattern
@@ -47,11 +47,11 @@ namespace Api.Services.DetectorController
             var detectorAddress = await ReceiveMacAddress(webSocket);
             if (detectorAddress is null) return;
 
-            var detector = await RegisterDetector(detectorAddress);
+            var detectorId = await RegisterDetector(detectorAddress);
 
-            await HandleCommandLoop(webSocket, detector);
+            await HandleCommandLoop(webSocket, detectorId);
 
-            await DisconnectDetector(detector);
+            await DisconnectDetector(detectorId);
         }
 
         private async Task<PhysicalAddress?> ReceiveMacAddress(WebSocket webSocket)
@@ -70,17 +70,21 @@ namespace Api.Services.DetectorController
             }
         }
 
-        private async Task DisconnectDetector(Detector detector)
+        private async Task DisconnectDetector(int detectorId)
         {
-            _logger.Information("Detector (id: {Id}) disconnected", detector.Id);
-            _queues.RemoveQueue(detector.Id);
+            await using var context = _contextFactory.CreateDbContext();
+
+            var detector = await context.Detectors.SingleOrDefaultAsync(d => d.Id == detectorId);
+
+            _logger.Information("Detector (id: {Id}) disconnected", detectorId);
+            _queues.RemoveQueue(detectorId);
             detector.State = DetectorState.Off;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
-        private async Task HandleCommandLoop(WebSocket webSocket, Detector detector)
+        private async Task HandleCommandLoop(WebSocket webSocket, int detectorId)
         {
-            var queue = _queues.AddQueue(detector.Id);
+            var queue = _queues.AddQueue(detectorId);
 
             try
             {
@@ -91,7 +95,7 @@ namespace Api.Services.DetectorController
                         // TODO(rg): use BlockingConnection<T> or smth
                         queue.EnqueueEvent.WaitOne(_options.PingMilliseconds);
                         const DetectorCommandType ping = DetectorCommandType.Ping;
-                        _logger.Debug("Sending '{Ping}' to detector (id: {Id})", ping, detector.Id);
+                        _logger.Debug("Sending '{Ping}' to detector (id: {Id})", ping, detectorId);
                         var pingResult = await SendCommandWithVerificationAsync(webSocket, ping);
                         if (!pingResult)
                         {
@@ -101,6 +105,12 @@ namespace Api.Services.DetectorController
                     }
 
                     var command = queue.Dequeue();
+                    await using var context = _contextFactory.CreateDbContext();
+
+                    var detector = await context.Detectors
+                        .Where(d => d.Id == detectorId)
+                        .Include(d => d.Location)
+                        .SingleOrDefaultAsync();
 
                     var result = await CheckPreconditions(detector, command);
                     if (!result) continue;
@@ -109,47 +119,44 @@ namespace Api.Services.DetectorController
                     result = await SendCommandWithVerificationAsync(webSocket, command);
                     if (!result) continue;
 
-                    await PerformStateChanges(webSocket, detector, command);
+                    await PerformStateChanges(webSocket, context, detector, command);
                 }
             }
             catch (WebSocketException ex)
             {
                 _logger.Information("Lost connection to detector (id: {Id}). WebSocket error code: {@WsErr}",
-                    detector.Id, ex.WebSocketErrorCode);
+                    detectorId, ex.WebSocketErrorCode);
             }
         }
 
         private async Task<bool> CheckPreconditions(Detector detector, DetectorCommand command)
         {
-            var actualDetector = await _context.Detectors
-                .Where(d => d.Id == detector.Id)
-                .Include(d => d.Location)
-                .SingleOrDefaultAsync();
-
             if (command.Type == DetectorCommandType.TakeSnapshot)
             {
-                _logger.Warning("Detector: {@D}", detector);
-                _logger.Warning("Actual detector: {@AD}", actualDetector);
                 return detector.Location is not null;
             }
 
             return true;
         }
 
-        private async Task PerformStateChanges(WebSocket webSocket, Detector detector, DetectorCommand command)
+        private async Task PerformStateChanges(
+            WebSocket webSocket,
+            Context context,
+            Detector detector,
+            DetectorCommand command)
         {
             switch (command.Type)
             {
                 case DetectorCommandType.StartStreaming:
                 {
                     detector.State = DetectorState.Running;
-                    await _context.SaveChangesAsync();
+                    await context.SaveChangesAsync();
                     break;
                 }
                 case DetectorCommandType.StopStreaming:
                 {
                     detector.State = DetectorState.Standby;
-                    await _context.SaveChangesAsync();
+                    await context.SaveChangesAsync();
                     break;
                 }
                 case DetectorCommandType.TakeSnapshot:
@@ -215,7 +222,6 @@ namespace Api.Services.DetectorController
                     var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(tempBuffer),
                         new CancellationTokenSource(_options.TimeoutMilliseconds).Token);
 
-                    _logger.Warning("Result: {@Res}", result);
                     if (webSocket.State == WebSocketState.CloseReceived)
                     {
                         await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null,
@@ -271,10 +277,12 @@ namespace Api.Services.DetectorController
         }
 
 
-        private async Task<Detector> RegisterDetector(PhysicalAddress macAddress)
+        private async Task<int> RegisterDetector(PhysicalAddress macAddress)
         {
+            await using var context = _contextFactory.CreateDbContext();
+
             var existingDetector =
-                await _context.Detectors
+                await context.Detectors
                     .Where(d => d.MacAddress.Equals(macAddress))
                     .Include(d => d.Location)
                     .SingleOrDefaultAsync();
@@ -282,8 +290,8 @@ namespace Api.Services.DetectorController
             {
                 _logger.Information("Detector (id: {Id}) connected", existingDetector.Id);
                 existingDetector.State = DetectorState.Standby;
-                await _context.SaveChangesAsync();
-                return existingDetector;
+                await context.SaveChangesAsync();
+                return existingDetector.Id;
             }
 
             var detector = new Detector
@@ -293,11 +301,11 @@ namespace Api.Services.DetectorController
                 State = DetectorState.Standby,
             };
 
-            await _context.Detectors.AddAsync(detector);
-            await _context.SaveChangesAsync();
+            await context.Detectors.AddAsync(detector);
+            await context.SaveChangesAsync();
             _logger.Information("Registered new detector with MAC address '{Mac}' (id: {Id})", macAddress, detector.Id);
 
-            return detector;
+            return detector.Id;
         }
     }
 }
