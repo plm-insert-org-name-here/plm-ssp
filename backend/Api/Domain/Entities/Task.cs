@@ -7,7 +7,12 @@ namespace Api.Domain.Entities
         public string Name { get; set; } = default!;
         public bool Ordered { get; set; }
         public TaskStatus Status { get; set; }
+
+        public Job Job { get; set; } = default!;
+        public int JobId { get; set; }
+
         public List<Template>? Templates { get; set; }
+
     }
 
     public enum TaskStatus

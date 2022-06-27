@@ -1,14 +1,16 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Infrastructure.Validation;
 using Ardalis.ApiEndpoints;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Api.Features.Detectors
+namespace Api.Features.Jobs
 {
     public class Update : EndpointBaseAsync
         .WithRequest<Update.Req>
@@ -16,6 +18,7 @@ namespace Api.Features.Detectors
     {
         private readonly Context _context;
         private readonly IValidator<Req> _validator;
+
         public Update(Context context, IValidator<Req> validator)
         {
             _context = context;
@@ -27,7 +30,7 @@ namespace Api.Features.Detectors
             [FromRoute(Name = "id")] public int Id { get; set; }
             [FromBody] public ReqBody Body { get; set; } = default!;
 
-            public record ReqBody(string Name);
+            public record ReqBody(string Name, JobType? Type);
         }
 
         public class Validator : AbstractValidator<Req>
@@ -38,22 +41,23 @@ namespace Api.Features.Detectors
             {
                 _context = context;
 
-                RuleFor(d => d.Body.Name).MaximumLength(64).NotEmpty();
-                RuleFor(d => d).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+                RuleFor(j => j.Body.Name).NotEmpty().MaximumLength(64);
+                RuleFor(j => j).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+                RuleFor(j => j.Body.Type).NotNull();
             }
 
             private bool HaveUniqueName(Req req) =>
-                _context.Detectors
-                    .Where(d => d.Id != req.Id)
-                    .All(d => d.Name != req.Body.Name);
+                _context.Jobs
+                    .Where(j => j.Id != req.Id)
+                    .All(j => j.Name != req.Body.Name);
         }
 
-        [HttpPut(Routes.Detectors.Update)]
+        [HttpPut(Routes.Jobs.Update)]
         [SwaggerOperation(
-            Summary = "Update an existing detector",
-            Description = "Update an existing detector",
-            OperationId = "Detectors.Update",
-            Tags = new[] { "Detectors" })
+            Summary = "Update an existing job",
+            Description = "Update an existing job",
+            OperationId = "Jobs.Update",
+            Tags = new[] { "Jobs" })
         ]
         public override async Task<ActionResult> HandleAsync(
             [FromRoute] Req req,
@@ -63,14 +67,22 @@ namespace Api.Features.Detectors
             if (!validation.IsValid)
                 return ValidationProblem();
 
-            var existingDetector = await _context.Detectors.FindAsync(new object[] { req.Id }, ct);
-            if (existingDetector is null) return NotFound();
+            var job = await _context.Jobs
+                .Where(j => j.Id == req.Id)
+                .Include(j => j.Location!)
+                .ThenInclude(l => l.Detector)
+                .SingleOrDefaultAsync(ct);
 
-            existingDetector.Name = req.Body.Name;
+            if (job is null) return NotFound();
+            if (job.Location?.Detector?.State == DetectorState.Running)
+                return BadRequest("The detector attached to the location of the job is busy");
+
+            job.Name = req.Body.Name;
+            // TODO(rg): if there are no tasks
+            job.Type = req.Body.Type!.Value;
+
             await _context.SaveChangesAsync(ct);
-
             return NoContent();
         }
-
     }
 }

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
+using Api.Infrastructure.Validation;
 using Ardalis.ApiEndpoints;
 using AutoMapper;
 using FluentValidation;
@@ -17,14 +18,16 @@ namespace Api.Features.Locations
     {
         private readonly Context _context;
         private readonly IMapper _mapper;
+        private readonly IValidator<Req> _validator;
 
         public record Req(string Name);
         public record Res(int Id, string Name);
 
-        public Create(Context context, IMapper mapper)
+        public Create(Context context, IMapper mapper, IValidator<Req> validator)
         {
             _context = context;
             _mapper = mapper;
+            _validator = validator;
         }
 
         public class Validator : AbstractValidator<Req>
@@ -34,8 +37,9 @@ namespace Api.Features.Locations
             {
                 _context = context;
 
-                RuleFor(l => l.Name).MaximumLength(64);
+                RuleFor(l => l.Name).MaximumLength(64).NotEmpty();
                 RuleFor(l => l).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+
             }
             private bool HaveUniqueName(Req req) => _context.Locations.All(l => l.Name != req.Name);
         }
@@ -57,6 +61,10 @@ namespace Api.Features.Locations
         ]
         public override async Task<ActionResult<Res>> HandleAsync(Req req, CancellationToken ct = new())
         {
+            var validation = await _validator.ValidateToModelStateAsync(req, ModelState, ct);
+            if (!validation.IsValid)
+                return ValidationProblem();
+
             var location = new Location
             {
                 Name = req.Name

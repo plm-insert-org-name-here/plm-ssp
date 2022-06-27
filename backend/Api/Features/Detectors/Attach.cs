@@ -2,10 +2,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Infrastructure.Database;
+using Api.Infrastructure.Validation;
 using Ardalis.ApiEndpoints;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Features.Detectors
@@ -15,10 +16,12 @@ namespace Api.Features.Detectors
         .WithActionResult
     {
         private readonly Context _context;
+        private readonly IValidator<Req> _validator;
 
-        public Attach(Context context)
+        public Attach(Context context, IValidator<Req> validator)
         {
             _context = context;
+            _validator = validator;
         }
 
         public class Req
@@ -28,6 +31,11 @@ namespace Api.Features.Detectors
             [FromBody] public ReqBody Body { get; set; } = default!;
 
             public record ReqBody(int LocationId);
+        }
+
+        public class Validator : AbstractValidator<Req>
+        {
+            public Validator() => RuleFor(d => d.Body.LocationId).NotEmpty();
         }
 
         [HttpPost(Routes.Detectors.Attach)]
@@ -41,6 +49,10 @@ namespace Api.Features.Detectors
             [FromRoute] Req req,
             CancellationToken ct = new())
         {
+            var validation = await _validator.ValidateToModelStateAsync(req, ModelState, ct);
+            if (!validation.IsValid)
+                return ValidationProblem();
+
             var detector = await _context.Detectors
                 .Where(d => d.Id == req.Id)
                 .Include(d => d.Location)

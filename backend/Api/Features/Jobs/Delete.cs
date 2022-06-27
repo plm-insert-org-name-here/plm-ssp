@@ -39,7 +39,7 @@ namespace Api.Features.Jobs
         {
             var job = await _context.Jobs
                 .Where(j => j.Id == req.Id)
-                .Include(j => j.Location)
+                .Include(j => j.Location!)
                 .ThenInclude(l => l.Detector)
                 .SingleOrDefaultAsync(ct);
 

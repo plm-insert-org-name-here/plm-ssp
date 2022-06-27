@@ -9,7 +9,6 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
-using Task = System.Threading.Tasks.Task;
 
 namespace Api.Features.Jobs
 {

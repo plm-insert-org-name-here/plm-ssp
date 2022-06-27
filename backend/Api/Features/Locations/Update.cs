@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Infrastructure.Database;
+using Api.Infrastructure.Validation;
 using Ardalis.ApiEndpoints;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,12 @@ namespace Api.Features.Locations
         .WithActionResult
     {
         private readonly Context _context;
+        private readonly IValidator<Req> _validator;
 
-        public Update(Context context)
+        public Update(Context context, IValidator<Req> validator)
         {
             _context = context;
+            _validator = validator;
         }
 
         public class Req
@@ -36,7 +39,7 @@ namespace Api.Features.Locations
             {
                 _context = context;
 
-                RuleFor(l => l.Body.Name).MaximumLength(64);
+                RuleFor(l => l.Body.Name).MaximumLength(64).NotEmpty();
                 RuleFor(l => l).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
             }
 
@@ -57,6 +60,10 @@ namespace Api.Features.Locations
             [FromRoute] Req req,
             CancellationToken ct = new())
         {
+            var validation = await _validator.ValidateToModelStateAsync(req, ModelState, ct);
+            if (!validation.IsValid)
+                return ValidationProblem();
+
             var existingLocation = await _context.Locations.FindAsync(new object[] { req.Id }, ct);
             if (existingLocation is null) return NotFound();
 

@@ -11,7 +11,7 @@ namespace Api.Domain.Entities
         public Location? Location { get; set; }
         public int? LocationId { get; set; }
 
-        public List<Task>? Tasks { get; set; }
+        public List<Task> Tasks { get; set; } = default!;
     }
 
     public enum JobType

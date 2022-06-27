@@ -1,15 +1,19 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
+using Api.Infrastructure.Validation;
 using Api.Services;
 using Ardalis.ApiEndpoints;
 using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
+using Task = Api.Domain.Entities.Task;
 
 namespace Api.Features.Jobs
 {
@@ -20,25 +24,38 @@ namespace Api.Features.Jobs
         private readonly Context _context;
         private readonly LocationSnapshotCache _snapshotCache;
         private readonly IMapper _mapper;
+        private readonly IValidator<Req> _validator;
+        private readonly ILogger _logger;
 
-
-        public Create(Context context, LocationSnapshotCache snapshotCache, IMapper mapper)
+        public Create(Context context, LocationSnapshotCache snapshotCache, IMapper mapper, IValidator<Req> validator, ILogger logger)
         {
             _context = context;
             _snapshotCache = snapshotCache;
             _mapper = mapper;
+            _validator = validator;
+            _logger = logger;
         }
 
-        public record Req(string Name, JobType Type, int LocationId);
+        public record Req(string Name, JobType? Type, int LocationId);
 
         public record Res(int Id, string Name, JobType Type, int LocationId);
 
         public class Validator : AbstractValidator<Req>
         {
-            public Validator()
+            private readonly Context _context;
+            public Validator(Context context)
             {
-                RuleFor(j => j.Name).MaximumLength(64);
+                _context = context;
+
+                RuleFor(j => j.Name).MaximumLength(64).NotEmpty();
+                // NOTE(rg): NotEmpty would reject the "0" enum value
+                RuleFor(j => j).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+                RuleFor(j => j.Type).NotNull();
+                RuleFor(j => j.LocationId).NotEmpty();
             }
+
+            private bool HaveUniqueName(Req req) =>
+                _context.Jobs.All(j => j.Name != req.Name);
         }
 
         private class MappingProfile : Profile
@@ -58,6 +75,11 @@ namespace Api.Features.Jobs
         ]
         public override async Task<ActionResult<Res>> HandleAsync(Req req, CancellationToken ct = new())
         {
+            _logger.Warning("Before validation: {@Req}", req);
+            var validation = await _validator.ValidateToModelStateAsync(req, ModelState, ct);
+            if (!validation.IsValid)
+                return ValidationProblem();
+
             var location = await _context.Locations
                 .Where(l => l.Id == req.LocationId)
                 .Include(l => l.Job)
@@ -66,7 +88,7 @@ namespace Api.Features.Jobs
 
             if (location is null) return NotFound();
             if (location.Job is not null)
-                return BadRequest("The specified location already has a Job associated with it");
+                return BadRequest("The specified location already has a Job associated with it") ;
 
             var snapshot = _snapshotCache.Get(location.Id);
             if (snapshot is null)
@@ -75,9 +97,10 @@ namespace Api.Features.Jobs
             var job = new Job
             {
                 Name = req.Name,
-                Type = req.Type,
+                Type = req.Type!.Value,
                 Location = location,
-                Snapshot = snapshot
+                Snapshot = snapshot,
+                Tasks = new List<Task>()
             };
 
             await _context.Jobs.AddAsync(job, ct);

@@ -39,9 +39,9 @@ namespace Api.Features.Jobs
             OperationId = "Jobs.GetAll",
             Tags = new[] { "Jobs" })
         ]
-        public override Task<List<Res>> HandleAsync(CancellationToken ct = new())
+        public override async Task<List<Res>> HandleAsync(CancellationToken ct = new())
         {
-            return _context.Jobs.ProjectTo<Res>(_mapperConfig).ToListAsync(ct);
+            return await _context.Jobs.ProjectTo<Res>(_mapperConfig).ToListAsync(ct);
         }
     }
 }

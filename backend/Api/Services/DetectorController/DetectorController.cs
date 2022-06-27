@@ -112,7 +112,7 @@ namespace Api.Services.DetectorController
                         .Include(d => d.Location)
                         .SingleOrDefaultAsync();
 
-                    var result = await CheckPreconditions(detector, command);
+                    var result = CheckPreconditions(detector, command);
                     if (!result) continue;
 
                     _logger.Debug("Sending '{Cmd}' to detector (id: {Id})", command, detector.Id);
@@ -129,7 +129,7 @@ namespace Api.Services.DetectorController
             }
         }
 
-        private async Task<bool> CheckPreconditions(Detector detector, DetectorCommand command)
+        private bool CheckPreconditions(Detector detector, DetectorCommand command)
         {
             if (command.Type == DetectorCommandType.TakeSnapshot)
             {

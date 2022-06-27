@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using Api.Infrastructure.Database;
 using Api.Services;
 using Api.Services.DetectorController;
-using FluentValidation.AspNetCore;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,16 +23,15 @@ namespace Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // services.AddHostedService<DetectorImageProcessorService>();
+
             services.AddControllers()
                 .AddJsonOptions(opts =>
                 {
                     opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                })
-                .AddFluentValidation(configuration =>
-                {
-                    configuration.RegisterValidatorsFromAssemblyContaining<Startup>();
-                    configuration.DisableDataAnnotationsValidation = true;
                 });
+
+            services.AddValidatorsFromAssemblyContaining<Startup>();
             services.AddDatabase(Configuration);
             services.AddAutoMapper(typeof(Startup));
             services.AddAuthorization();
@@ -53,7 +52,10 @@ namespace Api
             {
                 app.InitializeDatabase();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "PLM API V1"); });
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PLM API V1");
+                });
             }
 
             mapperConfiguration.AssertConfigurationIsValid();
