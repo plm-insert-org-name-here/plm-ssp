@@ -23,7 +23,7 @@ namespace Api.Features.Locations
             _mapperConfig = mapperConfig;
         }
 
-        public record Res(string Name);
+        public record Res(int Id, string Name);
 
         private class MappingProfile : Profile
         {

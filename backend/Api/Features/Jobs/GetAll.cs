@@ -25,7 +25,7 @@ namespace Api.Features.Jobs
             _mapperConfig = mapperConfig;
         }
 
-        public record Res(string Name, JobType Type);
+        public record Res(int Id, string Name, JobType Type);
 
         private class MappingProfile : Profile
         {

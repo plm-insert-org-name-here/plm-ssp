@@ -28,6 +28,7 @@ namespace Api.Features.Locations
 
         public class Res
         {
+            public int Id { get; set; }
             public string Name { get; set; } = default!;
             [JsonPropertyName("Detector")]
             public Detector? AttachedDetector { get; set; }

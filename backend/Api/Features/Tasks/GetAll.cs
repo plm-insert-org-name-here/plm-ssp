@@ -25,7 +25,7 @@ namespace Api.Features.Tasks
             _context = context;
         }
 
-        public record Res(string Name, bool Ordered);
+        public record Res(int Id, string Name, bool Ordered);
 
         private class MappingProfile : Profile
         {
