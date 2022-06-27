@@ -11,7 +11,7 @@ namespace Api.Domain.Entities
         public Job Job { get; set; } = default!;
         public int JobId { get; set; }
 
-        public List<Template>? Templates { get; set; }
+        public List<Template> Templates { get; set; } = default!;
 
     }
 

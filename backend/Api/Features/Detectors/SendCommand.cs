@@ -66,7 +66,7 @@ namespace Api.Features.Detectors
             if (detector is null) return NotFound();
             if (detector.State is DetectorState.Off) return BadRequest("The specified detector is offline");
 
-            var result = _queues.EnqueueCommand(detector.Id, req.Body.Command);
+            var result = _queues.EnqueueCommand(detector.Id, req.Body.Command!);
             if (!result) return Problem("Detector is online, but its command queue does not exist");
 
             return NoContent();

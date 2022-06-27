@@ -31,5 +31,14 @@ namespace Api
             public const string Update = "jobs/{id:int}";
             public const string Delete = "jobs/{id:int}";
         }
+
+        public static class Tasks
+        {
+            public const string GetAll = "tasks";
+            public const string GetById = "tasks/{id:int}";
+            public const string Create = "tasks";
+            public const string Update = "tasks/{id:int}";
+            public const string Delete = "tasks/{id:int}";
+        }
     }
 }
