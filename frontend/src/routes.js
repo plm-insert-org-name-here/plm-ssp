@@ -3,5 +3,5 @@ const api = origin + "/api/v1";
 
 export const Routes = {
     locations: api + "/locations",
-    detectors: api + "/detectors"
-}
+    detectors: api + "/detectors",
+};

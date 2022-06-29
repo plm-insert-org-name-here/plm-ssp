@@ -1,11 +1,12 @@
-import React from 'react';
-import {Box, List, ListItem, ListItemText, Paper} from "@mui/material";
+import React from "react";
 
-const Detectors = ({detectors}) => {
+import { Box, List, ListItem, ListItemText } from "@mui/material";
+
+const Detectors = ({ detectors }) => {
     return (
-        <Box sx={{flexGrow: 1, height: 0}}>
-            <List sx={{height: '100%', overflowY: 'auto'}}>
-                {detectors.map(d => (
+        <Box sx={{ flexGrow: 1, height: 0 }}>
+            <List sx={{ height: "100%", overflowY: "auto" }}>
+                {detectors.map((d) => (
                     <ListItem key={d.id}>
                         <ListItemText>{d.name}</ListItemText>
                     </ListItem>
@@ -13,6 +14,6 @@ const Detectors = ({detectors}) => {
             </List>
         </Box>
     );
-}
+};
 
 export default Detectors;

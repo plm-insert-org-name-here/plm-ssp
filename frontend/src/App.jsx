@@ -1,13 +1,15 @@
-import {useState, useEffect, useCallback, useRef} from "react";
-import {useSnackbar} from "notistack";
-import "./App.css";
 import axios from "axios";
-import Infrastructure from "./components/infra/Infrastructure";
-import {Grid} from "@mui/material";
-import Main from "./components/main/Main";
-import {BrowserRouter, Route, Switch} from "react-router-dom";
+import { useSnackbar } from "notistack";
+import { useEffect } from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+
+import { Grid } from "@mui/material";
+
+import "./App.css";
 import AppBar from "./common/appbar/AppBar";
 import About from "./components/about/About";
+import Infrastructure from "./components/infra/Infrastructure";
+import Main from "./components/main/Main";
 
 const setupAxiosInterceptors = (
     onBadRequest,
@@ -28,13 +30,13 @@ const setupAxiosInterceptors = (
 };
 
 function App() {
-    const {enqueueSnackbar} = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         setupAxiosInterceptors(
             (err) => {
                 // TODO(rg): error formatting
-                enqueueSnackbar(err.response.data.status, {variant: "error"});
+                enqueueSnackbar(err.response.data.status, { variant: "error" });
                 console.log(err);
             },
             () => {
@@ -50,27 +52,27 @@ function App() {
                 });
             },
             () => {
-                enqueueSnackbar("An internal server error occurred", {variant: "error"});
+                enqueueSnackbar("An internal server error occurred", { variant: "error" });
             }
         );
     }, []);
 
     return (
         <>
-            <AppBar/>
+            <AppBar />
             <BrowserRouter>
                 <Switch>
                     <Route path="/" exact>
-                        <Grid container sx={{p: 1, height: "100vh"}}>
+                        <Grid container sx={{ p: 1, height: "100vh" }}>
                             <Grid item xs={12} md={4} lg={3} display="flex">
-                                <Infrastructure/>
+                                <Infrastructure />
                             </Grid>
                             <Grid item xs={12} md={8} lg={9} display="flex">
-                                <Main/>
+                                <Main />
                             </Grid>
                         </Grid>
                     </Route>
-                    <Route path="/about" render={() => <About />}/>
+                    <Route path="/about" render={() => <About />} />
                 </Switch>
             </BrowserRouter>
         </>

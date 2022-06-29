@@ -1,18 +1,18 @@
+import { SnackbarProvider } from "notistack";
 import React from "react";
 import ReactDOM from "react-dom";
 
+import { CssBaseline, Grow, ThemeProvider } from "@mui/material";
+
 import App from "./App";
-import {CssBaseline, Grow} from "@mui/material";
-import {SnackbarProvider} from "notistack";
-import {ThemeProvider} from "@mui/material";
 import theme from "./theme";
 
 ReactDOM.render(
     <React.StrictMode>
         <ThemeProvider theme={theme}>
             <SnackbarProvider maxSnack={3} TransitionComponent={Grow}>
-                <CssBaseline/>
-                <App/>
+                <CssBaseline />
+                <App />
             </SnackbarProvider>
         </ThemeProvider>
     </React.StrictMode>,
