@@ -30,10 +30,10 @@ namespace Api.Features.Locations
         {
             public int Id { get; set; }
             public string Name { get; set; } = default!;
-            [JsonPropertyName("Detector")]
+            [JsonPropertyName("detector")]
             public Detector? AttachedDetector { get; set; }
 
-            public record Detector(string Name);
+            public record Detector(int Id, string Name);
         };
 
         class MappingProfile : Profile

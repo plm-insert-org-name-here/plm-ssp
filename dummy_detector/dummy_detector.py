@@ -36,7 +36,7 @@ def get_response(cmd):
         return 'Ok'
 
 async def hello():
-    async with websockets.connect("wss://localhost:9696/detectors/controller", \
+    async with websockets.connect("wss://localhost:9696/api/v1/detectors/controller", \
             ssl=ssl._create_unverified_context()) as websocket:
         await websocket.send("121212121212")
         while True:

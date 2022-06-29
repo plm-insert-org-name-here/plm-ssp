@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Entities;
@@ -23,12 +24,25 @@ namespace Api.Features.Locations
             _mapperConfig = mapperConfig;
         }
 
-        public record Res(int Id, string Name);
+        public class Res
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = default!;
+            [JsonPropertyName("detector")]
+            public Detector? AttachedDetector { get; set; }
+
+            public record Detector(int Id, string Name);
+        }
 
         private class MappingProfile : Profile
         {
-            public MappingProfile() => CreateProjection<Location, Res>();
-        }
+            public MappingProfile()
+            {
+                CreateMap<Detector, Res.Detector>();
+                CreateProjection<Location, Res>()
+                    .ForMember(dest => dest.AttachedDetector, opt => opt.MapFrom(src => src.Detector));
+            }
+    }
 
         [HttpGet(Routes.Locations.GetAll)]
         [SwaggerOperation(
@@ -39,8 +53,9 @@ namespace Api.Features.Locations
         ]
         public override Task<List<Res>> HandleAsync(CancellationToken ct = new())
         {
-            return _context.Locations.ProjectTo<Res>(_mapperConfig).ToListAsync(ct);
+            return _context.Locations
+                .Include(l => l.Detector)
+                .ProjectTo<Res>(_mapperConfig).ToListAsync(ct);
         }
     }
-
 }

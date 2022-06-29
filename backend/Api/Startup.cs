@@ -58,6 +58,18 @@ namespace Api
                 });
             }
 
+            app.UseCors(options =>
+            {
+                options.AllowAnyMethod();
+                options.AllowAnyHeader();
+                // NOTE(rg): workaround; the JS SignalR requires credentials to be allowed,
+                // but AllowAnyOrigin and AllowCredentials can't be used together
+                options.SetIsOriginAllowed(_ => true);
+                // options.AllowAnyOrigin();
+                options.AllowCredentials();
+            });
+
+
             mapperConfiguration.AssertConfigurationIsValid();
 
             app.UseHttpsRedirection();
