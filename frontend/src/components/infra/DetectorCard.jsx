@@ -4,10 +4,10 @@ import React, { useRef, useState } from "react";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import LocationOffIcon from "@mui/icons-material/LocationOff";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PowerIcon from "@mui/icons-material/Power";
 import PowerOffIcon from "@mui/icons-material/PowerOff";
-import VideocamIcon from "@mui/icons-material/Videocam";
-import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import { Box, Card, IconButton, Tooltip } from "@mui/material";
 
 import ConfirmPopup from "../../common/ConfirmPopup";
@@ -16,13 +16,13 @@ import MenuPopup from "../../common/MenuPopup";
 import OverflowText from "../../common/OverflowText";
 import { Routes } from "../../routes";
 
-const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
+const DetectorCard = ({ detector, onAttach, onDetach, onDelete, onRename }) => {
     const [attachPopupItems, setAttachPopupItems] = useState([]);
 
-    const renamePopup = usePopupState({ variant: "popover", popupId: "rename-location" });
+    const renamePopup = usePopupState({ variant: "popover", popupId: "rename-detector" });
     const detachPopup = usePopupState({ variant: "popover", popupId: "detach-detector" });
     const attachPopup = usePopupState({ variant: "popover", popupId: "attach-detector" });
-    const deletePopup = usePopupState({ variant: "popover", popupId: "delete-location" });
+    const deletePopup = usePopupState({ variant: "popover", popupId: "delete-detector" });
     const ref = useRef(null);
 
     renamePopup.setAnchorEl(ref.current);
@@ -31,8 +31,8 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
     deletePopup.setAnchorEl(ref.current);
 
     const onRenameInner = (newName) => {
-        if (location.name !== newName) {
-            onRename(location.id, newName);
+        if (detector.name !== newName) {
+            onRename(detector.id, newName);
             return true;
         }
 
@@ -40,24 +40,24 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
     };
 
     const onDetachInner = () => {
-        onDetach(location.detector?.id);
+        onDetach(detector.id);
         detachPopup.close();
     };
 
     const onAttachPopupOpen = () => {
-        axios(`${Routes.detectors}/attachable`).then((res) => {
+        axios(`${Routes.locations}/free`).then((res) => {
             setAttachPopupItems(res.data);
             attachPopup.open();
         });
     };
 
-    const onAttachInner = (detector) => {
+    const onAttachInner = (location) => {
         onAttach(location, detector);
         attachPopup.close();
     };
 
     const onDeleteInner = () => {
-        onDelete(location.id);
+        onDelete(detector.id);
         deletePopup.close();
     };
 
@@ -86,19 +86,19 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
                     sx={{ p: 1 }}
                 >
                     <OverflowText
-                        text={location.name}
-                        sx={{ color: location.detector ? "text.default" : "text.lighter" }}
+                        text={detector.name}
+                        sx={{ color: detector.location ? "text.default" : "text.lighter" }}
                         variant="h6"
                     />
                     <Box display="flex" alignItems="center">
-                        {location.detector ? (
-                            <VideocamIcon sx={{ height: "32px", color: "text.lighter" }} />
+                        {detector.location ? (
+                            <LocationOnIcon sx={{ height: "32px", color: "text.lighter" }} />
                         ) : (
-                            <VideocamOffIcon sx={{ height: "32px", color: "text.lightest" }} />
+                            <LocationOffIcon sx={{ height: "32px", color: "text.lightest" }} />
                         )}
                         <OverflowText
                             color="text.lighter"
-                            text={location.detector?.name ?? ""}
+                            text={detector.location?.name ?? ""}
                             sx={{ pt: 0.6, pl: 1, fontSize: "14px" }}
                         />
                     </Box>
@@ -118,7 +118,7 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
                             <EditIcon />
                         </IconButton>
                     </Tooltip>
-                    {location.detector ? (
+                    {detector.location ? (
                         <Tooltip title="Detach detector" placement="right">
                             <IconButton
                                 size="small"
@@ -144,8 +144,8 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
             </Card>
             <EditPopup
                 popupProps={renamePopup}
-                initialValue={location.name}
-                label="Location name"
+                initialValue={detector.name}
+                label="Detector name"
                 handler={onRenameInner}
             />
             <ConfirmPopup
@@ -153,7 +153,7 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
                 handler={onDetachInner}
                 text={
                     <>
-                        Detaching <i>{location.detector?.name}</i>
+                        Detaching <i>{detector.name}</i>
                     </>
                 }
             />
@@ -163,7 +163,7 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
                 handler={onDeleteInner}
                 text={
                     <>
-                        Deleting <i>{location.name}</i>
+                        Deleting <i>{detector.name}</i>
                     </>
                 }
             />
@@ -171,4 +171,4 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
     );
 };
 
-export default LocationCard;
+export default DetectorCard;

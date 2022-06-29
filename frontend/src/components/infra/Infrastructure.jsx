@@ -23,6 +23,37 @@ const Infrastructure = () => {
     const [locations, setLocations] = useState([]);
     const isMounted = useMounted();
 
+    const onDetach = (detectorId) => {
+        axios.post(`${Routes.detectors}/${detectorId}/detach`).then((_) => {
+            const newLocations = [...locations];
+            let editedLocation = newLocations.find((l) => l.detector?.id === detectorId);
+            editedLocation.detector = null;
+
+            const newDetectors = [...detectors];
+            let editedDetector = newDetectors.find((d) => d.id === detectorId);
+            editedDetector.location = null;
+
+            setLocations(newLocations);
+            setDetectors(newDetectors);
+        });
+    };
+
+    const onAttach = (location, detector) => {
+        const data = { locationId: location.id };
+        axios.post(`${Routes.detectors}/${detector.id}/attach`, data).then((_) => {
+            const newLocations = [...locations];
+            let editedLocation = newLocations.find((l) => l.id === location.id);
+            editedLocation.detector = detector;
+
+            const newDetectors = [...detectors];
+            let editedDetector = newDetectors.find((d) => d.id === detector.id);
+            editedDetector.location = location;
+
+            setLocations(newLocations);
+            setDetectors(newDetectors);
+        });
+    };
+
     useEffect(() => {
         const locationsPromise = axios(Routes.locations);
         const detectorsPromise = axios(Routes.detectors);
@@ -44,10 +75,20 @@ const Infrastructure = () => {
                 </Tabs>
             </Box>
             <TabPanel value={selectedTab} index={0}>
-                <Locations locations={locations} setLocations={setLocations} />
+                <Locations
+                    locations={locations}
+                    setLocations={setLocations}
+                    onAttach={onAttach}
+                    onDetach={onDetach}
+                />
             </TabPanel>
             <TabPanel value={selectedTab} index={1}>
-                <Detectors detectors={detectors} />
+                <Detectors
+                    detectors={detectors}
+                    setDetectors={setDetectors}
+                    onAttach={onAttach}
+                    onDetach={onDetach}
+                />
             </TabPanel>
         </Paper>
     );

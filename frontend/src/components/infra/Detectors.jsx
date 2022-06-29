@@ -1,17 +1,43 @@
+import axios from "axios";
 import React from "react";
 
-import { Box, List, ListItem, ListItemText } from "@mui/material";
+import { Box } from "@mui/material";
 
-const Detectors = ({ detectors }) => {
+import { Routes } from "../../routes";
+import DetectorCard from "./DetectorCard";
+
+const Detectors = ({ detectors, setDetectors, onAttach, onDetach }) => {
+    const onRename = (id, newName) => {
+        const data = { name: newName };
+        axios.put(`${Routes.detectors}/${id}`, data).then((_) => {
+            const newDetectors = [...detectors];
+            let editedDetector = newDetectors.find((d) => d.id === id);
+            editedDetector.name = newName;
+
+            setDetectors(newDetectors);
+        });
+    };
+
+    const onDelete = (id) => {
+        axios.delete(`${Routes.detectors}/${id}`).then((_) => {
+            setDetectors((ds) => ds.filter((d) => d.id !== id));
+        });
+    };
+
     return (
         <Box sx={{ flexGrow: 1, height: 0 }}>
-            <List sx={{ height: "100%", overflowY: "auto" }}>
+            <Box sx={{ height: "100%", bgcolor: "#f6f6f6", overflowY: "auto" }}>
                 {detectors.map((d) => (
-                    <ListItem key={d.id}>
-                        <ListItemText>{d.name}</ListItemText>
-                    </ListItem>
+                    <DetectorCard
+                        key={d.id}
+                        detector={d}
+                        onAttach={onAttach}
+                        onDetach={onDetach}
+                        onDelete={onDelete}
+                        onRename={onRename}
+                    />
                 ))}
-            </List>
+            </Box>
         </Box>
     );
 };

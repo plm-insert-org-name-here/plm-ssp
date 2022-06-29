@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Entities;
@@ -25,11 +26,27 @@ namespace Api.Features.Detectors
             _mapperConfig = mapperConfig;
         }
 
-        public record Res(int Id, string Name, string MacAddress, DetectorState state);
+        public record Res
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = default!;
+            public string MacAddress { get; set; } = default!;
+            public DetectorState State;
+
+            [JsonPropertyName("location")]
+            public Location? AttachedLocation { get; set; }
+
+            public record Location(int Id, string Name);
+        }
 
         class MappingProfile : Profile
         {
-            public MappingProfile() => CreateProjection<Detector, Res>();
+            public MappingProfile()
+            {
+                CreateMap<Location, Res.Location>();
+                CreateProjection<Detector, Res>()
+                    .ForMember(dest => dest.AttachedLocation, opt => opt.MapFrom(src => src.Location));
+            }
         }
 
         [HttpGet(Routes.Detectors.GetById, Name = Routes.Detectors.GetById)]
@@ -42,7 +59,8 @@ namespace Api.Features.Detectors
         public override async Task<ActionResult<Res>> HandleAsync(int id, CancellationToken ct = new())
         {
             var result = await _context.Detectors
-                .Where(l => l.Id == id)
+                .Where(d => d.Id == id)
+                .Include(d => d.Location)
                 .ProjectTo<Res>(_mapperConfig)
                 .SingleOrDefaultAsync(ct);
 

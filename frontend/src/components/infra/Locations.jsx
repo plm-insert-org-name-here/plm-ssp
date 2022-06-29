@@ -9,9 +9,8 @@ import EditPopup from "../../common/EditPopup";
 import { Routes } from "../../routes";
 import LocationCard from "./LocationCard";
 
-const Locations = ({ locations, setLocations }) => {
+const Locations = ({ locations, setLocations, onAttach, onDetach }) => {
     const addPopup = usePopupState({ variant: "popover", popupId: "add-location" });
-    const [newLocationName, setNewLocationName] = useState("");
 
     const onRename = (id, newName) => {
         const data = { name: newName };
@@ -19,27 +18,6 @@ const Locations = ({ locations, setLocations }) => {
             const newLocations = [...locations];
             let editedLocation = newLocations.find((l) => l.id === id);
             editedLocation.name = newName;
-
-            setLocations(newLocations);
-        });
-    };
-
-    const onDetach = (detectorId) => {
-        axios.post(`${Routes.detectors}/${detectorId}/detach`).then((_) => {
-            const newLocations = [...locations];
-            let editedLocation = newLocations.find((l) => l.detector?.id === detectorId);
-            editedLocation.detector = null;
-
-            setLocations(newLocations);
-        });
-    };
-
-    const onAttach = (id, detector) => {
-        const data = { locationId: id };
-        axios.post(`${Routes.detectors}/${detector.id}/attach`, data).then((_) => {
-            const newLocations = [...locations];
-            let editedLocation = newLocations.find((l) => l.id === id);
-            editedLocation.detector = detector;
 
             setLocations(newLocations);
         });

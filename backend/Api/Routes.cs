@@ -6,6 +6,7 @@ namespace Api
         public static class Locations
         {
             public const string GetAll = Prefix + "locations";
+            public const string GetAllFree = Prefix + "locations/free";
             public const string GetById = Prefix + "locations/{id:int}";
             public const string Create = Prefix + "locations";
             public const string Update = Prefix + "locations/{id:int}";
