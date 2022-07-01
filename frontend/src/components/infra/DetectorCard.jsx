@@ -87,7 +87,9 @@ const DetectorCard = ({ detector, onAttach, onDetach, onDelete, onRename }) => {
                 >
                     <OverflowText
                         text={detector.name}
-                        sx={{ color: detector.location ? "text.default" : "text.lighter" }}
+                        sx={{
+                            color: detector.location ? "text.default" : "text.lighter",
+                        }}
                         variant="h6"
                     />
                     <Box display="flex" alignItems="center">

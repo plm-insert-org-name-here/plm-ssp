@@ -16,7 +16,7 @@ function TabPanel({ children, value, index, ...other }) {
     );
 }
 
-const Infrastructure = () => {
+const Infrastructure = ({ selectedLocation, setSelectedLocation }) => {
     const [selectedTab, setSelectedTab] = useState(0);
 
     const [detectors, setDetectors] = useState([]);
@@ -78,6 +78,8 @@ const Infrastructure = () => {
                 <Locations
                     locations={locations}
                     setLocations={setLocations}
+                    selectedLocation={selectedLocation}
+                    setSelectedLocation={setSelectedLocation}
                     onAttach={onAttach}
                     onDetach={onDetach}
                 />

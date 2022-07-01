@@ -9,7 +9,14 @@ import EditPopup from "../../common/EditPopup";
 import { Routes } from "../../routes";
 import LocationCard from "./LocationCard";
 
-const Locations = ({ locations, setLocations, onAttach, onDetach }) => {
+const Locations = ({
+    locations,
+    setLocations,
+    selectedLocation,
+    setSelectedLocation,
+    onAttach,
+    onDetach,
+}) => {
     const addPopup = usePopupState({ variant: "popover", popupId: "add-location" });
 
     const onRename = (id, newName) => {
@@ -54,6 +61,8 @@ const Locations = ({ locations, setLocations, onAttach, onDetach }) => {
                         <LocationCard
                             key={l.id}
                             location={l}
+                            selectedLocation={selectedLocation}
+                            setSelectedLocation={setSelectedLocation}
                             onAttach={onAttach}
                             onDetach={onDetach}
                             onDelete={onDelete}

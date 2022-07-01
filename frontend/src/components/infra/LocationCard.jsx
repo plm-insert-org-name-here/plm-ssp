@@ -8,7 +8,7 @@ import PowerIcon from "@mui/icons-material/Power";
 import PowerOffIcon from "@mui/icons-material/PowerOff";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
-import { Box, Card, IconButton, Tooltip } from "@mui/material";
+import { Box, Card, CardActionArea, IconButton, Tooltip } from "@mui/material";
 
 import ConfirmPopup from "../../common/ConfirmPopup";
 import EditPopup from "../../common/EditPopup";
@@ -16,7 +16,15 @@ import MenuPopup from "../../common/MenuPopup";
 import OverflowText from "../../common/OverflowText";
 import { Routes } from "../../routes";
 
-const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
+const LocationCard = ({
+    location,
+    selectedLocation,
+    setSelectedLocation,
+    onAttach,
+    onDetach,
+    onDelete,
+    onRename,
+}) => {
     const [attachPopupItems, setAttachPopupItems] = useState([]);
 
     const renamePopup = usePopupState({ variant: "popover", popupId: "rename-location" });
@@ -74,16 +82,22 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
                     width: "auto",
                     height: "120px",
                     borderRadius: "8px",
+                    border: selectedLocation?.id === location.id ? "1px solid black" : "none",
                 }}
             >
-                <Box
-                    height="100%"
-                    display="flex"
-                    width={0}
-                    flexGrow={1}
-                    flexDirection="column"
-                    justifyContent="space-between"
-                    sx={{ p: 1 }}
+                <CardActionArea
+                    onClick={() => setSelectedLocation(location)}
+                    sx={{
+                        height: "100%",
+                        width: 0,
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        alignItems: "stretch",
+                        p: 1,
+                        zIndex: 0,
+                    }}
                 >
                     <OverflowText
                         text={location.name}
@@ -102,12 +116,13 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
                             sx={{ pt: 0.6, pl: 1, fontSize: "14px" }}
                         />
                     </Box>
-                </Box>
+                </CardActionArea>
                 <Box
                     display="flex"
                     flexDirection="column"
                     className="hidden-icon"
                     bgcolor="#eeeeee"
+                    zIndex={1}
                 >
                     <Tooltip title="Rename" placement="right">
                         <IconButton

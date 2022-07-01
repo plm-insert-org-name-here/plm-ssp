@@ -88,6 +88,13 @@ namespace Api.Services.DetectorController
 
             try
             {
+                await webSocket.SendAsync(
+                    new ArraySegment<byte>(Encoding.ASCII.GetBytes(detectorId.ToString())),
+                    WebSocketMessageType.Text,
+                    true,
+                    new CancellationTokenSource(_options.TimeoutMilliseconds).Token
+                );
+
                 while (true)
                 {
                     while (queue.Count == 0)

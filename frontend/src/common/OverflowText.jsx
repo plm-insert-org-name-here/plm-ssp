@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import useResizeObserver from "@react-hook/resize-observer";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { Tooltip, Typography } from "@mui/material";
 
@@ -7,34 +8,29 @@ const OverflowText = ({ text, ...props }) => {
     const [showTooltip, setShowTooltip] = useState(false);
     const textRef = useRef();
 
-    useEffect(() => {
-        const curr = textRef.current;
-        const show = !!(curr && curr.scrollWidth > curr.clientWidth);
-        if (show) setShowTooltip(show);
-    }, []);
-
-    const textElement = (
-        <Typography
-            ref={textRef}
-            whiteSpace="nowrap"
-            overflow="hidden"
-            textOverflow="ellipsis"
-            {...props}
-        >
-            {text}
-        </Typography>
-    );
+    useResizeObserver(textRef, (_) => {
+        const elem = textRef.current;
+        const shouldShow = elem.scrollWidth > elem.clientWidth;
+        setShowTooltip(shouldShow);
+    });
 
     return (
-        <>
-            {showTooltip ? (
-                <Tooltip title={text} enterDelay={500} enterTouchDelay={500}>
-                    {textElement}
-                </Tooltip>
-            ) : (
-                textElement
-            )}
-        </>
+        <Tooltip
+            title={text}
+            enterDelay={500}
+            enterTouchDelay={500}
+            disableHoverListener={!showTooltip}
+        >
+            <Typography
+                ref={textRef}
+                whiteSpace="nowrap"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                {...props}
+            >
+                {text}
+            </Typography>
+        </Tooltip>
     );
 };
 

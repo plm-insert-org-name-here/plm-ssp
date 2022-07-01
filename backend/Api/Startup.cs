@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Api.Infrastructure.Database;
 using Api.Services;
 using Api.Services.DetectorController;
+using Api.Services.DetectorStreamProcessor;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,8 +24,6 @@ namespace Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.AddHostedService<DetectorImageProcessorService>();
-
             services.AddControllers()
                 .AddJsonOptions(opts =>
                 {
@@ -43,6 +42,7 @@ namespace Api
 
             services.AddSingleton<LocationSnapshotCache>();
             services.AddDetectorControllerWebSocket();
+            services.AddDetectorStreamProcessor();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,

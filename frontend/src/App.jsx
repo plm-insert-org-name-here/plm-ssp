@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useSnackbar } from "notistack";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 import { Grid } from "@mui/material";
@@ -31,6 +31,7 @@ const setupAxiosInterceptors = (
 
 function App() {
     const { enqueueSnackbar } = useSnackbar();
+    const [selectedLocation, setSelectedLocation] = useState(null);
 
     useEffect(() => {
         setupAxiosInterceptors(
@@ -65,7 +66,10 @@ function App() {
                     <Route path="/" exact>
                         <Grid container sx={{ p: 1, height: "100vh" }}>
                             <Grid item xs={12} md={4} lg={3} display="flex">
-                                <Infrastructure />
+                                <Infrastructure
+                                    selectedLocation={selectedLocation}
+                                    setSelectedLocation={setSelectedLocation}
+                                />
                             </Grid>
                             <Grid item xs={12} md={8} lg={9} display="flex">
                                 <Main />
