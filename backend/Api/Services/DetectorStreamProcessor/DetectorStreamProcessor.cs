@@ -16,12 +16,14 @@ namespace Api.Services.DetectorStreamProcessor
     {
         private readonly ILogger _logger;
         private readonly DetectorStreamProcessorOptions _options;
+        private readonly DetectorStreamViewerGroups _groups;
 
         public DetectorStreamProcessor(ILogger logger, IConfiguration configuration,
-            DetectorStreamProcessorOptions options)
+            DetectorStreamProcessorOptions options, DetectorStreamViewerGroups groups)
         {
             _logger = logger;
             _options = options;
+            _groups = groups;
 
             configuration.GetSection(DetectorStreamProcessorOptions.SectionName).Bind(_options);
         }
@@ -52,7 +54,8 @@ namespace Api.Services.DetectorStreamProcessor
                     else
                     {
                         var image = buffer.Take(bufferIndex).ToArray();
-                        // TODO: do stuff with image
+                        await _groups.SendStreamFrameToGroup(id, image);
+                        bufferIndex = 0;
                     }
                 }
 

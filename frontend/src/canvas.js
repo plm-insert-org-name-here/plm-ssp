@@ -1,4 +1,4 @@
-import { bifilter } from "../../utils";
+import { bifilter } from "./utils";
 
 const TEMPLATE_COLOR = "#ff0";
 const TEMPLATE_DASH_COLOR = "#fff";

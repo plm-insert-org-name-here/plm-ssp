@@ -16,14 +16,15 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 
-import { streamDrawFps } from "../canvas/utils";
-import useMounted from "../hooks/useMounted";
+import { streamDrawFps } from "../../canvas";
+import useMounted from "../../hooks/useMounted";
+import { Routes } from "../../routes";
 import "./devices.css";
 import useSignalR from "./useSignalR";
 
 const placeholderImageSrc = "https://via.placeholder.com/640x480";
 
-const DeviceStream = ({ enabled, deviceId, setSnapshot }) => {
+const DeviceStream = ({ enabled, detectorId, setSnapshot }) => {
     // NOTE(rg): this is not necessary, but it avoids a deprecation error related to findDOMNode,
     // used internally by the CSSTransition component
     // source: https://github.com/reactjs/react-transition-group/issues/668#issuecomment-695162879
@@ -31,6 +32,8 @@ const DeviceStream = ({ enabled, deviceId, setSnapshot }) => {
     const canvasRef = useRef();
     const menuPopup = usePopupState({ variant: "popover", popupId: "stream-menu" });
 
+    const [drawOverlay, setDrawOverlay] = useState(false);
+    const [drawLabels, setDrawLabels] = useState(false);
     const [drawFps, setDrawFps] = useState(true);
     const [isControlDisabled, setControlDisabled] = useState(false);
 
@@ -73,7 +76,7 @@ const DeviceStream = ({ enabled, deviceId, setSnapshot }) => {
     }, [active]);
 
     const handleTakeSnapshot = async () => {
-        await axios.post(Endpoints.streamSnapshot(deviceId));
+        await axios.post(Endpoints.streamSnapshot(detectorId));
         setSnapshotLoading(true);
     };
 
@@ -161,16 +164,16 @@ const DeviceStream = ({ enabled, deviceId, setSnapshot }) => {
 
     const handlers = useMemo(() => {
         return [
-            ["Streaming", handleReceiveStream],
+            ["ReceiveStreamFrame", handleReceiveStream],
             ["Snapshot", handleReceiveSnapshot],
             ["Fps", handleFps],
         ];
     }, [active, drawFps]);
 
     useSignalR({
-        url: Endpoints.signalrConnection,
+        url: Routes.detectorHub,
         active: active,
-        groups: ["Stream-" + deviceId, "Snapshot-" + deviceId],
+        groups: ["Stream-" + detectorId, "Snapshot-" + detectorId],
         handlers: handlers,
     });
 

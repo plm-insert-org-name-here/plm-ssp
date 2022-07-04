@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 import { Box, Paper, Tab, Tabs } from "@mui/material";
 
-import useMounted from "../../common/hooks/useMounted";
+import useMounted from "../../hooks/useMounted";
 import { Routes } from "../../routes";
 import Detectors from "./Detectors";
 import Locations from "./Locations";
@@ -16,7 +16,7 @@ function TabPanel({ children, value, index, ...other }) {
     );
 }
 
-const Infrastructure = ({ selectedLocation, setSelectedLocation }) => {
+const Infrastructure = () => {
     const [selectedTab, setSelectedTab] = useState(0);
 
     const [detectors, setDetectors] = useState([]);
@@ -78,8 +78,6 @@ const Infrastructure = ({ selectedLocation, setSelectedLocation }) => {
                 <Locations
                     locations={locations}
                     setLocations={setLocations}
-                    selectedLocation={selectedLocation}
-                    setSelectedLocation={setSelectedLocation}
                     onAttach={onAttach}
                     onDetach={onDetach}
                 />

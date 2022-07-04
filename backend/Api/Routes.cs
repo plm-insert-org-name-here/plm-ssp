@@ -24,6 +24,9 @@ namespace Api
             public const string Attach = Prefix + "detectors/{id:int}/attach";
             public const string Detach = Prefix + "detectors/{id:int}/detach";
             public const string Controller = "/" + Prefix + "detectors/controller";
+            public const string DetectorHub = "/" + Prefix + "detector_hub";
+
+            public const string StreamGroupPrefix = "Stream-";
         }
 
         public static class Jobs
@@ -43,5 +46,6 @@ namespace Api
             public const string Update = Prefix + "tasks/{id:int}";
             public const string Delete = Prefix + "tasks/{id:int}";
         }
+
     }
 }

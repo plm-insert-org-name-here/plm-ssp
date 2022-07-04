@@ -6,8 +6,8 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import Typography from "@mui/material/Typography";
 
-import OverflowText from "./OverflowText";
-import SimpleSearch from "./SimpleSearch";
+import OverflowText from "../common/OverflowText";
+import SimpleSearch from "../common/SimpleSearch";
 
 // TODO(rg): use OverflowText for displaying items with names too long
 const MenuPopup = ({ popupProps, items, handler, width = "25ch", displayProperty = "name" }) => {

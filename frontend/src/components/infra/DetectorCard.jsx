@@ -10,11 +10,11 @@ import PowerIcon from "@mui/icons-material/Power";
 import PowerOffIcon from "@mui/icons-material/PowerOff";
 import { Box, Card, IconButton, Tooltip } from "@mui/material";
 
-import ConfirmPopup from "../../common/ConfirmPopup";
-import EditPopup from "../../common/EditPopup";
-import MenuPopup from "../../common/MenuPopup";
-import OverflowText from "../../common/OverflowText";
 import { Routes } from "../../routes";
+import OverflowText from "../common/OverflowText";
+import ConfirmPopup from "../popups/ConfirmPopup";
+import EditPopup from "../popups/EditPopup";
+import MenuPopup from "../popups/MenuPopup";
 
 const DetectorCard = ({ detector, onAttach, onDetach, onDelete, onRename }) => {
     const [attachPopupItems, setAttachPopupItems] = useState([]);

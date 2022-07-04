@@ -1,5 +1,5 @@
 import useResizeObserver from "@react-hook/resize-observer";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 
 import { Tooltip, Typography } from "@mui/material";
 

@@ -8,6 +8,7 @@ namespace Api.Services.DetectorStreamProcessor
         {
             services.AddHostedService<DetectorStreamProcessor>();
             services.AddSingleton<DetectorStreamProcessorOptions>();
+            services.AddSingleton<DetectorStreamViewerGroups>();
 
             return services;
         }

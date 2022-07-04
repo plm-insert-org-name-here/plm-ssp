@@ -1,6 +1,6 @@
 import axios from "axios";
 import { usePopupState } from "material-ui-popup-state/hooks";
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -10,22 +10,16 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import { Box, Card, CardActionArea, IconButton, Tooltip } from "@mui/material";
 
-import ConfirmPopup from "../../common/ConfirmPopup";
-import EditPopup from "../../common/EditPopup";
-import MenuPopup from "../../common/MenuPopup";
-import OverflowText from "../../common/OverflowText";
+import { InfrastructureContext } from "../../App";
 import { Routes } from "../../routes";
+import OverflowText from "../common/OverflowText";
+import ConfirmPopup from "../popups/ConfirmPopup";
+import EditPopup from "../popups/EditPopup";
+import MenuPopup from "../popups/MenuPopup";
 
-const LocationCard = ({
-    location,
-    selectedLocation,
-    setSelectedLocation,
-    onAttach,
-    onDetach,
-    onDelete,
-    onRename,
-}) => {
+const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
     const [attachPopupItems, setAttachPopupItems] = useState([]);
+    const { selection, dispatchSelection } = useContext(InfrastructureContext);
 
     const renamePopup = usePopupState({ variant: "popover", popupId: "rename-location" });
     const detachPopup = usePopupState({ variant: "popover", popupId: "detach-detector" });
@@ -82,11 +76,19 @@ const LocationCard = ({
                     width: "auto",
                     height: "120px",
                     borderRadius: "8px",
-                    border: selectedLocation?.id === location.id ? "1px solid black" : "none",
+                    border: selection.locationId === location.id ? "1px solid black" : "none",
                 }}
             >
                 <CardActionArea
-                    onClick={() => setSelectedLocation(location)}
+                    onClick={() =>
+                        dispatchSelection({
+                            type: "SET_LOCATION_AND_DETECTOR",
+                            payload: {
+                                locationId: location.id,
+                                detectorId: location.detector?.id ?? null,
+                            },
+                        })
+                    }
                     sx={{
                         height: "100%",
                         width: 0,

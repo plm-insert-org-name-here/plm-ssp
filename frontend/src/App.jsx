@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useSnackbar } from "notistack";
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext, useReducer } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
-import { Grid } from "@mui/material";
+import { AppBar } from "@mui/material";
+import Grid from "@mui/material/Grid";
 
 import "./App.css";
-import AppBar from "./common/appbar/AppBar";
 import About from "./components/about/About";
 import Infrastructure from "./components/infra/Infrastructure";
 import Main from "./components/main/Main";
@@ -29,9 +29,27 @@ const setupAxiosInterceptors = (
     );
 };
 
+const defaultSelection = { locationId: null, detectorId: null };
+
+export const InfrastructureContext = createContext(defaultSelection);
+
+const selectionReducer = (state, { type, payload }) => {
+    switch (type) {
+        case "SET_LOCATION_AND_DETECTOR": {
+            const { locationId, detectorId } = payload;
+            console.log(`setting to ${locationId} / ${detectorId}`);
+            return { locationId, detectorId };
+        }
+        default: {
+            console.log("default");
+            return state;
+        }
+    }
+};
+
 function App() {
     const { enqueueSnackbar } = useSnackbar();
-    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [selection, dispatchSelection] = useReducer(selectionReducer, defaultSelection);
 
     useEffect(() => {
         setupAxiosInterceptors(
@@ -59,17 +77,14 @@ function App() {
     }, []);
 
     return (
-        <>
+        <InfrastructureContext.Provider value={{ selection, dispatchSelection }}>
             <AppBar />
             <BrowserRouter>
                 <Switch>
                     <Route path="/" exact>
                         <Grid container sx={{ p: 1, height: "100vh" }}>
                             <Grid item xs={12} md={4} lg={3} display="flex">
-                                <Infrastructure
-                                    selectedLocation={selectedLocation}
-                                    setSelectedLocation={setSelectedLocation}
-                                />
+                                <Infrastructure />
                             </Grid>
                             <Grid item xs={12} md={8} lg={9} display="flex">
                                 <Main />
@@ -79,7 +94,7 @@ function App() {
                     <Route path="/about" render={() => <About />} />
                 </Switch>
             </BrowserRouter>
-        </>
+        </InfrastructureContext.Provider>
     );
 }
 

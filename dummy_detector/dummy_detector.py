@@ -109,9 +109,7 @@ class DummyDetector:
                     fragment = np.concatenate((id_bytes, img[start*stride:(start+1)*stride]))
                     start += 1
                     sock.sendto(fragment, dest)
-                    sleep(0.2)
                 sock.sendto(id_bytes, dest)
-                sleep(0.2)
 
 
 

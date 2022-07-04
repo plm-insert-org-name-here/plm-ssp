@@ -5,18 +5,11 @@ import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import { Box, IconButton, Tooltip } from "@mui/material";
 
-import EditPopup from "../../common/EditPopup";
 import { Routes } from "../../routes";
+import EditPopup from "../popups/EditPopup";
 import LocationCard from "./LocationCard";
 
-const Locations = ({
-    locations,
-    setLocations,
-    selectedLocation,
-    setSelectedLocation,
-    onAttach,
-    onDetach,
-}) => {
+const Locations = ({ locations, setLocations, onAttach, onDetach }) => {
     const addPopup = usePopupState({ variant: "popover", popupId: "add-location" });
 
     const onRename = (id, newName) => {
@@ -61,8 +54,6 @@ const Locations = ({
                         <LocationCard
                             key={l.id}
                             location={l}
-                            selectedLocation={selectedLocation}
-                            setSelectedLocation={setSelectedLocation}
                             onAttach={onAttach}
                             onDetach={onDetach}
                             onDelete={onDelete}

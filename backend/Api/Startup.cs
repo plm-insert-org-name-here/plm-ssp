@@ -43,6 +43,8 @@ namespace Api
             services.AddSingleton<LocationSnapshotCache>();
             services.AddDetectorControllerWebSocket();
             services.AddDetectorStreamProcessor();
+
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
@@ -81,7 +83,12 @@ namespace Api
             app.UseWebSockets();
             app.UseDetectorControllerWebSocket();
 
-            app.UseEndpoints(builder => builder.MapControllers());
+            app.UseEndpoints(builder =>
+                {
+                    builder.MapControllers();
+
+                    builder.MapHub<DetectorHub>(Routes.Detectors.DetectorHub);
+                } );
         }
     }
 }

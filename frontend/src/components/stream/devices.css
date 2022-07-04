@@ -1,0 +1,22 @@
+.snapshot-image-enter-active {
+    opacity: 0;
+    transition: opacity 500ms ease-in-out;
+}
+
+.snapshot-image-enter-done {
+    opacity: 0;
+}
+
+.snapshot-image-exit {
+    opacity: 0;
+}
+
+.snapshot-image-exit-active {
+    opacity: 1;
+    transition: opacity 500ms ease-in-out;
+}
+
+.snapshot-image-exit-done {
+    opacity: 1;
+}
+
