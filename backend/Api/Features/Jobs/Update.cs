@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Infrastructure.Validation;
