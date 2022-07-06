@@ -6,5 +6,6 @@ namespace Api.Domain.Entities
     {
         public DateTime Timestamp { get; set; }
         public Template Template { get; set; } = default!;
+        public TaskResult TaskResult { get; set; } = default;
     }
 }

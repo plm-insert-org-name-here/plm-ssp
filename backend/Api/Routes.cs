@@ -47,5 +47,11 @@ namespace Api
             public const string Delete = Prefix + "tasks/{id:int}";
         }
 
+        public static class Events
+        {
+            public const string GetAll = Prefix + "events";
+            public const string GetByTemplateId = Prefix + "events/{id:int}";
+        }
+
     }
 }
