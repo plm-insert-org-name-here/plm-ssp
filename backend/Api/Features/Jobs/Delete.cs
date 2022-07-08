@@ -44,7 +44,7 @@ namespace Api.Features.Jobs
                 .SingleOrDefaultAsync(ct);
 
             if (job is null) return NotFound();
-            if (job.Location?.Detector?.State == DetectorState.Running)
+            if (job.Location?.Detector?.State == DetectorState.Streaming)
                 return BadRequest("The detector attached to the location of the job is busy");
 
             _context.Jobs.Remove(job);

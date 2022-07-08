@@ -17,28 +17,28 @@ namespace Api.Services.DetectorController
     public class DetectorController
     {
         private readonly ILogger _logger;
-        private readonly DetectorControllerOptions _options;
+        private readonly DetectorControllerOpt _opt;
+        private readonly StreamViewerGroups _groups;
         private readonly IDbContextFactory<Context> _contextFactory;
         private readonly DetectorCommandQueues _queues;
-        private readonly LocationSnapshotCache _snapshotCache;
+        private readonly SnapshotCache _snapshotCache;
 
         public DetectorController(
             IConfiguration configuration,
-            DetectorControllerOptions options,
+            DetectorControllerOpt opt,
             ILogger logger,
             DetectorCommandQueues queues,
-            LocationSnapshotCache snapshotCache,
-            IDbContextFactory<Context> contextFactory)
+            SnapshotCache snapshotCache,
+            IDbContextFactory<Context> contextFactory, StreamViewerGroups groups)
         {
             _logger = logger;
             _queues = queues;
             _snapshotCache = snapshotCache;
             _contextFactory = contextFactory;
+            _groups = groups;
 
-            // not sure if this works in the ctor
-            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-6.0#bind-hierarchical-configuration-data-using-the-options-pattern
-            _options = options;
-            configuration.GetSection(DetectorControllerOptions.SectionName).Bind(_options);
+            _opt = opt;
+            configuration.GetSection(DetectorControllerOpt.SectionName).Bind(_opt);
         }
 
         // TODO(rg): cancellation tokens?
@@ -63,7 +63,8 @@ namespace Api.Services.DetectorController
             }
             catch (FormatException)
             {
-                _logger.Warning("Connection attempt by detector with invalid MAC address: '{Mac}'", detectorAddressString);
+                _logger.Warning("Connection attempt by detector with invalid MAC address: '{Mac}'",
+                    detectorAddressString);
                 await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid MAC address",
                     CancellationToken.None);
                 return null;
@@ -92,7 +93,7 @@ namespace Api.Services.DetectorController
                     new ArraySegment<byte>(Encoding.ASCII.GetBytes(detectorId.ToString())),
                     WebSocketMessageType.Text,
                     true,
-                    new CancellationTokenSource(_options.TimeoutMilliseconds).Token
+                    new CancellationTokenSource(_opt.TimeoutMilliseconds).Token
                 );
 
                 while (true)
@@ -100,7 +101,7 @@ namespace Api.Services.DetectorController
                     while (queue.Count == 0)
                     {
                         // TODO(rg): use BlockingConnection<T> or smth
-                        queue.EnqueueEvent.WaitOne(_options.PingMilliseconds);
+                        queue.EnqueueEvent.WaitOne(_opt.PingMilliseconds);
                         const DetectorCommandType ping = DetectorCommandType.Ping;
                         _logger.Debug("Sending '{Ping}' to detector (id: {Id})", ping, detectorId);
                         var pingResult = await SendCommandWithVerificationAsync(webSocket, ping);
@@ -116,7 +117,8 @@ namespace Api.Services.DetectorController
 
                     var detector = await context.Detectors
                         .Where(d => d.Id == detectorId)
-                        .Include(d => d.Location)
+                        .Include(d => d.Location!)
+                        .ThenInclude(l => l.Job)
                         .SingleOrDefaultAsync();
 
                     var result = CheckPreconditions(detector, command);
@@ -138,7 +140,7 @@ namespace Api.Services.DetectorController
 
         private bool CheckPreconditions(Detector detector, DetectorCommand command)
         {
-            if (command.Type == DetectorCommandType.TakeSnapshot)
+            if (command.Type is DetectorCommandType.TakeSnapshot)
             {
                 return detector.Location is not null;
             }
@@ -156,13 +158,18 @@ namespace Api.Services.DetectorController
             {
                 case DetectorCommandType.StartStreaming:
                 {
-                    detector.State = DetectorState.Running;
+                    if (detector.State is DetectorState.Standby)
+                        detector.State = DetectorState.Streaming;
                     await context.SaveChangesAsync();
                     break;
                 }
                 case DetectorCommandType.StopStreaming:
                 {
-                    detector.State = DetectorState.Standby;
+                    // If Monitoring is enabled, don't stop to stream
+                    // (this would cripple Monitoring)
+                    if (detector.State is DetectorState.Streaming)
+                        detector.State = DetectorState.Standby;
+
                     await context.SaveChangesAsync();
                     break;
                 }
@@ -175,6 +182,7 @@ namespace Api.Services.DetectorController
                         // after CheckPreconditions returned
                         break;
                     }
+
                     _snapshotCache.Set(detector.Location.Id, snapshot);
                     break;
                 }
@@ -206,7 +214,7 @@ namespace Api.Services.DetectorController
                     new ArraySegment<byte>(Encoding.ASCII.GetBytes(command.ToString())),
                     WebSocketMessageType.Text,
                     true,
-                    new CancellationTokenSource(_options.TimeoutMilliseconds).Token
+                    new CancellationTokenSource(_opt.TimeoutMilliseconds).Token
                 );
             }
             catch (OperationCanceledException ex)
@@ -218,8 +226,8 @@ namespace Api.Services.DetectorController
 
         private async Task<byte[]> ReceiveSnapshotAsync(WebSocket webSocket)
         {
-            var image = new byte[_options.SnapshotBufferSize];
-            var tempBuffer = new byte[_options.SnapshotBufferSize];
+            var image = new byte[_opt.SnapshotBufferSize];
+            var tempBuffer = new byte[_opt.SnapshotBufferSize];
             var imageSize = 0;
 
             while (true)
@@ -227,12 +235,12 @@ namespace Api.Services.DetectorController
                 try
                 {
                     var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(tempBuffer),
-                        new CancellationTokenSource(_options.TimeoutMilliseconds).Token);
+                        new CancellationTokenSource(_opt.TimeoutMilliseconds).Token);
 
                     if (webSocket.State == WebSocketState.CloseReceived)
                     {
                         await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null,
-                            new CancellationTokenSource(_options.TimeoutMilliseconds).Token);
+                            new CancellationTokenSource(_opt.TimeoutMilliseconds).Token);
                         throw new WebSocketException(WebSocketError.Success);
                     }
 
@@ -253,23 +261,22 @@ namespace Api.Services.DetectorController
                     throw new WebSocketException(WebSocketError.Faulted);
                 }
             }
-
         }
 
         private async Task<string> ReceiveTextAsync(WebSocket webSocket)
         {
-            var buffer = new byte[_options.ResponseBufferSize];
+            var buffer = new byte[_opt.ResponseBufferSize];
 
 
             try
             {
                 await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer),
-                    new CancellationTokenSource(_options.TimeoutMilliseconds).Token);
+                    new CancellationTokenSource(_opt.TimeoutMilliseconds).Token);
 
                 if (webSocket.State == WebSocketState.CloseReceived)
                 {
                     await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null,
-                        new CancellationTokenSource(_options.TimeoutMilliseconds).Token);
+                        new CancellationTokenSource(_opt.TimeoutMilliseconds).Token);
                     throw new WebSocketException(WebSocketError.Success);
                 }
 

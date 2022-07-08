@@ -11,6 +11,8 @@ namespace Api
             public const string Create = Prefix + "locations";
             public const string Update = Prefix + "locations/{id:int}";
             public const string Delete = Prefix + "locations/{id:int}";
+            public const string StartMonitoring = Prefix + "locations/{id:int}/start_monitoring";
+            public const string StopMonitoring = Prefix + "locations/{id:int}/stop_monitoring";
         }
 
         public static class Detectors

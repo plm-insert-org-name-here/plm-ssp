@@ -4,12 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Services.DetectorController
 {
-    public static class DetectorControllerExtensions
+    public static class DetectorControllerExt
     {
         public static IApplicationBuilder UseDetectorControllerWebSocket(this IApplicationBuilder app)
         {
             return app != null
-                ? app.UseMiddleware<DetectorControllerMiddleware>()
+                ? app.UseMiddleware<DetectorControllerMw>()
                 : throw new ArgumentException(null, nameof(app));
         }
 
@@ -17,7 +17,7 @@ namespace Api.Services.DetectorController
         {
             services.AddSingleton<DetectorCommandQueues>();
             services.AddScoped<DetectorController>();
-            services.AddScoped<DetectorControllerOptions>();
+            services.AddSingleton<DetectorControllerOpt>();
 
             return services;
         }

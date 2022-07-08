@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Api.Infrastructure.Validation
 {
-    public static class FluentValidationExtensions
+    public static class FluentValidationExt
     {
         public static async Task<ValidationResult> ValidateToModelStateAsync<T>(
             this IValidator<T> validator,

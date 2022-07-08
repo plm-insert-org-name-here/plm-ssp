@@ -17,8 +17,7 @@ namespace Api.Domain.Entities
     {
         Off,
         Standby,
-        Running
+        Streaming,
+        Monitoring
     }
-
-
 }

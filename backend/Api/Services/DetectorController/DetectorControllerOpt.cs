@@ -1,6 +1,6 @@
 namespace Api.Services.DetectorController
 {
-    public class DetectorControllerOptions
+    public class DetectorControllerOpt
     {
         public const string SectionName = "DetectorController";
 

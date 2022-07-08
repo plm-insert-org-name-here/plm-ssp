@@ -1,4 +1,3 @@
-using Api.Features.Detectors;
 using Api.Infrastructure.Database;
 using Ardalis.ApiEndpoints;
 using AutoMapper;

@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Infrastructure.Validation;
@@ -75,7 +74,7 @@ namespace Api.Features.Jobs
                 .SingleOrDefaultAsync(ct);
 
             if (job is null) return NotFound();
-            if (job.Location?.Detector?.State == DetectorState.Running)
+            if (job.Location?.Detector?.State == DetectorState.Streaming)
                 return BadRequest("The detector attached to the location of the job is busy");
 
             job.Name = req.Body.Name;

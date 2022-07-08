@@ -1,19 +1,20 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.Services.DetectorController;
+using Api.Services.StreamHandler;
 using Microsoft.AspNetCore.SignalR;
 using Serilog;
 
-namespace Api.Services.DetectorStreamProcessor
+namespace Api.Services
 {
-    public class DetectorStreamViewerGroups
+    public class StreamViewerGroups
     {
-        private readonly IHubContext<DetectorHub> _hubContext;
+        private readonly IHubContext<StreamHub> _hubContext;
         private readonly ILogger _logger;
         private readonly Dictionary<string, int> _viewersPerGroup = new();
         private readonly DetectorCommandQueues _queues;
 
-        public DetectorStreamViewerGroups(IHubContext<DetectorHub> hubContext, ILogger logger, DetectorCommandQueues queues)
+        public StreamViewerGroups(IHubContext<StreamHub> hubContext, ILogger logger, DetectorCommandQueues queues)
         {
             _hubContext = hubContext;
             _logger = logger;
@@ -38,7 +39,7 @@ namespace Api.Services.DetectorStreamProcessor
                         _queues.EnqueueCommand(deviceId, DetectorCommandType.StartStreaming);
                     }
                 }
-                catch (InvalidViewerGroupException ex)
+                catch (InvalidViewerGroupEx ex)
                 {
                     _logger.Error("{Message}", ex.Message);
                 }
@@ -63,7 +64,7 @@ namespace Api.Services.DetectorStreamProcessor
                             _queues.EnqueueCommand(deviceId, DetectorCommandType.StopStreaming);
                         }
                     }
-                    catch (InvalidViewerGroupException ex)
+                    catch (InvalidViewerGroupEx ex)
                     {
                         _logger.Error("{Message}", ex.Message);
                     }
@@ -79,13 +80,13 @@ namespace Api.Services.DetectorStreamProcessor
                     .SendAsync("ReceiveStreamFrame", frame);
         }
 
-        public bool Exists(string groupName) => _viewersPerGroup.ContainsKey(groupName);
+        public bool HasViewers(int detectorId) => _viewersPerGroup.ContainsKey(Routes.Detectors.StreamGroupPrefix + detectorId);
 
         public static int ExtractDeviceId(string group)
         {
             var deviceIdString = group.Split('-')[1];
             var result = int.TryParse(deviceIdString, out var deviceId);
-            if (!result) throw new InvalidViewerGroupException("Could not extract device Id from group name: " + group);
+            if (!result) throw new InvalidViewerGroupEx("Could not extract device Id from group name: " + group);
 
             return deviceId;
         }

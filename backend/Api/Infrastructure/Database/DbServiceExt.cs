@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Infrastructure.Database
 {
-    public static class DbServiceExtensions
+    public static class DbServiceExt
     {
         public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
@@ -30,7 +30,7 @@ namespace Api.Infrastructure.Database
             var scope = app.ApplicationServices.CreateScope();
 
             DbInitializer.Initialize(scope);
-            DbInitializer.ResetDetectorStates(scope);
+            DbInitializer.SetInitialStates(scope);
         }
 
 

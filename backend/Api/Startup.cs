@@ -2,7 +2,8 @@ using System.Text.Json.Serialization;
 using Api.Infrastructure.Database;
 using Api.Services;
 using Api.Services.DetectorController;
-using Api.Services.DetectorStreamProcessor;
+using Api.Services.ProcessorHandler;
+using Api.Services.StreamHandler;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,9 +41,10 @@ namespace Api
                 configuration.CustomSchemaIds(x => x.FullName);
             });
 
-            services.AddSingleton<LocationSnapshotCache>();
+            services.AddSingleton<SnapshotCache>();
             services.AddDetectorControllerWebSocket();
-            services.AddDetectorStreamProcessor();
+            services.AddStreamHandler();
+            services.AddProcessorHandler();
 
             services.AddSignalR();
         }
@@ -87,7 +89,7 @@ namespace Api
                 {
                     builder.MapControllers();
 
-                    builder.MapHub<DetectorHub>(Routes.Detectors.DetectorHub);
+                    builder.MapHub<StreamHub>(Routes.Detectors.DetectorHub);
                 } );
         }
     }

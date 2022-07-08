@@ -2,11 +2,13 @@ using System.Collections.Generic;
 
 namespace Api.Services
 {
-    public class LocationSnapshotCache
-    {
-        private readonly Dictionary<int, byte[]> _snapshots = new();
+    using LocationId = System.Int32;
 
-        public byte[]? Get(int id)
+    public class SnapshotCache
+    {
+        private readonly Dictionary<LocationId, byte[]> _snapshots = new();
+
+        public byte[]? Get(LocationId id)
         {
             if (_snapshots.ContainsKey(id))
                 return _snapshots[id];
@@ -14,7 +16,7 @@ namespace Api.Services
             return null;
         }
 
-        public void Set(int id, byte[] newSnapshot)
+        public void Set(LocationId id, byte[] newSnapshot)
         {
             if (_snapshots.ContainsKey(id))
                 _snapshots[id] = newSnapshot;
@@ -22,7 +24,7 @@ namespace Api.Services
                 _snapshots.Add(id, newSnapshot);
         }
 
-        public bool Reset(int id)
+        public bool Reset(LocationId id)
         {
             return _snapshots.Remove(id);
         }

@@ -6,7 +6,6 @@ using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Infrastructure.Validation;
 using Ardalis.ApiEndpoints;
-using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

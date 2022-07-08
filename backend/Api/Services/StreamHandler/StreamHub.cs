@@ -2,19 +2,20 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Serilog;
 
-namespace Api.Services.DetectorStreamProcessor
+namespace Api.Services.StreamHandler
 {
-    public class DetectorHub : Hub
+    public class StreamHub : Hub
     {
-        private readonly DetectorStreamViewerGroups _groups;
+        private readonly StreamViewerGroups _groups;
         private readonly ILogger _logger;
 
-        public DetectorHub(DetectorStreamViewerGroups groups, ILogger logger)
+        public StreamHub(StreamViewerGroups groups, ILogger logger)
         {
             _groups = groups;
             _logger = logger;
         }
 
+        // Called by the frontend (remote procedure call)
         public async Task JoinGroup(string groupName)
         {
             // TODO(rg): validate groupName
@@ -25,9 +26,12 @@ namespace Api.Services.DetectorStreamProcessor
             _logger.Information("Connection {Id} joined group {Group}", Context.ConnectionId, groupName);
         }
 
+        // Called by the frontend (remote procedure call)
         public async Task LeaveGroup(string groupName)
         {
-            if (_groups.Exists(groupName))
+            var detectorId = StreamViewerGroups.ExtractDeviceId(groupName);
+
+            if (_groups.HasViewers(detectorId))
             {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
                 _groups.Leave(groupName);
@@ -37,6 +41,5 @@ namespace Api.Services.DetectorStreamProcessor
 
             // TODO(rg): handle case where groupName is invalid
         }
-
     }
 }

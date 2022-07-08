@@ -8,7 +8,6 @@ using Api.Infrastructure.Validation;
 using Ardalis.ApiEndpoints;
 using AutoMapper;
 using FluentValidation;
-using LanguageExt;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;

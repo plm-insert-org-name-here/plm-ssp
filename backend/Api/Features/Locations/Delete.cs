@@ -34,7 +34,7 @@ namespace Api.Features.Locations
                 .SingleOrDefaultAsync(ct);
 
             if (existingLocation is null) return NotFound();
-            if (existingLocation.Detector?.State == DetectorState.Running)
+            if (existingLocation.Detector?.State == DetectorState.Streaming)
                 return BadRequest("The detector attached to the location is busy");
 
             _context.Locations.Remove(existingLocation);

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using Serilog;
 
+
 namespace Api.Services.DetectorController
 {
+    using DetectorId = Int32;
+
     public class DetectorCommandQueues
     {
-        private readonly Dictionary<int, DetectorCommandQueue> _queues = new();
+        private readonly Dictionary<DetectorId, DetectorCommandQueue> _queues = new();
         private readonly ILogger _logger;
 
         public DetectorCommandQueues(ILogger logger)
@@ -15,9 +18,7 @@ namespace Api.Services.DetectorController
             _logger = logger;
         }
 
-        public DetectorCommandQueue this[int index] => _queues[index];
-
-        public bool EnqueueCommand(int key, DetectorCommand command)
+        public bool EnqueueCommand(DetectorId key, DetectorCommand command)
         {
             if (!_queues.ContainsKey(key)) return false;
 
@@ -25,7 +26,7 @@ namespace Api.Services.DetectorController
             return true;
         }
 
-        public DetectorCommandQueue AddQueue(int key)
+        public DetectorCommandQueue AddQueue(DetectorId key)
         {
             var queue = new DetectorCommandQueue();
             try
@@ -40,7 +41,7 @@ namespace Api.Services.DetectorController
             return queue;
         }
 
-        public bool RemoveQueue(int key)
+        public bool RemoveQueue(DetectorId key)
         {
             return _queues.Remove(key);
         }

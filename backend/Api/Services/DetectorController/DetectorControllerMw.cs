@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace Api.Services.DetectorController
 {
-    public class DetectorControllerMiddleware
+    public class DetectorControllerMw
     {
         private readonly RequestDelegate _next;
 
-        public DetectorControllerMiddleware(RequestDelegate next)
+        public DetectorControllerMw(RequestDelegate next)
         {
             _next = next;
         }

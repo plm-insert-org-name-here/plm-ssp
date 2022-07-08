@@ -3,7 +3,7 @@ using Serilog;
 
 namespace Api.Infrastructure.Logging
 {
-    public static class LoggingExtensions
+    public static class LoggingExt
     {
         public static void UseLogging(this IHostBuilder builder)
         {

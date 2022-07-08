@@ -22,12 +22,12 @@ namespace Api.Features.Jobs
         .WithActionResult<Create.Res>
     {
         private readonly Context _context;
-        private readonly LocationSnapshotCache _snapshotCache;
+        private readonly SnapshotCache _snapshotCache;
         private readonly IMapper _mapper;
         private readonly IValidator<Req> _validator;
         private readonly ILogger _logger;
 
-        public Create(Context context, LocationSnapshotCache snapshotCache, IMapper mapper, IValidator<Req> validator, ILogger logger)
+        public Create(Context context, SnapshotCache snapshotCache, IMapper mapper, IValidator<Req> validator, ILogger logger)
         {
             _context = context;
             _snapshotCache = snapshotCache;
