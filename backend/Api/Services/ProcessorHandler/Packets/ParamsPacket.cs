@@ -38,12 +38,12 @@ namespace Api.Services.ProcessorHandler
         {
             var bytes = new byte[GetSizeInBytes()];
 
-            var typeByte = BitConverter.GetBytes((int)JobType)[3];
             var detectorIdBytes = BitConverter.GetBytes(DetectorId);
+            var typeByte = BitConverter.GetBytes((int)JobType)[3];
             var templateCountBytes = BitConverter.GetBytes(Templates.Count);
 
-            bytes[0] = typeByte;
-            Buffer.BlockCopy(detectorIdBytes, 0, bytes, 1, 4);
+            Buffer.BlockCopy(detectorIdBytes, 0, bytes, 0, 4);
+            bytes[4] = typeByte;
             Buffer.BlockCopy(templateCountBytes, 0, bytes, 5, 4);
 
             for (var i = 0; i < Templates.Count; i++)

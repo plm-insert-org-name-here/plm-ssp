@@ -1,68 +1,69 @@
-import socket
-import cv2 as cv
-import numpy as np
-from collections import namedtuple
+from utils.types import PacketType, Template, Params
+from runner import Runner
+from sock import Sock
 
-sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-sock.connect("/tmp/plm-ssp.sock")
-
-Templ = namedtuple("Templ", "id x y w h order")
-Params = namedtuple("Params", "job_type detector_id templs")
+sock = Sock('/tmp/plm-ssp.sock')
+runners = {}
 
 def print_params(ps):
     print(f'job type: {ps.job_type}')
-    print(f'detector id: {ps.detector_id}')
     for t in ps.templs:
         print(f'templ: id: {t.id} x: {t.x} y: {t.y} w: {t.w} h: {t.h} order: {t.order}')
 
 def print_frame(frame):
-    print(f'frame size: {frame.shape}')
-
-def read_int_from_sock(n_bytes):
-    bytes = sock.recv(n_bytes)
-    return int.from_bytes(bytes, byteorder='little')
-
-def read_frame_from_sock(n_bytes):
-    bytes = sock.recv(n_bytes)
-    bytes = np.frombuffer(bytes, np.byte)
-    frame = cv.imdecode(bytes, cv.IMREAD_GRAYSCALE)
-    return frame
+    print(f'frame shape: {frame.shape}')
 
 def read_params():
-    job_type = read_int_from_sock(1)
-    detector_id = read_int_from_sock(4)
-    templ_count = read_int_from_sock(4)
+    detector_id = sock.read_int(4)
+    job_type = sock.read_int(1)
+    templ_count = sock.read_int(4)
     templs = []
     for i in range(templ_count):
-        id = read_int_from_sock(4)
-        x = read_int_from_sock(4)
-        y = read_int_from_sock(4)
-        w = read_int_from_sock(4)
-        h = read_int_from_sock(4)
-        order = read_int_from_sock(4)
-        templs.append(Templ(id, x, y, w, h, order))
+        id = sock.read_int(4)
+        x = sock.read_int(4)
+        y = sock.read_int(4)
+        w = sock.read_int(4)
+        h = sock.read_int(4)
+        order = sock.read_int(4)
+        templs.append(Template(id, x, y, w, h, order))
 
-    params = Params(job_type, detector_id, templs)
-    print_params(params)
+    params = Params(job_type, templs)
+    # print_params(params)
+    return detector_id, params
 
 def read_frame():
-    detector_id = read_int_from_sock(4)
-    frame_size = read_int_from_sock(4)
-    frame = read_frame_from_sock(frame_size)
+    detector_id = sock.read_int(4)
+    frame_size = sock.read_int(4)
+    frame = sock.read_frame(frame_size)
+    # print_frame(frame)
+    return detector_id, frame
 
-    print_frame(frame)
+def process_packet():
+    packet_type = sock.read_int(4)
 
+    if packet_type == PacketType.Params.value:
+        detector_id, params = read_params()
+        try:
+            runners[detector_id].stop()
+        except KeyError:
+            pass
+        runner = Runner(detector_id, params, sock)
+        runners[detector_id] = runner
+        runner.start()
 
-def read_packet():
-    msg_type = read_int_from_sock(4)
+    elif packet_type == PacketType.Frame.value:
+        detector_id, frame = read_frame()
+        try:
+            runners[detector_id].enqueue_frame(frame)
+        except KeyError:
+            # TODO(rg): handle error
+            # processor should not receive a frame for a given task before the params have been
+            # sent
+            print('error: frame received, but no params')
+            pass
 
-    if msg_type == 0:
-        read_params()
-    elif msg_type == 1:
-        read_frame()
     else:
-        print('unknown')
+        print(f'invalid packet type: {packet_type}')
 
 while True:
-    pkg = read_packet()
-
+    process_packet()

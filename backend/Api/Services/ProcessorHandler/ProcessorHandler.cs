@@ -44,7 +44,7 @@ namespace Api.Services.ProcessorHandler
             {
                 ProcessorSocket ??= await ServerSocket.AcceptAsync();
 
-                var mTypeBytes = BitConverter.GetBytes((int)ProcessorMessageType.Params);
+                var mTypeBytes = BitConverter.GetBytes((int)PacketType.Params);
                 var bytes = ps.ToBytes();
 
                 await ProcessorSocket.SendAsync(mTypeBytes, SocketFlags.None);
@@ -59,7 +59,7 @@ namespace Api.Services.ProcessorHandler
                 // TODO(rg): cancellation token
                 ProcessorSocket ??= await ServerSocket.AcceptAsync();
 
-                var mTypeBytes = BitConverter.GetBytes((int)ProcessorMessageType.Request);
+                var mTypeBytes = BitConverter.GetBytes((int)PacketType.Frame);
                 var reqBytes = frame.ToBytes();
 
                 await ProcessorSocket.SendAsync(mTypeBytes, SocketFlags.None);

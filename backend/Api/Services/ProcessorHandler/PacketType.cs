@@ -1,8 +1,8 @@
 namespace Api.Services.ProcessorHandler
 {
-    public enum ProcessorMessageType
+    public enum PacketType
     {
         Params = 0,
-        Request = 1
+        Frame = 1
     }
 }
