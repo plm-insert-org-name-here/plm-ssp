@@ -1,4 +1,5 @@
 using System;
+using Serilog;
 
 namespace Api.Services.ProcessorHandler
 {
@@ -20,6 +21,7 @@ namespace Api.Services.ProcessorHandler
             var bytes = new byte[4 + 4 + FrameSize];
 
             var detectorIdBytes = BitConverter.GetBytes(DetectorId);
+
             var frameSizeBytes = BitConverter.GetBytes(FrameSize);
 
             Buffer.BlockCopy(detectorIdBytes, 0, bytes, 0, 4);

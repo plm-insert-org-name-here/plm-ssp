@@ -52,7 +52,7 @@ namespace Api.Services.ProcessorHandler
             }
         }
 
-        public async Task SendRequest(FramePacket req)
+        public async Task SendFrame(FramePacket frame)
         {
             using (await _lock.Lock(CancellationToken.None))
             {
@@ -60,7 +60,7 @@ namespace Api.Services.ProcessorHandler
                 ProcessorSocket ??= await ServerSocket.AcceptAsync();
 
                 var mTypeBytes = BitConverter.GetBytes((int)ProcessorMessageType.Request);
-                var reqBytes = req.ToBytes();
+                var reqBytes = frame.ToBytes();
 
                 await ProcessorSocket.SendAsync(mTypeBytes, SocketFlags.None);
                 await ProcessorSocket.SendAsync(reqBytes, SocketFlags.None);

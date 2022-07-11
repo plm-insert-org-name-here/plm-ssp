@@ -46,9 +46,9 @@ namespace Api.Services.StreamHandler
             await RunServer(stoppingToken);
         }
 
-        private struct DetectorFrameBuffer
+        private class DetectorFrameBuffer
         {
-            public byte[] Buffer { get; set; }
+            public byte[] Buffer { get; set; } = default!;
             public int Index { get; set; }
         }
 
@@ -94,8 +94,8 @@ namespace Api.Services.StreamHandler
                             .SingleOrDefaultAsync(stoppingToken);
 
                         if (detector.State is DetectorState.Monitoring) {
-                            var req = new FramePacket(detectorId, frame.Length, frame);
-                            await _processor.SendRequest(req);
+                            var framePacket = new FramePacket(detectorId, frame.Length, frame);
+                            await _processor.SendFrame(framePacket);
                         }
 
                         // We don't need to check for subs here as the method already does
