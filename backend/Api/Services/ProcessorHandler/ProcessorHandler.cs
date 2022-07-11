@@ -38,31 +38,24 @@ namespace Api.Services.ProcessorHandler
             ServerSocket.Listen(1);
         }
 
-        public async Task SendParameters(ProcessorParams ps)
+        public async Task SendParameters(ParamsPacket ps)
         {
-            _logger.Warning("About to lock sendparameters");
             using (await _lock.Lock(CancellationToken.None))
             {
-                _logger.Warning("Locked sendparameters");
                 ProcessorSocket ??= await ServerSocket.AcceptAsync();
 
                 var mTypeBytes = BitConverter.GetBytes((int)ProcessorMessageType.Params);
-                var bytes = ps.ToBytes(_logger);
-
-                _logger.Debug("Param bytes: {Bytes}", bytes);
+                var bytes = ps.ToBytes();
 
                 await ProcessorSocket.SendAsync(mTypeBytes, SocketFlags.None);
                 await ProcessorSocket.SendAsync(bytes, SocketFlags.None);
             }
-            _logger.Warning("Unlocked sendparameters");
         }
 
-        public async Task SendRequest(ProcessorReq req)
+        public async Task SendRequest(FramePacket req)
         {
-            _logger.Warning("About to lock sendreq");
             using (await _lock.Lock(CancellationToken.None))
             {
-                _logger.Warning("Locked sendreq");
                 // TODO(rg): cancellation token
                 ProcessorSocket ??= await ServerSocket.AcceptAsync();
 
@@ -72,10 +65,9 @@ namespace Api.Services.ProcessorHandler
                 await ProcessorSocket.SendAsync(mTypeBytes, SocketFlags.None);
                 await ProcessorSocket.SendAsync(reqBytes, SocketFlags.None);
             }
-            _logger.Warning("Unlocked sendreq");
         }
 
-        public async Task<ProcessorRes?> TryReadResponse()
+        public async Task<ResultPacket?> TryReadResponse()
         {
             using (await _lock.Lock(CancellationToken.None))
             {

@@ -7,17 +7,17 @@ using Serilog;
 
 namespace Api.Services.ProcessorHandler
 {
-    public class ProcessorParams
+    public class ParamsPacket
     {
         public int DetectorId { get; set; }
         public JobType JobType {get; set; }
-        public List<ProcessorParamsTemplate> Templates { get; set; } = default!;
+        public List<ParamsPacketTemplate> Templates { get; set; } = default!;
 
         public class MappingProfile : Profile
         {
             public MappingProfile()
             {
-                CreateProjection<Task, ProcessorParams>()
+                CreateProjection<Task, ParamsPacket>()
                     .ForMember(dest => dest.JobType, opt => opt.MapFrom(src => src.Job.Type))
                     .ForMember(dest => dest.DetectorId, opt => opt.MapFrom(src => src.Job.Location!.Detector!.Id))
                     .ForMember(dest => dest.Templates, opt => opt.MapFrom(src => src.Templates));
@@ -29,20 +29,18 @@ namespace Api.Services.ProcessorHandler
             // 1 byte for job type (it's technically a 4 byte integer)
             // 4 bytes for task id
             // 4 bytes for template count
-            // 20 bytes for each template
+            // some amount of bytes for each template
             return 1 + 4 + 4 +
-                   Templates.Count * ProcessorParamsTemplate.SizeInBytes;
+                   Templates.Count * ParamsPacketTemplate.SizeInBytes;
         }
 
-        public byte[] ToBytes(ILogger logger)
+        public byte[] ToBytes()
         {
             var bytes = new byte[GetSizeInBytes()];
 
             var typeByte = BitConverter.GetBytes((int)JobType)[3];
             var detectorIdBytes = BitConverter.GetBytes(DetectorId);
             var templateCountBytes = BitConverter.GetBytes(Templates.Count);
-
-            logger.Debug("D-Id bytes: {Bytes}", detectorIdBytes);
 
             bytes[0] = typeByte;
             Buffer.BlockCopy(detectorIdBytes, 0, bytes, 1, 4);
@@ -54,8 +52,8 @@ namespace Api.Services.ProcessorHandler
                     Templates[i].ToBytes(),
                     0,
                     bytes,
-                    9 + i * ProcessorParamsTemplate.SizeInBytes,
-                    ProcessorParamsTemplate.SizeInBytes
+                    9 + i * ParamsPacketTemplate.SizeInBytes,
+                    ParamsPacketTemplate.SizeInBytes
                 );
             }
 
@@ -63,20 +61,22 @@ namespace Api.Services.ProcessorHandler
         }
     }
 
-    public class ProcessorParamsTemplate
+    public class ParamsPacketTemplate
     {
-        public static int SizeInBytes = 20;
+        public static int SizeInBytes = 24;
 
         public int Id { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public int OrderNum { get; set; }
 
         public class MappingProfile : Profile
         {
             public MappingProfile() =>
-                CreateProjection<Template, ProcessorParamsTemplate>();
+                CreateProjection<Template, ParamsPacketTemplate>()
+                    .ForMember(src => src.OrderNum, opt => opt.NullSubstitute(0));
         }
 
         public byte[] ToBytes()
@@ -88,12 +88,14 @@ namespace Api.Services.ProcessorHandler
             var yBytes = BitConverter.GetBytes(Y);
             var wBytes = BitConverter.GetBytes(Width);
             var hBytes = BitConverter.GetBytes(Height);
+            var orderBytes = BitConverter.GetBytes(OrderNum);
 
             Buffer.BlockCopy(idBytes, 0, bytes, 0, 4);
             Buffer.BlockCopy(xBytes, 0, bytes, 4, 4);
             Buffer.BlockCopy(yBytes, 0, bytes, 8, 4);
             Buffer.BlockCopy(wBytes, 0, bytes, 12, 4);
             Buffer.BlockCopy(hBytes, 0, bytes, 16, 4);
+            Buffer.BlockCopy(orderBytes, 0, bytes, 20, 4);
 
             return bytes;
         }

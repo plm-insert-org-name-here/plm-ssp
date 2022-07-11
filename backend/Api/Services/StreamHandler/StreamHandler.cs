@@ -94,7 +94,7 @@ namespace Api.Services.StreamHandler
                             .SingleOrDefaultAsync(stoppingToken);
 
                         if (detector.State is DetectorState.Monitoring) {
-                            var req = new ProcessorReq(detectorId, frame.Length, frame);
+                            var req = new FramePacket(detectorId, frame.Length, frame);
                             await _processor.SendRequest(req);
                         }
 

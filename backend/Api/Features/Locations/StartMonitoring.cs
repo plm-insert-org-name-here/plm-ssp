@@ -88,7 +88,7 @@ namespace Api.Features.Locations
                 .ThenInclude(j => j.Location!)
                 .ThenInclude(l => l.Detector)
                 .Include(t => t.Templates)
-                .ProjectTo<ProcessorParams>(_mapperConfig)
+                .ProjectTo<ParamsPacket>(_mapperConfig)
                 .SingleOrDefaultAsync(ct);
 
             _logger.Debug("{DetectorId}", processorParams.DetectorId);

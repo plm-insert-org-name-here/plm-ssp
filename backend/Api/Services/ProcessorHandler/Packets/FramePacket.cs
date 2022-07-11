@@ -1,11 +1,10 @@
 using System;
-using Api.Domain.Entities;
 
 namespace Api.Services.ProcessorHandler
 {
-    public class ProcessorReq
+    public class FramePacket
     {
-        public ProcessorReq(int detectorId, int frameSize, byte[] frame)
+        public FramePacket(int detectorId, int frameSize, byte[] frame)
         {
             DetectorId = detectorId;
             FrameSize = frameSize;

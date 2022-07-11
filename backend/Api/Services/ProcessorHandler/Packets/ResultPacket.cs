@@ -1,7 +1,7 @@
 namespace Api.Services.ProcessorHandler
 {
-    public class ProcessorRes
+    public class ResultPacket
     {
-        
+
     }
 }

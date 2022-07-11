@@ -4,14 +4,14 @@ from collections import namedtuple
 sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 sock.connect("/tmp/plm-ssp.sock")
 
-Templ = namedtuple("Templ", "id x y w h")
+Templ = namedtuple("Templ", "id x y w h order")
 Params = namedtuple("Params", "job_type detector_id templs")
 
 def print_params(ps):
         print(f'job type: {ps.job_type}')
         print(f'detector id: {ps.detector_id}')
         for t in ps.templs:
-            print(f'templ: id: {t.id} x: {t.x} y: {t.y} w: {t.w} h: {t.h}')
+            print(f'templ: id: {t.id} x: {t.x} y: {t.y} w: {t.w} h: {t.h} order: {t.order}')
 
 def read_int_from_sock(n_bytes):
     bytes = sock.recv(n_bytes)
@@ -31,7 +31,8 @@ def read_params():
         y = read_int_from_sock(4)
         w = read_int_from_sock(4)
         h = read_int_from_sock(4)
-        templs.append(Templ(id, x, y, w, h))
+        order = read_int_from_sock(4)
+        templs.append(Templ(id, x, y, w, h, order))
 
     params = Params(job_type, detector_id, templs)
     print_params(params)
