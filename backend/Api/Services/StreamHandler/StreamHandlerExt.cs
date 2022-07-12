@@ -6,7 +6,7 @@ namespace Api.Services.StreamHandler
     {
         public static IServiceCollection AddStreamHandler(this IServiceCollection services)
         {
-            services.AddHostedService<StreamHandler>();
+            services.AddHostedService<StreamHandlerService>();
             services.AddSingleton<StreamHandlerOpt>();
             services.AddSingleton<StreamViewerGroups>();
 

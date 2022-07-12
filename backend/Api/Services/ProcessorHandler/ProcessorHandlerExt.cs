@@ -9,7 +9,9 @@ namespace Api.Services.ProcessorHandler
     {
         public static IServiceCollection AddProcessorHandler(this IServiceCollection services)
         {
-            services.AddSingleton<ProcessorHandler>();
+            services.AddSingleton<PacketSender>();
+            services.AddHostedService<PacketReceiverService>();
+            services.AddSingleton<ProcessorSocket>();
             services.AddSingleton<ProcessorHandlerOpt>();
 
             return services;

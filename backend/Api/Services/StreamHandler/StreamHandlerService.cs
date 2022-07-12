@@ -14,21 +14,21 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Api.Services.StreamHandler
 {
-    public class StreamHandler : BackgroundService
+    public class StreamHandlerService : BackgroundService
     {
         private readonly ILogger _logger;
         private readonly StreamHandlerOpt _opt;
         private readonly StreamViewerGroups _groups;
-        private readonly ProcessorHandler.ProcessorHandler _processor;
+        private readonly PacketSender _processor;
         private readonly IDbContextFactory<Context> _contextFactory;
 
-        public StreamHandler(
+        public StreamHandlerService(
             ILogger logger,
             IConfiguration configuration,
             StreamHandlerOpt opt,
             StreamViewerGroups groups,
             IDbContextFactory<Context> contextFactory,
-            ProcessorHandler.ProcessorHandler processor)
+            PacketSender processor)
         {
             _logger = logger;
             _opt = opt;
