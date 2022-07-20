@@ -26,5 +26,4 @@ class TemplateState(Enum):
 class QAState(Enum):
     Success = 0
     Failure = 1
-    Obstructed = 2 
-    Uncertain = 3
+    Uncertain = 2
