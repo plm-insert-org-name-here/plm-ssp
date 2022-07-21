@@ -9,6 +9,7 @@ using Api.Services.ProcessorHandler;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 
@@ -24,19 +25,16 @@ namespace Api.Services.StreamHandler
 
         public StreamHandlerService(
             ILogger logger,
-            IConfiguration configuration,
-            StreamHandlerOpt opt,
+            IOptions<StreamHandlerOpt> opt,
             StreamViewerGroups groups,
             IDbContextFactory<Context> contextFactory,
             PacketSender processor)
         {
             _logger = logger;
-            _opt = opt;
+            _opt = opt.Value;
             _groups = groups;
             _contextFactory = contextFactory;
             _processor = processor;
-
-            configuration.GetSection(StreamHandlerOpt.SectionName).Bind(_opt);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

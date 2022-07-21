@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Services.DetectorController
@@ -13,8 +14,11 @@ namespace Api.Services.DetectorController
                 : throw new ArgumentException(null, nameof(app));
         }
 
-        public static IServiceCollection AddDetectorControllerWebSocket(this IServiceCollection services)
+        public static IServiceCollection AddDetectorControllerWebSocket(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<DetectorControllerOpt>(
+                configuration.GetSection(DetectorControllerOpt.SectionName));
+
             services.AddSingleton<DetectorCommandQueues>();
             services.AddScoped<DetectorController>();
             services.AddSingleton<DetectorControllerOpt>();

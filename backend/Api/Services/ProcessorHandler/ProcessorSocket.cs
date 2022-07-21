@@ -2,6 +2,7 @@ using System.IO;
 using System.Net.Sockets;
 using Api.Utils;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Api.Services.ProcessorHandler
 {
@@ -13,13 +14,9 @@ namespace Api.Services.ProcessorHandler
         public Socket? RemoteSocket { get; set; }
         public CancellableLock SockLock { get; } = new();
 
-        public ProcessorSocket(
-            IConfiguration config,
-            ProcessorHandlerOpt opt)
+        public ProcessorSocket(IOptions<ProcessorHandlerOpt> opt)
         {
-            _opt = opt;
-
-            config.GetSection(ProcessorHandlerOpt.SectionName).Bind(_opt);
+            _opt = opt.Value;
 
             ServerSocket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
 

@@ -9,6 +9,7 @@ using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 
@@ -24,8 +25,7 @@ namespace Api.Services.DetectorController
         private readonly SnapshotCache _snapshotCache;
 
         public DetectorController(
-            IConfiguration configuration,
-            DetectorControllerOpt opt,
+            IOptions<DetectorControllerOpt> opt,
             ILogger logger,
             DetectorCommandQueues queues,
             SnapshotCache snapshotCache,
@@ -36,9 +36,7 @@ namespace Api.Services.DetectorController
             _snapshotCache = snapshotCache;
             _contextFactory = contextFactory;
             _groups = groups;
-
-            _opt = opt;
-            configuration.GetSection(DetectorControllerOpt.SectionName).Bind(_opt);
+            _opt = opt.Value;
         }
 
         // TODO(rg): cancellation tokens?
