@@ -8,8 +8,8 @@ import Grid from "@mui/material/Grid";
 
 import "./App.css";
 import About from "./components/about/About";
+import Dashboard from "./components/dashboard/Dashboard";
 import Infrastructure from "./components/infra/Infrastructure";
-import Main from "./components/main/Main";
 
 const setupAxiosInterceptors = (
     onBadRequest,
@@ -83,11 +83,11 @@ function App() {
                 <Switch>
                     <Route path="/" exact>
                         <Grid container sx={{ p: 1, height: "100vh" }}>
-                            <Grid item xs={12} md={4} lg={3} display="flex">
+                            <Grid item xs={12} md={3} lg={2} display="flex">
                                 <Infrastructure />
                             </Grid>
-                            <Grid item xs={12} md={8} lg={9} display="flex">
-                                <Main />
+                            <Grid item xs={12} md={9} lg={10} display="flex">
+                                <Dashboard />
                             </Grid>
                         </Grid>
                     </Route>
