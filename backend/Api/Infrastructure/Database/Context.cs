@@ -18,7 +18,7 @@ namespace Api.Infrastructure.Database
         public DbSet<Job> Jobs => Set<Job>();
         public DbSet<Location> Locations => Set<Location>();
         public DbSet<Task> Tasks => Set<Task>();
-        public DbSet<TaskResult> TaskResults => Set<TaskResult>();
+        public DbSet<TaskInstance> TaskInstances => Set<TaskInstance>();
         public DbSet<Template> Templates => Set<Template>();
 
     }

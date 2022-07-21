@@ -30,7 +30,7 @@ namespace Api.Services.ProcessorHandler
             await RunReceiver(stoppingToken);
         }
 
-        public async Task<ResultPacket> ReceiveResult()
+        public async Task<ResultPacketBase> ReceiveResult()
         {
             using (await _processorSocket.SockLock.Lock(CancellationToken.None))
             {
@@ -42,7 +42,7 @@ namespace Api.Services.ProcessorHandler
                 await _processorSocket.RemoteSocket.ReceiveAsync(buffer, SocketFlags.None);
 
                 // TODO(rg): error handling (buffer content may be invalid)
-                return ResultPacket.FromBytes(buffer);
+                return ResultPacketBase.FromBytes(buffer);
             }
         }
 
@@ -74,7 +74,7 @@ namespace Api.Services.ProcessorHandler
         // 2. expected state: OK, actual state: NOK => Event(NOK)
 
         // TaskResult FinalState should depend on the states of Events belonging to it
-        private async Task ProcessResult(ResultPacket result)
+        private async Task ProcessResult(ResultPacketBase result)
         {
             throw new NotImplementedException();
         }

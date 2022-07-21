@@ -62,7 +62,6 @@ namespace Api.Features.Locations
 
             var task = await _context.Tasks.SingleOrDefaultAsync(t => t.Id == req.Body.TaskId, ct);
 
-
             if (location is null) return NotFound();
             if (location.Detector is null) return BadRequest("The specified location does not have a detector attached to it");
 

@@ -46,7 +46,6 @@ namespace Api.Features.Tasks
                 RuleFor(t => t.Name).MaximumLength(64).NotEmpty();
                 RuleFor(t => t).Must(HaveUniqueNameWithinJob)
                     .WithMessage("'Name' must be unique within the parent Job.");
-                RuleFor(t => t.Ordered).NotNull();
                 RuleFor(t => t.JobId).NotEmpty();
             }
 
@@ -86,12 +85,20 @@ namespace Api.Features.Tasks
 
             if (job is null) return NotFound();
 
+            var qa = job.Type is JobType.QA;
+
+            if (qa && req.Ordered.HasValue)
+                return BadRequest("QA tasks cannot set the 'Ordered' field");
+
+            if (!qa && !req.Ordered.HasValue)
+                return BadRequest("Kit tasks must set the 'Ordered' field");
+
             var task = new Task
             {
                 Name = req.Name,
-                Ordered = req.Ordered!.Value,
+                Ordered = qa ? null : req.Ordered!.Value,
                 Status = TaskStatus.Inactive,
-                Templates = new List<Template>()
+                Templates = qa ? null : new List<Template>()
             };
 
             job.Tasks.Add(task);

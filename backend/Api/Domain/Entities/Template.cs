@@ -8,12 +8,16 @@ namespace Api.Domain.Entities
         public int Width { get; set; }
         public int Height { get; set; }
         public int? OrderNum { get; set; }
-        public TemplateAction Action { get; set; }
+
+        public TemplateState ExpectedInitialState { get; set; }
+        public TemplateState ExpectedSubsequentState { get; set; }
     }
 
-    public enum TemplateAction
+    public enum TemplateState
     {
-        Take,
-        Put
+        Present,
+        Missing,
+        Uncertain,
+        Invalid
     }
 }
