@@ -15,7 +15,7 @@ def print_frame(frame):
 
 def read_params():
     detector_id = sock.read_int(4)
-    job_type = sock.read_int(1)
+    job_type = sock.read_int(4)
     templ_count = sock.read_int(4)
     templs = []
     for i in range(templ_count):

@@ -27,13 +27,13 @@ namespace Api.Services.ProcessorHandler
         private int GetSizeInBytes()
         {
             // 4 bytes for task id
-            // 1 byte for job type (it's technically a 4 byte integer)
-            if (JobType == JobType.QA) return 4 + 1;
+            // 4 bytes for job type integer
+            if (JobType == JobType.QA) return 4 + 4;
 
             // additionally:
             // 4 bytes for template count
             // some amount of bytes for each template
-            return 4 + 1 + 4 +
+            return 4 + 4 + 4 +
                    Templates!.Count * ParamsPacketTemplate.SizeInBytes;
         }
 
@@ -42,15 +42,15 @@ namespace Api.Services.ProcessorHandler
             var bytes = new byte[GetSizeInBytes()];
 
             var detectorIdBytes = BitConverter.GetBytes(DetectorId);
-            var typeByte = BitConverter.GetBytes((int)JobType)[3];
+            var typeBytes = BitConverter.GetBytes((int)JobType);
 
             Buffer.BlockCopy(detectorIdBytes, 0, bytes, 0, 4);
-            bytes[4] = typeByte;
+            Buffer.BlockCopy(typeBytes, 0, bytes, 4, 4);
 
             if (JobType != JobType.QA)
             {
                 var templateCountBytes = BitConverter.GetBytes(Templates!.Count);
-                Buffer.BlockCopy(templateCountBytes, 0, bytes, 5, 4);
+                Buffer.BlockCopy(templateCountBytes, 0, bytes, 8, 4);
 
                 for (var i = 0; i < Templates.Count; i++)
                 {
@@ -58,7 +58,7 @@ namespace Api.Services.ProcessorHandler
                         Templates[i].ToBytes(),
                         0,
                         bytes,
-                        9 + i * ParamsPacketTemplate.SizeInBytes,
+                        12 + i * ParamsPacketTemplate.SizeInBytes,
                         ParamsPacketTemplate.SizeInBytes
                     );
                 }
