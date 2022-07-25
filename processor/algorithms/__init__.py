@@ -1,11 +1,9 @@
-from utils.types import JobType
+from utils.types import JobType, QAState
 from abc import abstractmethod
 import tensorflow as tf
 import numpy as np
 import cv2
 from PIL import Image
-
-from types import QAState
 
 # TODO: algorithms
 def get_algorithm(params):
