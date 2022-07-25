@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Api.Domain.Common;
 using Api.Domain.Entities;
 
 namespace Api.Services.ProcessorHandler.Packets

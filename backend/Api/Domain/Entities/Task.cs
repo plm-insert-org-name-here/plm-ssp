@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Api.Domain.Common;
 
 namespace Api.Domain.Entities
 {
@@ -11,12 +12,5 @@ namespace Api.Domain.Entities
 
         public Job Job { get; set; } = default!;
         public int JobId { get; set; }
-    }
-
-    public enum TaskStatus
-    {
-        Active,
-        Paused,
-        Inactive
     }
 }

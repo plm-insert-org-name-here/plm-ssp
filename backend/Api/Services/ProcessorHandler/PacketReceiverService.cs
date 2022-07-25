@@ -1,12 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Api.Domain.Common;
+using Api.Domain.Entities;
 using Api.Services.ProcessorHandler.Packets;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Task = System.Threading.Tasks.Task;
 
 namespace Api.Services.ProcessorHandler
 {
@@ -38,12 +43,47 @@ namespace Api.Services.ProcessorHandler
                 _processorSocket.RemoteSocket ??=
                     await _processorSocket.ServerSocket.AcceptAsync();
 
-                // TODO(rg): buffer size from config
-                var buffer = new byte[1024];
-                await _processorSocket.RemoteSocket.ReceiveAsync(buffer, SocketFlags.None);
+                var baseBuffer = new byte[8];
+                await _processorSocket.RemoteSocket.ReceiveAsync(baseBuffer, SocketFlags.None);
+                var detectorId = BitConverter.ToInt32(baseBuffer, 0);
+                var jobType = (JobType)BitConverter.ToInt32(baseBuffer, 4);
 
-                // TODO(rg): error handling (buffer content may be invalid)
-                return ResultPacketBase.FromBytes(buffer);
+                if (jobType is JobType.QA)
+                {
+                    var qaBuffer = new byte[4];
+                    await _processorSocket.RemoteSocket.ReceiveAsync(qaBuffer, SocketFlags.None);
+                    var result = (QAResult)BitConverter.ToInt32(qaBuffer, 0);
+
+                    return new QAResultPacket
+                    {
+                        DetectorId = detectorId,
+                        JobType = jobType,
+                        Result = result
+                    };
+                }
+                else
+                {
+                    var templatesLenBuffer = new byte[4];
+                    await _processorSocket.RemoteSocket.ReceiveAsync(templatesLenBuffer, SocketFlags.None);
+                    var templatesLen = BitConverter.ToInt32(templatesLenBuffer, 0);
+
+                    var templateStates = new List<(int, TemplateState)>();
+                    var templateStatesBuffer = new byte[8 * templatesLen];
+                    await _processorSocket.RemoteSocket.ReceiveAsync(templateStatesBuffer, SocketFlags.None);
+                    for (var i = 0; i < templatesLen; i++)
+                    {
+                        var id = BitConverter.ToInt32(templateStatesBuffer, 8 * i);
+                        var state = (TemplateState)BitConverter.ToInt32(templateStatesBuffer, 8 * i + 4);
+                        templateStates.Add((id, state));
+                    }
+
+                    return new KitResultPacket
+                    {
+                        DetectorId = detectorId,
+                        JobType = jobType,
+                        TemplateStates = templateStates
+                    };
+                }
             }
         }
 

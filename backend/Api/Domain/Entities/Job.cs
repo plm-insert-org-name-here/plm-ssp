@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Api.Domain.Common;
 
 namespace Api.Domain.Entities
 {
@@ -13,12 +14,4 @@ namespace Api.Domain.Entities
 
         public List<Task> Tasks { get; set; } = default!;
     }
-
-    public enum JobType
-    {
-        ToolKit,
-        ItemKit,
-        QA,
-    }
-
 }

@@ -1,3 +1,5 @@
+using Api.Domain.Common;
+
 namespace Api.Domain.Entities
 {
     public class Template : BaseEntity
@@ -11,13 +13,5 @@ namespace Api.Domain.Entities
 
         public TemplateState ExpectedInitialState { get; set; }
         public TemplateState ExpectedSubsequentState { get; set; }
-    }
-
-    public enum TemplateState
-    {
-        Present,
-        Missing,
-        Uncertain,
-        Invalid
     }
 }

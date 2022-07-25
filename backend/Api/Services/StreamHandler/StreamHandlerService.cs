@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
+using Api.Domain.Common;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Services.ProcessorHandler;

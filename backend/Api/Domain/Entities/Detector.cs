@@ -1,4 +1,5 @@
 using System.Net.NetworkInformation;
+using Api.Domain.Common;
 
 namespace Api.Domain.Entities
 {
@@ -10,14 +11,5 @@ namespace Api.Domain.Entities
 
         public Location? Location { get; set; }
         public int? LocationId { get; set; }
-    }
-
-    // TODO(rg): Error state(s)
-    public enum DetectorState
-    {
-        Off,
-        Standby,
-        Streaming,
-        Monitoring
     }
 }

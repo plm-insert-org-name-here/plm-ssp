@@ -1,4 +1,5 @@
 using System;
+using Api.Domain.Common;
 
 namespace Api.Domain.Entities
 {
@@ -7,13 +8,7 @@ namespace Api.Domain.Entities
         public DateTime Timestamp { get; set; }
         public Template? Template { get; set; }
         public TaskInstance TaskInstance { get; set; } = default!;
-        public EventState State { get; set; }
+        public EventResult Result { get; set; }
         public string? FailureReason { get; set; }
-    }
-
-    public enum EventState
-    {
-        Success,
-        Failure,
     }
 }
