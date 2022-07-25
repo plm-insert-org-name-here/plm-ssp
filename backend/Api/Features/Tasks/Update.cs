@@ -34,13 +34,14 @@ namespace Api.Features.Tasks
 
             [FromBody] public ReqBody Body { get; set; } = default!;
 
-            public record ReqBody(string Name, bool? Ordered, List<Template> Templates);
+            public record ReqBody(string Name, bool? Ordered, List<Template>? Templates);
 
             public record Template(
                 string Name,
                 int? X, int? Y, int? Width, int? Height,
                 int? OrderNum,
-                TemplateAction? Action);
+                TemplateState? ExpectedInitialState,
+                TemplateState? ExpectedSubsequentState);
         }
 
         public class Validator : AbstractValidator<Req>
@@ -48,21 +49,22 @@ namespace Api.Features.Tasks
             public Validator(Context context)
             {
                 RuleFor(t => t.Body.Name).NotEmpty().MaximumLength(64);
-                RuleFor(t => t.Body.Ordered).NotNull();
                 RuleFor(t => t.Body.Templates).Must(HaveUniqueNamesWithinTask)
                     .WithMessage("All Template must have unique names within the parent Task");
-                RuleFor(t => t.Body.Templates).Must(HaveTemplatesInOrder).When(t => t.Body.Ordered!.Value)
+                RuleFor(t => t.Body.Templates).Must(HaveTemplatesInOrder).When(t => t.Body.Ordered.HasValue && t.Body.Ordered.Value)
                     .WithMessage("Templates' order numbers must be in ascending order, with starting index 1 and step 1, if the Task is Ordered.");
-                RuleFor(t => t.Body.Templates).Must(BeUnordered).When(t => !t.Body.Ordered!.Value)
+                RuleFor(t => t.Body.Templates).Must(BeUnordered).When(t => t.Body.Ordered.HasValue && !t.Body.Ordered.Value)
                     .WithMessage("Templates' order numbers must all be null, if the Task is not Ordered.");
                 RuleForEach(t => t.Body.Templates).SetValidator(new TemplateValidator());
             }
 
-            private bool BeUnordered(List<Req.Template> ts) =>
-                ts.All(t => t.OrderNum is null);
+            private bool BeUnordered(List<Req.Template>? ts) =>
+                ts is null || ts.All(t => t.OrderNum is null);
 
-            private bool HaveTemplatesInOrder(List<Req.Template> ts)
+            private bool HaveTemplatesInOrder(List<Req.Template>? ts)
             {
+                if (ts is null) return true;
+
                 // There's probably a nicer way of doing this
                 var orderNums = ts.Select(t => t.OrderNum).OrderBy(n => n).ToList();
                 return orderNums.Distinct().Count() == orderNums.Count
@@ -70,9 +72,11 @@ namespace Api.Features.Tasks
                     && orderNums[^1] == orderNums.Count;
             }
 
-            private bool HaveUniqueNamesWithinTask(List<Req.Template> templates)
+            private bool HaveUniqueNamesWithinTask(List<Req.Template>? ts)
             {
-                var names = templates.Select(t => t.Name).ToList();
+                if (ts is null) return true;
+
+                var names = ts.Select(t => t.Name).ToList();
                 return names.Distinct().Count() == names.Count;
             }
         }
@@ -84,7 +88,8 @@ namespace Api.Features.Tasks
                 RuleFor(t => t).Must(BeWithinBounds)
                     .WithMessage("All Templates must fit within the 640x480 snapshot area");
                 // TODO(rg): NotNull for x,y,w,h?
-                RuleFor(t => t.Action).NotNull();
+                RuleFor(t => t.ExpectedInitialState).NotNull();
+                RuleFor(t => t.ExpectedSubsequentState).NotNull();
             }
 
             private bool BeWithinBounds(Req.Template t)
@@ -126,25 +131,38 @@ namespace Api.Features.Tasks
             if (task.Status is not TaskStatus.Inactive)
                 return BadRequest("The Task must be in the Inactive state");
 
-            var isUnique = ValidateTaskNamesUniqueness(req, task);
-            if (!isUnique)
+            if (!ValidateTaskNamesUniqueness(req, task))
                 return BadRequest("'Name' must be unique within the parent Job");
 
+            var qa = task.Job.Type == JobType.QA;
 
             task.Name = req.Body.Name;
-            task.Ordered = req.Body.Ordered!.Value;
 
-            _context.RemoveRange(task.Templates);
+            if (req.Body.Ordered.HasValue)
+            {
+                if (qa)
+                    return BadRequest("QA tasks cannot set the 'Ordered' field");
 
-            var newTemplates = MapTemplates(req);
-            task.Templates = newTemplates;
+                task.Ordered = req.Body.Ordered!.Value;
+            }
+
+            if (req.Body.Templates is not null)
+            {
+                if (qa)
+                    return BadRequest("QA tasks cannot have templates");
+
+                _context.RemoveRange(task.Templates!);
+
+                var newTemplates = MapTemplates(req);
+                task.Templates = newTemplates;
+            }
 
             await _context.SaveChangesAsync(ct);
             return NoContent();
         }
 
         private static List<Template> MapTemplates(Req req) =>
-            req.Body.Templates.Select(t => new Template
+            req.Body.Templates!.Select(t => new Template
             {
                 Name = t.Name,
                 X = t.X!.Value,
@@ -152,7 +170,8 @@ namespace Api.Features.Tasks
                 Width = t.Width!.Value,
                 Height = t.Height!.Value,
                 OrderNum = t.OrderNum,
-                Action = t.Action!.Value
+                ExpectedInitialState = t.ExpectedInitialState!.Value,
+                ExpectedSubsequentState = t.ExpectedSubsequentState!.Value
             }).ToList();
 
         private static bool ValidateTaskNamesUniqueness(Req req, Task task) =>

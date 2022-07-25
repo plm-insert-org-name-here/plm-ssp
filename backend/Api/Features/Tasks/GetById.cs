@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Ardalis.ApiEndpoints;
 using AutoMapper;

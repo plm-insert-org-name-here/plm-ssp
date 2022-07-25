@@ -23,7 +23,7 @@ namespace Api.Features.Locations
         private readonly Context _context;
         private readonly DetectorCommandQueues _queues;
         private readonly IConfigurationProvider _mapperConfig;
-        private readonly ProcessorHandler _processor;
+        private readonly PacketSender _processor;
         private readonly ILogger _logger;
 
         public class Req
@@ -35,7 +35,7 @@ namespace Api.Features.Locations
             public record ReqBody(int TaskId);
         }
 
-        public StartMonitoring(Context context, DetectorCommandQueues queues, IConfigurationProvider mapperConfig, ProcessorHandler processor, ILogger logger)
+        public StartMonitoring(Context context, DetectorCommandQueues queues, IConfigurationProvider mapperConfig, PacketSender processor, ILogger logger)
         {
             _context = context;
             _queues = queues;
@@ -61,7 +61,6 @@ namespace Api.Features.Locations
                 .SingleOrDefaultAsync(ct);
 
             var task = await _context.Tasks.SingleOrDefaultAsync(t => t.Id == req.Body.TaskId, ct);
-
 
             if (location is null) return NotFound();
             if (location.Detector is null) return BadRequest("The specified location does not have a detector attached to it");
@@ -90,8 +89,6 @@ namespace Api.Features.Locations
                 .Include(t => t.Templates)
                 .ProjectTo<ParamsPacket>(_mapperConfig)
                 .SingleOrDefaultAsync(ct);
-
-            _logger.Debug("{DetectorId}", processorParams.DetectorId);
 
             await _processor.SendParameters(processorParams);
 

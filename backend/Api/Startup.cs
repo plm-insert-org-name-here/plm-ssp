@@ -42,9 +42,9 @@ namespace Api
             });
 
             services.AddSingleton<SnapshotCache>();
-            services.AddDetectorControllerWebSocket();
-            services.AddStreamHandler();
-            services.AddProcessorHandler();
+            services.AddDetectorControllerWebSocket(Configuration);
+            services.AddStreamHandler(Configuration);
+            services.AddProcessorHandler(Configuration);
 
             services.AddSignalR();
         }

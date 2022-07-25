@@ -12,9 +12,9 @@ import { Box, Card, IconButton, Tooltip } from "@mui/material";
 
 import { Routes } from "../../routes";
 import OverflowText from "../common/OverflowText";
-import ConfirmPopup from "../popups/ConfirmPopup";
-import EditPopup from "../popups/EditPopup";
-import MenuPopup from "../popups/MenuPopup";
+import ConfirmPopup from "../common/popups/ConfirmPopup";
+import EditPopup from "../common/popups/EditPopup";
+import MenuPopup from "../common/popups/MenuPopup";
 
 const DetectorCard = ({ detector, onAttach, onDetach, onDelete, onRename }) => {
     const [attachPopupItems, setAttachPopupItems] = useState([]);

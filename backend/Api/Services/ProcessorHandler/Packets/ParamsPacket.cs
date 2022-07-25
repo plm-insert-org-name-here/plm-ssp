@@ -11,7 +11,7 @@ namespace Api.Services.ProcessorHandler
     {
         public int DetectorId { get; set; }
         public JobType JobType {get; set; }
-        public List<ParamsPacketTemplate> Templates { get; set; } = default!;
+        public List<ParamsPacketTemplate>? Templates { get; set; } = default!;
 
         public class MappingProfile : Profile
         {
@@ -26,12 +26,15 @@ namespace Api.Services.ProcessorHandler
 
         private int GetSizeInBytes()
         {
-            // 1 byte for job type (it's technically a 4 byte integer)
             // 4 bytes for task id
+            // 1 byte for job type (it's technically a 4 byte integer)
+            if (JobType == JobType.QA) return 4 + 1;
+
+            // additionally:
             // 4 bytes for template count
             // some amount of bytes for each template
-            return 1 + 4 + 4 +
-                   Templates.Count * ParamsPacketTemplate.SizeInBytes;
+            return 4 + 1 + 4 +
+                   Templates!.Count * ParamsPacketTemplate.SizeInBytes;
         }
 
         public byte[] ToBytes()
@@ -40,21 +43,25 @@ namespace Api.Services.ProcessorHandler
 
             var detectorIdBytes = BitConverter.GetBytes(DetectorId);
             var typeByte = BitConverter.GetBytes((int)JobType)[3];
-            var templateCountBytes = BitConverter.GetBytes(Templates.Count);
 
             Buffer.BlockCopy(detectorIdBytes, 0, bytes, 0, 4);
             bytes[4] = typeByte;
-            Buffer.BlockCopy(templateCountBytes, 0, bytes, 5, 4);
 
-            for (var i = 0; i < Templates.Count; i++)
+            if (JobType != JobType.QA)
             {
-                Buffer.BlockCopy(
-                    Templates[i].ToBytes(),
-                    0,
-                    bytes,
-                    9 + i * ParamsPacketTemplate.SizeInBytes,
-                    ParamsPacketTemplate.SizeInBytes
-                );
+                var templateCountBytes = BitConverter.GetBytes(Templates!.Count);
+                Buffer.BlockCopy(templateCountBytes, 0, bytes, 5, 4);
+
+                for (var i = 0; i < Templates.Count; i++)
+                {
+                    Buffer.BlockCopy(
+                        Templates[i].ToBytes(),
+                        0,
+                        bytes,
+                        9 + i * ParamsPacketTemplate.SizeInBytes,
+                        ParamsPacketTemplate.SizeInBytes
+                    );
+                }
             }
 
             return bytes;

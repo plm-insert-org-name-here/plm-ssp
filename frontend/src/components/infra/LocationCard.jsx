@@ -13,9 +13,9 @@ import { Box, Card, CardActionArea, IconButton, Tooltip } from "@mui/material";
 import { InfrastructureContext } from "../../App";
 import { Routes } from "../../routes";
 import OverflowText from "../common/OverflowText";
-import ConfirmPopup from "../popups/ConfirmPopup";
-import EditPopup from "../popups/EditPopup";
-import MenuPopup from "../popups/MenuPopup";
+import ConfirmPopup from "../common/popups/ConfirmPopup";
+import EditPopup from "../common/popups/EditPopup";
+import MenuPopup from "../common/popups/MenuPopup";
 
 const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
     const [attachPopupItems, setAttachPopupItems] = useState([]);

@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Box, IconButton, Tooltip } from "@mui/material";
 
 import { Routes } from "../../routes";
-import EditPopup from "../popups/EditPopup";
+import EditPopup from "../common/popups/EditPopup";
 import LocationCard from "./LocationCard";
 
 const Locations = ({ locations, setLocations, onAttach, onDetach }) => {
@@ -48,6 +48,7 @@ const Locations = ({ locations, setLocations, onAttach, onDetach }) => {
                         height: "100%",
                         bgcolor: "#f6f6f6",
                         overflowY: "auto",
+                        borderRadius: "8px",
                     }}
                 >
                     {locations.map((l) => (
