@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Api.Domain.Entities;
 using AutoMapper;
-using Serilog;
 
-namespace Api.Services.ProcessorHandler
+namespace Api.Services.ProcessorHandler.Packets
 {
     public class ParamsPacket
     {

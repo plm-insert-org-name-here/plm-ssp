@@ -5,6 +5,7 @@ using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Services.DetectorController;
 using Api.Services.ProcessorHandler;
+using Api.Services.ProcessorHandler.Packets;
 using Ardalis.ApiEndpoints;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;

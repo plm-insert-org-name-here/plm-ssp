@@ -1,7 +1,6 @@
 using System;
-using Serilog;
 
-namespace Api.Services.ProcessorHandler
+namespace Api.Services.ProcessorHandler.Packets
 {
     public class FramePacket
     {

@@ -1,4 +1,4 @@
-namespace Api.Services.ProcessorHandler
+namespace Api.Services.ProcessorHandler.Packets
 {
     public class QAResultPacket
     {
