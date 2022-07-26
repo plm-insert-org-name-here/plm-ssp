@@ -5,7 +5,7 @@ using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
-using TaskStatus = Api.Domain.Entities.TaskStatus;
+using TaskStatus = Api.Domain.Common.TaskStatus;
 
 namespace Api.Features.Tasks
 {

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Api.Domain.Common;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Infrastructure.Validation;
@@ -12,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using Task = Api.Domain.Entities.Task;
-using TaskStatus = Api.Domain.Entities.TaskStatus;
+using TaskStatus = Api.Domain.Common.TaskStatus;
 
 namespace Api.Features.Tasks
 {

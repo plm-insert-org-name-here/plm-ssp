@@ -13,8 +13,8 @@ namespace Api.Services.ProcessorHandler
             services.Configure<ProcessorHandlerOpt>(
                 configuration.GetSection(ProcessorHandlerOpt.SectionName));
 
+            services.AddHostedService<PacketReceiverService>();
             services.AddSingleton<PacketSender>();
-            // services.AddHostedService<PacketReceiverService>();
             services.AddSingleton<ProcessorSocket>();
 
             return services;

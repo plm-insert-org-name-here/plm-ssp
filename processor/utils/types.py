@@ -1,13 +1,42 @@
 from collections import namedtuple
+from utils.serialization import to_bytes
 from enum import Enum
 
 Template = namedtuple("Template", "id x y w h order")
 Params = namedtuple("Params", "job_type templs")
+TemplateStateObj = namedtuple("TemplateStateObj", "id inner")
 
 # TODO: Result classes that know how to serialize themselves to socket
-ToolKitResult = namedtuple("ToolKitResult", "states")
-ItemKitResult = namedtuple("ItemKitResult", "states")
-QAResult = namedtuple("QAResult", "state")
+class ToolKitResult:
+    def __init__(self, states):
+        self.states = states
+
+    def serialize(self):
+        buf = b'' 
+        buf += to_bytes(len(self.states), 4)
+        for state in self.states:
+            buf += to_bytes(state.id, 4)
+            buf += to_bytes(state.inner.value, 4)
+        return buf
+
+class ItemKitResult:
+    def __init__(self, states):
+        self.states = states
+
+    def serialize(self):
+        buf = b'' 
+        buf += to_bytes(len(states), 4)
+        for state in states:
+            buf += to_bytes(state.id, 4)
+            buf += to_butes(state.value, 4)
+        return buf
+
+class QAResult:
+    def __init__(self, result):
+        self.result = result
+
+    def serialize(self):
+        return to_bytes(result, 4)
 
 class JobType(Enum):
     ToolKit = 0

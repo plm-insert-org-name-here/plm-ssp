@@ -1,14 +1,9 @@
-namespace Api.Services.ProcessorHandler
+using Api.Domain.Common;
+
+namespace Api.Services.ProcessorHandler.Packets
 {
-    public class QAResultPacket
+    public class QAResultPacket : ResultPacketBase
     {
         public QAResult Result { get; set; }
-    }
-
-    public enum QAResult
-    {
-        Success,
-        Failure,
-        Uncertain
     }
 }
