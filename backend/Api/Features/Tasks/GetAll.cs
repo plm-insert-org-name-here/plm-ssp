@@ -15,7 +15,7 @@ namespace Api.Features.Tasks
 {
     public class GetAll : EndpointBaseAsync
         .WithoutRequest
-        .WithResult<List<GetAll.Res>>
+        .WithResult<List<GetAll.Res>>, ITaskGetAll
     {
         private readonly Context _context;
         private readonly IConfigurationProvider _mapperConfig;
