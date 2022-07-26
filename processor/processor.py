@@ -1,6 +1,16 @@
-from utils.types import PacketType, Template, Params
+from utils.types import PacketType, Template, Params, JobType
 from runner import Runner
 from sock import Sock
+import argparse
+
+parser = argparse.ArgumentParser(description="PLM server side processing - processor")
+
+parser.add_argument(
+        '--dummy',
+        action='store_true',
+        help="Use dummy algorithms")
+
+args = parser.parse_args()
 
 sock = Sock('/tmp/plm-ssp.sock')
 runners = {}
@@ -16,18 +26,23 @@ def print_frame(frame):
 def read_params():
     detector_id = sock.read_int(4)
     job_type = sock.read_int(4)
-    templ_count = sock.read_int(4)
-    templs = []
-    for i in range(templ_count):
-        id = sock.read_int(4)
-        x = sock.read_int(4)
-        y = sock.read_int(4)
-        w = sock.read_int(4)
-        h = sock.read_int(4)
-        order = sock.read_int(4)
-        templs.append(Template(id, x, y, w, h, order))
 
-    params = Params(job_type, templs)
+    if job_type == JobType.QA.value:
+        params = Params(job_type, None)
+    else:
+        templ_count = sock.read_int(4)
+        templs = []
+        for i in range(templ_count):
+            id = sock.read_int(4)
+            x = sock.read_int(4)
+            y = sock.read_int(4)
+            w = sock.read_int(4)
+            h = sock.read_int(4)
+            order = sock.read_int(4)
+            templs.append(Template(id, x, y, w, h, order))
+
+        params = Params(job_type, templs)
+
     # print_params(params)
     return detector_id, params
 
@@ -47,7 +62,7 @@ def process_packet():
             runners[detector_id].stop()
         except KeyError:
             pass
-        runner = Runner(detector_id, params, sock)
+        runner = Runner(detector_id, params, sock, args.dummy)
         runners[detector_id] = runner
         runner.start()
 

@@ -36,12 +36,18 @@ namespace Api.Services.ProcessorHandler
             await RunReceiver(stoppingToken);
         }
 
-        public async Task<ResultPacketBase> ReceiveResult()
+        public async Task<ResultPacketBase?> ReceiveResult()
         {
             using (await _processorSocket.SockLock.Lock(CancellationToken.None))
             {
                 _processorSocket.RemoteSocket ??=
                     await _processorSocket.ServerSocket.AcceptAsync();
+
+                var canRead = _processorSocket.RemoteSocket.Poll(0, SelectMode.SelectRead);
+                if (!canRead)
+                {
+                    return null;
+                }
 
                 var baseBuffer = new byte[8];
                 await _processorSocket.RemoteSocket.ReceiveAsync(baseBuffer, SocketFlags.None);
@@ -132,7 +138,8 @@ namespace Api.Services.ProcessorHandler
                 await Task.Delay(TimeSpan.FromMilliseconds(_opt.ReceiverPauseMilliseconds));
 
                 var result = await ReceiveResult();
-                await ProcessResult(result);
+                if (result is not null)
+                    await ProcessResult(result);
             }
         }
     }
