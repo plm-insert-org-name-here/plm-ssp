@@ -21,7 +21,7 @@ class Queue:
     def _get_next_index(self):
         n = (self._latest_index + 1) % self._buffer_size
         if n == self._reading_index:
-            n = (self._latest_index + 1) % self._buffer_size
+            n = (n + 1) % self._buffer_size
         return n
 
     def insert(self, new_payload):
