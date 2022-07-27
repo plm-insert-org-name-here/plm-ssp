@@ -36,6 +36,7 @@ class Sock:
 
     def read_params(self):
         detector_id = self._read_int(4)
+        task_id = self._read_int(4)
         job_type = self._read_int(4)
 
         if job_type == JobType.QA.value:
@@ -54,7 +55,7 @@ class Sock:
 
             params = Params(job_type, templs)
 
-        return detector_id, params
+        return detector_id, task_id, params
 
     def read_frame(self):
         detector_id = self._read_int(4)
@@ -65,8 +66,9 @@ class Sock:
         frame = cv.imdecode(bytes, cv.IMREAD_GRAYSCALE)
         return detector_id, frame
 
-    def send_result(self, detector_id, job_type, result):
+    def send_result(self, detector_id, task_id, job_type, result):
         with self._res_lock:
             self._write_int(detector_id, 4)
+            self._write_int(task_id, 4)
             self._write_int(job_type, 4)
             self._write_bytes(result.serialize())

@@ -29,12 +29,12 @@ def process_packet():
     packet_type = sock.read_packet_type()
 
     if packet_type == PacketType.Params.value:
-        detector_id, params = sock.read_params()
+        detector_id, task_id, params = sock.read_params()
         try:
             runners[detector_id].stop()
         except KeyError:
             pass
-        runner = Runner(detector_id, params, sock, args.dummy)
+        runner = Runner(detector_id, task_id, params, sock, args.dummy)
         runners[detector_id] = runner
         runner.start()
 

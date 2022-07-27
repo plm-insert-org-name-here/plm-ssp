@@ -3,9 +3,10 @@ from algorithms import get_algorithm
 from threading import Thread, Event
 
 class Runner:
-    def __init__(self, detector_id, params, sock, dummy):
+    def __init__(self, detector_id, task_id, params, sock, dummy):
         self._queue = Queue(3)
         self._detector_id = detector_id
+        self._task_id = task_id
         self._params = params
         self._sock = sock
         self._stopped_event = Event()
@@ -21,6 +22,7 @@ class Runner:
                 result = self._algorithm.run(frame)
             self._sock.send_result(
                     self._detector_id, 
+                    self._task_id,
                     self._params.job_type, 
                     result)
 

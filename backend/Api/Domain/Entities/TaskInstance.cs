@@ -6,5 +6,6 @@ namespace Api.Domain.Entities
     {
         public Task Task { get; set; } = default!;
         public List<Event> Events { get; set; } = default!;
+        public bool Finished { get; set; }
     }
 }

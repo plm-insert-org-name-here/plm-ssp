@@ -1,30 +1,37 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Common;
+using Api.Infrastructure.Database;
 using Api.Services.ProcessorHandler.Packets;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using TaskStatus = Api.Domain.Common.TaskStatus;
 
 namespace Api.Services.ProcessorHandler
 {
     public class PacketReceiverService : BackgroundService
     {
         private readonly ProcessorSocket _processorSocket;
+        private readonly IDbContextFactory<Context> _contextFactory;
         private readonly ProcessorHandlerOpt _opt;
         private readonly ILogger _logger;
 
         public PacketReceiverService(
             IOptions<ProcessorHandlerOpt> opt,
-            ILogger logger)
+            ILogger logger,
+            IDbContextFactory<Context> contextFactory)
         {
             _processorSocket = new ProcessorSocket(opt.Value.ResSocketPath);
             _opt = opt.Value;
             _logger = logger;
+            _contextFactory = contextFactory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -47,7 +54,7 @@ namespace Api.Services.ProcessorHandler
                     return null;
                 }
 
-                var baseBuffer = new byte[8];
+                var baseBuffer = new byte[12];
                 var read_bytes = await _processorSocket.RemoteSocket.ReceiveAsync(baseBuffer, SocketFlags.None);
                 if (read_bytes == 0)
                 {
@@ -58,7 +65,8 @@ namespace Api.Services.ProcessorHandler
                     return null;
                 }
                 var detectorId = BitConverter.ToInt32(baseBuffer, 0);
-                var jobType = (JobType)BitConverter.ToInt32(baseBuffer, 4);
+                var taskId = BitConverter.ToInt32(baseBuffer, 4);
+                var jobType = (JobType)BitConverter.ToInt32(baseBuffer, 8);
 
                 if (jobType is JobType.QA)
                 {
@@ -69,6 +77,7 @@ namespace Api.Services.ProcessorHandler
                     return new QAResultPacket
                     {
                         DetectorId = detectorId,
+                        TaskId = taskId,
                         JobType = jobType,
                         Result = result
                     };
@@ -92,6 +101,7 @@ namespace Api.Services.ProcessorHandler
                     return new KitResultPacket
                     {
                         DetectorId = detectorId,
+                        TaskId = taskId,
                         JobType = jobType,
                         TemplateStates = templateStates
                     };
@@ -129,8 +139,15 @@ namespace Api.Services.ProcessorHandler
         // TaskResult FinalState should depend on the states of Events belonging to it
         private async Task ProcessResult(ResultPacketBase result)
         {
-            _logger.Warning("{@Result}", result);
+            await using var context = _contextFactory.CreateDbContext();
 
+            var task = await context.Tasks
+                .SingleOrDefaultAsync(t => t.Id == result.TaskId);
+
+            if (task is not null)
+            {
+                _logger.Warning("Task id: {Id}, name: {Name}", task.Id, task.Name);
+            }
         }
 
 

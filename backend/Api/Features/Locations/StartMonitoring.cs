@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -82,6 +83,22 @@ namespace Api.Features.Locations
             task.Status = TaskStatus.Active;
             location.Detector.State = DetectorState.Monitoring;
             await _context.SaveChangesAsync(ct);
+
+            var taskInstance = await _context.TaskInstances
+                .SingleOrDefaultAsync(ti => ti.Task.Id == task.Id, ct);
+
+            if (taskInstance is null)
+            {
+                taskInstance = new TaskInstance
+                {
+                    Events = new List<Event>(),
+                    Task = task,
+                    Finished = false
+                };
+
+                await _context.TaskInstances.AddAsync(taskInstance, ct);
+                await _context.SaveChangesAsync(ct);
+            }
 
             var processorParams = await _context.Tasks
                 .Where(t => t.Id == req.Body.TaskId)
