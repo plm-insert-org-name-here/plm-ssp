@@ -4,10 +4,12 @@ using Api.Domain.Common;
 using Api.Domain.Entities;
 using AutoMapper;
 
-namespace Api.Services.ProcessorHandler.Packets
+namespace Api.Services.ProcessorHandler.Packets.Req
 {
-    public class ParamsPacket
+    public class ParamsPacket : IReqPacket
     {
+        public PacketType Type => PacketType.Params;
+
         public int DetectorId { get; set; }
         public int TaskId { get; set; }
         public JobType JobType {get; set; }

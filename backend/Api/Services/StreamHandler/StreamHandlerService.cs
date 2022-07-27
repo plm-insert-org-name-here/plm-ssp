@@ -8,6 +8,7 @@ using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Services.ProcessorHandler;
 using Api.Services.ProcessorHandler.Packets;
+using Api.Services.ProcessorHandler.Packets.Req;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -22,7 +23,7 @@ namespace Api.Services.StreamHandler
         private readonly ILogger _logger;
         private readonly StreamHandlerOpt _opt;
         private readonly StreamViewerGroups _groups;
-        private readonly PacketSender _processor;
+        private readonly PacketSender _sender;
         private readonly IDbContextFactory<Context> _contextFactory;
 
         public StreamHandlerService(
@@ -30,13 +31,13 @@ namespace Api.Services.StreamHandler
             IOptions<StreamHandlerOpt> opt,
             StreamViewerGroups groups,
             IDbContextFactory<Context> contextFactory,
-            PacketSender processor)
+            PacketSender sender)
         {
             _logger = logger;
             _opt = opt.Value;
             _groups = groups;
             _contextFactory = contextFactory;
-            _processor = processor;
+            _sender = sender;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -95,7 +96,7 @@ namespace Api.Services.StreamHandler
 
                         if (detector.State is DetectorState.Monitoring) {
                             var framePacket = new FramePacket(detectorId, frame.Length, frame);
-                            await _processor.SendFrame(framePacket);
+                            await _sender.SendPacket(framePacket);
                         }
 
                         // We don't need to check for subs here as the method already does

@@ -8,6 +8,7 @@ using Api.Infrastructure.Database;
 using Api.Services.DetectorController;
 using Api.Services.ProcessorHandler;
 using Api.Services.ProcessorHandler.Packets;
+using Api.Services.ProcessorHandler.Packets.Req;
 using Ardalis.ApiEndpoints;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -26,7 +27,7 @@ namespace Api.Features.Locations
         private readonly Context _context;
         private readonly DetectorCommandQueues _queues;
         private readonly IConfigurationProvider _mapperConfig;
-        private readonly PacketSender _processor;
+        private readonly PacketSender _sender;
         private readonly ILogger _logger;
 
         public class Req
@@ -38,12 +39,12 @@ namespace Api.Features.Locations
             public record ReqBody(int TaskId);
         }
 
-        public StartMonitoring(Context context, DetectorCommandQueues queues, IConfigurationProvider mapperConfig, PacketSender processor, ILogger logger)
+        public StartMonitoring(Context context, DetectorCommandQueues queues, IConfigurationProvider mapperConfig, PacketSender sender, ILogger logger)
         {
             _context = context;
             _queues = queues;
             _mapperConfig = mapperConfig;
-            _processor = processor;
+            _sender = sender;
             _logger = logger;
         }
 
@@ -109,7 +110,7 @@ namespace Api.Features.Locations
                 .ProjectTo<ParamsPacket>(_mapperConfig)
                 .SingleOrDefaultAsync(ct);
 
-            await _processor.SendParameters(processorParams);
+            await _sender.SendPacket(processorParams);
 
             if (originalState is DetectorState.Standby)
                 _queues.EnqueueCommand(location.Detector.Id, DetectorCommandType.StartStreaming);

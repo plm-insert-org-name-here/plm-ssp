@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Entities;
+using Api.Features.Tasks.Interfaces;
 using Api.Infrastructure.Database;
 using Ardalis.ApiEndpoints;
 using AutoMapper;

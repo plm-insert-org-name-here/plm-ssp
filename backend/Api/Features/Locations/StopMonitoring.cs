@@ -8,6 +8,7 @@ using Api.Services;
 using Api.Services.DetectorController;
 using Api.Services.ProcessorHandler;
 using Api.Services.ProcessorHandler.Packets;
+using Api.Services.ProcessorHandler.Packets.Req;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -71,12 +72,12 @@ namespace Api.Features.Locations
                 location.Detector.State = DetectorState.Standby;
             }
 
-            var stopPacket = new StopPacket()
+            var stopPacket = new StopPacket
             {
                 DetectorId = location.Detector.Id
             };
 
-            await _sender.SendStop(stopPacket);
+            await _sender.SendPacket(stopPacket);
 
             await _context.SaveChangesAsync(ct);
 

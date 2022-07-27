@@ -1,8 +1,7 @@
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Features.Tasks
+namespace Api.Features.Tasks.Interfaces
 {
     public interface ITaskCreate
     {

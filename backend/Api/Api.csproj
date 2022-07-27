@@ -28,4 +28,8 @@
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.3.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\ProcessorHandler\Packets\Res" />
+    </ItemGroup>
+
 </Project>

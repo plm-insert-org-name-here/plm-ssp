@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Api.Features.Tasks
+namespace Api.Features.Tasks.Interfaces
 {
     public interface ITaskGetAll
     {

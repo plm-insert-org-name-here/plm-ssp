@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Services.ProcessorHandler.Packets;
+using Api.Services.ProcessorHandler.Packets.Req;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -21,7 +22,7 @@ namespace Api.Services.ProcessorHandler
             _processorSocket = new ProcessorSocket(opt.Value.ReqSocketPath);
         }
 
-        public async Task SendParameters(ParamsPacket ps)
+        public async Task SendPacket(IReqPacket packet)
         {
             // TODO(rg): cancellation token
             using (await _processorSocket.SockLock.Lock(CancellationToken.None))
@@ -29,43 +30,11 @@ namespace Api.Services.ProcessorHandler
                 _processorSocket.RemoteSocket ??=
                     await _processorSocket.ServerSocket.AcceptAsync();
 
-                var mTypeBytes = BitConverter.GetBytes((int)PacketType.Params);
-                var bytes = ps.ToBytes();
+                var mTypeBytes = BitConverter.GetBytes((int)packet.Type);
+                var bytes = packet.ToBytes();
 
                 await _processorSocket.RemoteSocket.SendAsync(mTypeBytes, SocketFlags.None);
                 await _processorSocket.RemoteSocket.SendAsync(bytes, SocketFlags.None);
-            }
-        }
-
-        public async Task SendFrame(FramePacket frame)
-        {
-            // TODO(rg): cancellation token
-            using (await _processorSocket.SockLock.Lock(CancellationToken.None))
-            {
-                _processorSocket.RemoteSocket ??=
-                    await _processorSocket.ServerSocket.AcceptAsync();
-
-                var mTypeBytes = BitConverter.GetBytes((int)PacketType.Frame);
-                var reqBytes = frame.ToBytes();
-
-                await _processorSocket.RemoteSocket.SendAsync(mTypeBytes, SocketFlags.None);
-                await _processorSocket.RemoteSocket.SendAsync(reqBytes, SocketFlags.None);
-            }
-        }
-
-        public async Task SendStop(StopPacket stop)
-        {
-            // TODO(rg): cancellation token
-            using (await _processorSocket.SockLock.Lock(CancellationToken.None))
-            {
-                _processorSocket.RemoteSocket ??=
-                    await _processorSocket.ServerSocket.AcceptAsync();
-
-                var mTypeBytes = BitConverter.GetBytes((int)PacketType.Stop);
-                var reqBytes = stop.ToBytes();
-
-                await _processorSocket.RemoteSocket.SendAsync(mTypeBytes, SocketFlags.None);
-                await _processorSocket.RemoteSocket.SendAsync(reqBytes, SocketFlags.None);
             }
         }
     }

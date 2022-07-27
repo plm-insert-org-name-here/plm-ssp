@@ -1,9 +1,11 @@
 using System;
 
-namespace Api.Services.ProcessorHandler.Packets
+namespace Api.Services.ProcessorHandler.Packets.Req
 {
-    public class FramePacket
+    public class FramePacket : IReqPacket
     {
+        public PacketType Type => PacketType.Frame;
+
         public FramePacket(int detectorId, int frameSize, byte[] frame)
         {
             DetectorId = detectorId;
@@ -14,6 +16,7 @@ namespace Api.Services.ProcessorHandler.Packets
         private int DetectorId { get; }
         private int FrameSize { get; }
         private byte[] Frame { get; }
+
 
         public byte[] ToBytes()
         {
