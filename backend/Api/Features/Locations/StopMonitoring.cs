@@ -6,6 +6,8 @@ using Api.Domain.Entities;
 using Api.Infrastructure.Database;
 using Api.Services;
 using Api.Services.DetectorController;
+using Api.Services.ProcessorHandler;
+using Api.Services.ProcessorHandler.Packets;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,12 +23,14 @@ namespace Api.Features.Locations
         private readonly Context _context;
         private readonly DetectorCommandQueues _queues;
         private readonly StreamViewerGroups _groups;
+        private readonly PacketSender _sender;
 
-        public StopMonitoring(Context context, DetectorCommandQueues queues, StreamViewerGroups groups)
+        public StopMonitoring(Context context, DetectorCommandQueues queues, StreamViewerGroups groups, PacketSender sender)
         {
             _context = context;
             _queues = queues;
             _groups = groups;
+            _sender = sender;
         }
 
         [HttpPost(Routes.Locations.StopMonitoring)]
@@ -66,6 +70,13 @@ namespace Api.Features.Locations
                 _queues.EnqueueCommand(location.Detector.Id, DetectorCommandType.StopStreaming);
                 location.Detector.State = DetectorState.Standby;
             }
+
+            var stopPacket = new StopPacket()
+            {
+                DetectorId = location.Detector.Id
+            };
+
+            await _sender.SendStop(stopPacket);
 
             await _context.SaveChangesAsync(ct);
 

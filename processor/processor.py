@@ -49,6 +49,10 @@ def process_packet():
             print('error: frame received, but no params')
             pass
 
+    elif packet_type == PacketType.Stop.value:
+        detector_id = sock.read_stop()
+        runners[detector_id].stop()
+
     else:
         print(f'invalid packet type: {packet_type}')
 

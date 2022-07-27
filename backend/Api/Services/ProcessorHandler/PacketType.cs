@@ -3,6 +3,7 @@ namespace Api.Services.ProcessorHandler
     public enum PacketType
     {
         Params = 0,
-        Frame = 1
+        Frame = 1,
+        Stop = 2
     }
 }

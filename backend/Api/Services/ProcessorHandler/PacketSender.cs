@@ -52,5 +52,21 @@ namespace Api.Services.ProcessorHandler
                 await _processorSocket.RemoteSocket.SendAsync(reqBytes, SocketFlags.None);
             }
         }
+
+        public async Task SendStop(StopPacket stop)
+        {
+            // TODO(rg): cancellation token
+            using (await _processorSocket.SockLock.Lock(CancellationToken.None))
+            {
+                _processorSocket.RemoteSocket ??=
+                    await _processorSocket.ServerSocket.AcceptAsync();
+
+                var mTypeBytes = BitConverter.GetBytes((int)PacketType.Stop);
+                var reqBytes = stop.ToBytes();
+
+                await _processorSocket.RemoteSocket.SendAsync(mTypeBytes, SocketFlags.None);
+                await _processorSocket.RemoteSocket.SendAsync(reqBytes, SocketFlags.None);
+            }
+        }
     }
 }

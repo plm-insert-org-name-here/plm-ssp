@@ -46,6 +46,7 @@ class JobType(Enum):
 class PacketType(Enum):
     Params = 0
     Frame = 1
+    Stop = 2
 
 class TemplateState(Enum):
     Present = 0

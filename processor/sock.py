@@ -66,6 +66,10 @@ class Sock:
         frame = cv.imdecode(bytes, cv.IMREAD_GRAYSCALE)
         return detector_id, frame
 
+    def read_stop(self):
+        detector_id = self._read_int(4)
+        return detector_id
+
     def send_result(self, detector_id, task_id, job_type, result):
         with self._res_lock:
             self._write_int(detector_id, 4)
