@@ -30,7 +30,7 @@ class Queue:
 
         with slot.lock:
             slot.payload = new_payload
-            self._latest_index = new_latest_index
+        self._latest_index = new_latest_index
 
         self._first_ready.set()
 

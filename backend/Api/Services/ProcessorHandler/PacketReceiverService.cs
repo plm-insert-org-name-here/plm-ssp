@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Common;
-using Api.Domain.Entities;
 using Api.Services.ProcessorHandler.Packets;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -22,11 +19,10 @@ namespace Api.Services.ProcessorHandler
         private readonly ILogger _logger;
 
         public PacketReceiverService(
-            ProcessorSocket processorSocket,
             IOptions<ProcessorHandlerOpt> opt,
             ILogger logger)
         {
-            _processorSocket = processorSocket;
+            _processorSocket = new ProcessorSocket(opt.Value.ResSocketPath);
             _opt = opt.Value;
             _logger = logger;
         }
@@ -43,6 +39,8 @@ namespace Api.Services.ProcessorHandler
                 _processorSocket.RemoteSocket ??=
                     await _processorSocket.ServerSocket.AcceptAsync();
 
+                // Check whether there's data available to read. The method returns with true if the remote end closed the connection,
+                // even if there is nothing to read, so we need to check for that later
                 var canRead = _processorSocket.RemoteSocket.Poll(0, SelectMode.SelectRead);
                 if (!canRead)
                 {
@@ -50,7 +48,15 @@ namespace Api.Services.ProcessorHandler
                 }
 
                 var baseBuffer = new byte[8];
-                await _processorSocket.RemoteSocket.ReceiveAsync(baseBuffer, SocketFlags.None);
+                var read_bytes = await _processorSocket.RemoteSocket.ReceiveAsync(baseBuffer, SocketFlags.None);
+                if (read_bytes == 0)
+                {
+                    // Connection was closed by the remote end
+                    // TODO(rg): consider doing this check on each Receive call - in case the remote dies while sending a packet
+                    // (thus sending an incomplete packet), the backend might end up parsing it into a valid packet,
+                    // which is wrong
+                    return null;
+                }
                 var detectorId = BitConverter.ToInt32(baseBuffer, 0);
                 var jobType = (JobType)BitConverter.ToInt32(baseBuffer, 4);
 
@@ -123,7 +129,8 @@ namespace Api.Services.ProcessorHandler
         // TaskResult FinalState should depend on the states of Events belonging to it
         private async Task ProcessResult(ResultPacketBase result)
         {
-            throw new NotImplementedException();
+            _logger.Warning("{@Result}", result);
+
         }
 
 

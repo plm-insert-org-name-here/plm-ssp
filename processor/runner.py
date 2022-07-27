@@ -1,10 +1,10 @@
 from utils.queue import Queue
-from threading import Thread, Event
 from algorithms import get_algorithm
+from threading import Thread, Event
 
 class Runner:
     def __init__(self, detector_id, params, sock, dummy):
-        self._queue = Queue(4)
+        self._queue = Queue(3)
         self._detector_id = detector_id
         self._params = params
         self._sock = sock
@@ -19,10 +19,10 @@ class Runner:
 
             with self._queue.get_latest() as frame:
                 result = self._algorithm.run(frame)
-                self._sock.send_result(
-                        self._detector_id, 
-                        self._params.job_type, 
-                        result)
+            self._sock.send_result(
+                    self._detector_id, 
+                    self._params.job_type, 
+                    result)
 
     def enqueue_frame(self, frame):
         self._queue.insert(frame)

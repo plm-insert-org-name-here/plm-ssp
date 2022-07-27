@@ -15,7 +15,6 @@ namespace Api.Services.ProcessorHandler
 
             services.AddHostedService<PacketReceiverService>();
             services.AddSingleton<PacketSender>();
-            services.AddSingleton<ProcessorSocket>();
 
             return services;
         }

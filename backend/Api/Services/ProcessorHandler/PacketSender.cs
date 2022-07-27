@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Services.ProcessorHandler.Packets;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace Api.Services.ProcessorHandler
@@ -14,10 +15,10 @@ namespace Api.Services.ProcessorHandler
 
         public PacketSender(
             ILogger logger,
-            ProcessorSocket processorSocket)
+            IOptions<ProcessorHandlerOpt> opt)
         {
             _logger = logger;
-            _processorSocket = processorSocket;
+            _processorSocket = new ProcessorSocket(opt.Value.ReqSocketPath);
         }
 
         public async Task SendParameters(ParamsPacket ps)

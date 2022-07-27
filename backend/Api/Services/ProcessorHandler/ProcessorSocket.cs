@@ -8,22 +8,18 @@ namespace Api.Services.ProcessorHandler
 {
     public class ProcessorSocket
     {
-        private readonly ProcessorHandlerOpt _opt;
-
         public Socket ServerSocket { get; }
         public Socket? RemoteSocket { get; set; }
         public CancellableLock SockLock { get; } = new();
 
-        public ProcessorSocket(IOptions<ProcessorHandlerOpt> opt)
+        public ProcessorSocket(string socketPath)
         {
-            _opt = opt.Value;
-
             ServerSocket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
 
-            if (File.Exists(_opt.UnixSocketPath))
-                File.Delete(_opt.UnixSocketPath);
+            if (File.Exists(socketPath))
+                File.Delete(socketPath);
 
-            ServerSocket.Bind(new UnixDomainSocketEndPoint(_opt.UnixSocketPath));
+            ServerSocket.Bind(new UnixDomainSocketEndPoint(socketPath));
             ServerSocket.Listen(1);
         }
     }
