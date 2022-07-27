@@ -19,7 +19,7 @@ namespace Api.Features.Tasks
 {
     public class Create : EndpointBaseAsync
         .WithRequest<Create.Req>
-        .WithActionResult<Create.Res>, ITaskCreate
+        .WithActionResult<Create.Res>
     {
         private readonly Context _context;
         private readonly IMapper _mapper;
@@ -106,11 +106,6 @@ namespace Api.Features.Tasks
             await _context.SaveChangesAsync(ct);
 
             return CreatedAtRoute(Routes.Tasks.GetById, new { task.Id }, _mapper.Map<Res>(task));
-        }
-
-        public async Task<ActionResult<Res>> _HandleAsync(Req req)
-        {
-            return await HandleAsync(req, new CancellationToken());
         }
     }
 }
