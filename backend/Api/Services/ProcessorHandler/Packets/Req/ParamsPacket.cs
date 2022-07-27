@@ -8,7 +8,7 @@ namespace Api.Services.ProcessorHandler.Packets.Req
 {
     public class ParamsPacket : IReqPacket
     {
-        public PacketType Type => PacketType.Params;
+        public ReqPacketType Type => ReqPacketType.Params;
 
         public int DetectorId { get; set; }
         public int TaskId { get; set; }

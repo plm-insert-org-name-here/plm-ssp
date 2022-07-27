@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using Api.Domain.Common;
-using Api.Domain.Entities;
 
-namespace Api.Services.ProcessorHandler.Packets
+namespace Api.Services.ProcessorHandler.Packets.Res
 {
     public class KitResultPacket : ResultPacketBase
     {

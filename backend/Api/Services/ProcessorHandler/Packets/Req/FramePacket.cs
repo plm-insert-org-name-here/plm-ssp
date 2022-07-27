@@ -4,7 +4,7 @@ namespace Api.Services.ProcessorHandler.Packets.Req
 {
     public class FramePacket : IReqPacket
     {
-        public PacketType Type => PacketType.Frame;
+        public ReqPacketType Type => ReqPacketType.Frame;
 
         public FramePacket(int detectorId, int frameSize, byte[] frame)
         {

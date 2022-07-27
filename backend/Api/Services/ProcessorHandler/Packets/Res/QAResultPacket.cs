@@ -1,6 +1,6 @@
 using Api.Domain.Common;
 
-namespace Api.Services.ProcessorHandler.Packets
+namespace Api.Services.ProcessorHandler.Packets.Res
 {
     public class QAResultPacket : ResultPacketBase
     {
