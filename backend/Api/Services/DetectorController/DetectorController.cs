@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Api.Domain.Common;
 using Api.Domain.Entities;
 using Api.Infrastructure.Database;
+using Api.Services.ProcessorHandler;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -20,7 +21,6 @@ namespace Api.Services.DetectorController
     {
         private readonly ILogger _logger;
         private readonly DetectorControllerOpt _opt;
-        private readonly StreamViewerGroups _groups;
         private readonly IDbContextFactory<Context> _contextFactory;
         private readonly DetectorCommandQueues _queues;
         private readonly SnapshotCache _snapshotCache;
@@ -30,13 +30,12 @@ namespace Api.Services.DetectorController
             ILogger logger,
             DetectorCommandQueues queues,
             SnapshotCache snapshotCache,
-            IDbContextFactory<Context> contextFactory, StreamViewerGroups groups)
+            IDbContextFactory<Context> contextFactory)
         {
             _logger = logger;
             _queues = queues;
             _snapshotCache = snapshotCache;
             _contextFactory = contextFactory;
-            _groups = groups;
             _opt = opt.Value;
         }
 

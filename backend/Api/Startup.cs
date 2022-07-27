@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Api.Infrastructure.Database;
 using Api.Services;
 using Api.Services.DetectorController;
+using Api.Services.MonitoringHandler;
 using Api.Services.ProcessorHandler;
 using Api.Services.StreamHandler;
 using FluentValidation;
@@ -42,6 +43,7 @@ namespace Api
             });
 
             services.AddSingleton<SnapshotCache>();
+            services.AddSingleton<MonitoringHandler>();
             services.AddDetectorControllerWebSocket(Configuration);
             services.AddStreamHandler(Configuration);
             services.AddProcessorHandler(Configuration);

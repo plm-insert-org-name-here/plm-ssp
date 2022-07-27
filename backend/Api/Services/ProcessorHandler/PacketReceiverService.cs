@@ -6,14 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Common;
 using Api.Infrastructure.Database;
-using Api.Services.ProcessorHandler.Packets;
 using Api.Services.ProcessorHandler.Packets.Res;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
-using TaskStatus = Api.Domain.Common.TaskStatus;
 
 namespace Api.Services.ProcessorHandler
 {
@@ -23,16 +21,22 @@ namespace Api.Services.ProcessorHandler
         private readonly IDbContextFactory<Context> _contextFactory;
         private readonly ProcessorHandlerOpt _opt;
         private readonly ILogger _logger;
+        private readonly PacketSender _sender;
+        private readonly MonitoringHandler.MonitoringHandler _monitoringHandler;
 
         public PacketReceiverService(
             IOptions<ProcessorHandlerOpt> opt,
             ILogger logger,
-            IDbContextFactory<Context> contextFactory)
+            IDbContextFactory<Context> contextFactory,
+            PacketSender sender,
+            MonitoringHandler.MonitoringHandler monitoringHandler)
         {
             _processorSocket = new ProcessorSocket(opt.Value.ResSocketPath);
             _opt = opt.Value;
             _logger = logger;
             _contextFactory = contextFactory;
+            _sender = sender;
+            _monitoringHandler = monitoringHandler;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -110,14 +114,6 @@ namespace Api.Services.ProcessorHandler
             }
         }
 
-        // TODO(rg): implement
-        // for each template state, query from DB:
-        // template id -> Template -> Task -> Job
-        // (in the future, consider using an in memory cache to avoid DB roundtrip on every template in each result)
-
-        // when a Task is started, create a new TaskResult instance; Events related to templates belonging to that task
-        // should belong to that TaskResult instance
-
         // the exact semantics of an Event, and what triggers them, depend on the type of task they're associated with
         // ToolKit/ItemKit:
         //  - semantics: the state of the physical object associated with the template has changed
@@ -136,21 +132,45 @@ namespace Api.Services.ProcessorHandler
         // e.g. QA:
         // 1. expected state: OK, actual state: OK => Event(OK)
         // 2. expected state: OK, actual state: NOK => Event(NOK)
-
-        // TaskResult FinalState should depend on the states of Events belonging to it
-        private async Task ProcessResult(ResultPacketBase result)
+        private async Task ProcessResult(ResultPacketBase packet)
         {
             await using var context = _contextFactory.CreateDbContext();
 
+            // TODO(rg): benchmark and consider using an in-memory cache (these queries run on each result,
+            // and they can't be modified while monitoring is active)
             var task = await context.Tasks
-                .SingleOrDefaultAsync(t => t.Id == result.TaskId);
-
-            if (task is not null)
+                .Include(t => t.Templates)
+                .SingleOrDefaultAsync(t => t.Id == packet.TaskId);
+            if (task is null)
             {
-                _logger.Warning("Task id: {Id}, name: {Name}", task.Id, task.Name);
+                _logger.Error("Task or TaskInstance for task id {Id} does not exist", packet.TaskId);
+                return;
             }
-        }
 
+            var taskInstance = await context.TaskInstances
+                .Where(ti => !ti.Finished)
+                .Include(ti => ti.Events)
+                .ThenInclude(e => e.Template)
+                .SingleOrDefaultAsync(ti => ti.Task.Id == packet.TaskId);
+            if (taskInstance is null)
+            {
+                _logger.Error("No active task instance exists for task id {Id}", packet.TaskId);
+                return;
+            }
+
+            var detector = await context.Detectors
+                .SingleOrDefaultAsync(d => d.Id == packet.DetectorId);
+            if (detector is null)
+            {
+                _logger.Error("Detector with id {Id} does not exist", packet.DetectorId);
+                return;
+            }
+
+            if (packet is KitResultPacket kitResult)
+                await _monitoringHandler.HandleKitResult(context, kitResult, task, taskInstance, detector);
+            else if (packet is QAResultPacket qaResult)
+                await _monitoringHandler.HandleQAResult(context, qaResult, task, taskInstance, detector);
+        }
 
         private async Task RunReceiver(CancellationToken stoppingToken)
         {
