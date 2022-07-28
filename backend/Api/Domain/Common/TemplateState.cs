@@ -10,4 +10,12 @@ namespace Api.Domain.Common
         Uncertain,
         UnknownObject
     }
+
+    public static class TemplateStateExt
+    {
+        public static bool IsValid(this TemplateState state)
+        {
+            return state is TemplateState.Present or TemplateState.Missing;
+        }
+    }
 }

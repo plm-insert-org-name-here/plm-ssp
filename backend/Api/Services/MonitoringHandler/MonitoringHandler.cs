@@ -8,32 +8,40 @@ using Api.Services.DetectorController;
 using Api.Services.ProcessorHandler;
 using Api.Services.ProcessorHandler.Packets.Req;
 using Api.Services.ProcessorHandler.Packets.Res;
+using AutoMapper;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 
 namespace Api.Services.MonitoringHandler
 {
+    using TemplateId = System.Int32;
+
+    // TODO(rg): error checking (e.g. SingleOrDefault instead of Single)
+    // TODO(rg): better failureReason for Failure events
     public class MonitoringHandler
     {
         private readonly StreamViewerGroups _groups;
         private readonly DetectorCommandQueues _queues;
         private readonly PacketSender _sender;
         private readonly ILogger _logger;
+        private readonly IMapper _mapper;
 
         // As long as templates are not shared between tasks, and only one instance of a task may run at a time,
         // this is fine
-        private Dictionary<int, TemplateStateHistory> TemplateStates = new();
+        private Dictionary<TemplateId, TemplateStateHistory> TemplateStates = new();
 
         public MonitoringHandler(
             StreamViewerGroups groups,
             DetectorCommandQueues queues,
             PacketSender sender,
-            ILogger logger)
+            ILogger logger,
+            IMapper mapper)
         {
             _groups = groups;
             _queues = queues;
             _sender = sender;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task StopMonitoring(Detector detector)
@@ -49,6 +57,60 @@ namespace Api.Services.MonitoringHandler
             await _sender.SendPacket(new StopPacket(detector.Id));
         }
 
+        private void SubmitEvent(TaskInstance ins, Template template, string? failureReason = null)
+        {
+            var ev = new Event
+            {
+                Timestamp = DateTime.Now,
+                Template = template,
+                TaskInstance = ins,
+                Result = failureReason is null ? EventResult.Success : EventResult.Failure,
+                FailureReason = failureReason
+            };
+            ins.Events.Add(ev);
+        }
+
+        private bool HandleTemplate(
+            Template template,
+            TemplateState newState,
+            TemplateStateHistory history,
+            TaskInstance ins)
+        {
+            var ret = false;
+
+            if (newState is TemplateState.UnknownObject &&
+                history.PreviousState is not TemplateState.UnknownObject)
+                SubmitEvent(ins, template, $"Detected an unknown object at template (name: '${template.Name}')");
+
+            if (history.PreviousValidState is null)
+            {
+                if ((newState is TemplateState.Missing && template.ExpectedInitialState is TemplateState.Present) ||
+                    (newState is TemplateState.Present && template.ExpectedInitialState is TemplateState.Missing))
+                    SubmitEvent(ins, template, $"Incorrect initial state for template (name: '${template.Name}')");
+
+                UpdateTemplateStateHistory(history, newState);
+                return false;
+            }
+
+            if (history.PreviousValidState == template.ExpectedInitialState
+                && newState == template.ExpectedSubsequentState)
+            {
+                SubmitEvent(ins, template);
+                ret = true;
+            }
+
+            UpdateTemplateStateHistory(history, newState);
+
+            return ret;
+        }
+
+        private void UpdateTemplateStateHistory(TemplateStateHistory history, TemplateState newState)
+        {
+            history.PreviousState = newState;
+            if (newState.IsValid())
+                history.PreviousValidState = newState;
+        }
+
         public async Task HandleKitResult(
             Context context,
             KitResultPacket packet,
@@ -56,48 +118,92 @@ namespace Api.Services.MonitoringHandler
             TaskInstance ins,
             Detector det)
         {
-            foreach (var templ in packet.TemplateStates)
+            if (task.Ordered!.Value)
             {
-                var template = task.Templates!.SingleOrDefault(t => t.Id == templ.Item1);
-                var state = templ.Item2;
-
-                if (template is null)
+                if (packet.TemplateStates.Count != 1)
                 {
-                    _logger.Error("Template id {Id} doesn't exist within task '{TaskName}'!", templ.Item1, task.Name);
-                    continue;
+                    _logger.Error("Result packet for ordered kit contains more than 1 template state");
+                    return;
                 }
 
-                if (task.Ordered!.Value)
-                {
-                    // Since the template order nums are a linear series starting from 1 with a step of 1, we can
-                    // determine the next order num this way
-                    var nextOrderNum = ins.Events.Select(e => e.Template!.OrderNum).Max() + 1;
-                    var nextTemplate = task.Templates!.Single(t => t.OrderNum == nextOrderNum);
+                var (id, newState) = packet.TemplateStates[0];
+                var template = task.Templates!.Single(t => t.Id == id);
 
-                    if (template.OrderNum != nextTemplate.OrderNum)
+                // Since the template order nums are a linear series starting from 1 with a step of 1, we can
+                // determine the next order num this way
+                var currentOrderNum = ins.Events.Select(e => e.Template!.OrderNum).Max() + 1;
+                var currentTemplate = task.Templates!.Single(t => t.OrderNum == currentOrderNum);
+                var isLast = task.Templates!.Count == currentOrderNum;
+
+                if (template.Id != currentTemplate.Id)
+                {
+                    _logger.Error(
+                        "Next template order is desynced between backend and processor; Actual: {Actual}, Result: {Result}",
+                        currentTemplate.OrderNum, template.OrderNum);
+                }
+
+                var history = TemplateStates[template.Id];
+                var success = HandleTemplate(template, newState, history, ins);
+
+                if (isLast)
+                {
+                    await StopMonitoring(det);
+                    task.Status = TaskStatus.Inactive;
+                }
+                else if (success)
+                {
+                    // We're in !isLast, so this is guaranteed to return with a template
+                    var nextTemplate = task.Templates!.Single(t => t.OrderNum == currentOrderNum + 1);
+
+                    var nextParams = new ParamsPacket
                     {
-                        _logger.Error("Template order numbers are desynchronized; Actual: {Actual}, Result: {Result}",
-                            nextTemplate.OrderNum, template.OrderNum);
+                        DetectorId = packet.DetectorId,
+                        TaskId = packet.TaskId,
+                        JobType = packet.JobType,
+                        Templates = new List<ParamsPacketTemplate>
+                        {
+                            _mapper.Map<ParamsPacketTemplate>(nextTemplate)
+                        }
+                    };
+                    await _sender.SendPacket(nextParams);
+                }
+            }
+            else
+            {
+                var successIds = new List<int>(packet.TemplateStates.Count);
+                foreach (var (id, newState) in packet.TemplateStates)
+                {
+                    var template = task.Templates!.Single(t => t.Id == id);
+                    var history = TemplateStates[template.Id];
+                    var success = HandleTemplate(template, newState, history, ins);
+                    if (success)
+                        successIds.Add(id);
+                }
+
+                if (successIds.Count > 0)
+                {
+                    var remainingIds = packet.TemplateStates.Select(ts => ts.Item1).Except(successIds).ToArray();
+
+                    if (remainingIds.Length() == 0)
+                    {
+                        await StopMonitoring(det);
+                        task.Status = TaskStatus.Inactive;
                     }
 
-                    // TODO(rg): check state
-                    // on failure: continue, Event(NOK)
-                    // on success: go next, Event(OK)
-                    // else: continue, Event(NOK) based on state
+                    var remainingTemplates = task.Templates!.Where(t => remainingIds.Contains(t.Id)).ToArray();
 
-                    // on success, either:
-                    // all templates are completed -> task is completed -> StopMonitoring & ins to Finished, task to Inactive
-                    // next template -> send updated ParamsPacket
-
-
-                }
-                else
-                {
-
+                    var nextParams = new ParamsPacket
+                    {
+                        DetectorId = packet.DetectorId,
+                        TaskId = packet.TaskId,
+                        JobType = packet.JobType,
+                        Templates = _mapper.Map<List<ParamsPacketTemplate>>(remainingTemplates)
+                    };
+                    await _sender.SendPacket(nextParams);
                 }
             }
 
-            // TODO(rg): check for task completion
+            await context.SaveChangesAsync();
         }
 
         public async Task HandleQAResult(
