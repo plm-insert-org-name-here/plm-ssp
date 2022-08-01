@@ -184,7 +184,7 @@ namespace Api.Services.MonitoringHandler
                 {
                     var remainingIds = packet.TemplateStates.Select(ts => ts.Item1).Except(successIds).ToArray();
 
-                    if (remainingIds.Length() == 0)
+                    if (remainingIds.Length == 0)
                     {
                         await StopMonitoring(det);
                         task.Status = TaskStatus.Inactive;

@@ -143,7 +143,7 @@ namespace Api.Infrastructure.Database
         public void Load()
         {
             var path = Path.Combine(Env.ContentRootPath, SeedDataPath);
-            var jsonFiles = Directory.GetFiles(path).Filter(f => f.EndsWith(".json")).ToArray();
+            var jsonFiles = Directory.GetFiles(path).Where(f => f.EndsWith(".json")).ToArray();
 
             foreach (var jsonFile in jsonFiles)
             {
