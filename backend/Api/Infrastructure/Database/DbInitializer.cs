@@ -1,75 +1,42 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text.Json;
 using Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace Api.Infrastructure.Database
 {
     public static class DbInitializer
     {
-        private static Location[] InitialLocations =
-        {
-            new()
-            {
-                Name = "New Location 1"
-            },
-            new()
-            {
-                Name = "New Location 2"
-            },
-            new()
-            {
-                Name = "New Location 3"
-            },
-            new()
-            {
-                Name = "New Location 4"
-            },
-            new()
-            {
-                Name = "New Location 5"
-            },
-            new()
-            {
-                Name = "New Location 6"
-            }
-        };
-
-        private static Detector[] InitialDetectors =
-        {
-            new()
-            {
-                Name = "New Detector 1",
-                MacAddress = PhysicalAddress.Parse("1234567890AB")
-            },
-            new()
-            {
-                Name = "New Detector 2",
-                MacAddress = PhysicalAddress.Parse("12AB34CD56EF")
-            },
-            new()
-            {
-                Name = "New Detector 3",
-                MacAddress = PhysicalAddress.Parse("123123123123")
-            }
-        };
 
         public static void Initialize(IServiceScope scope)
         {
             var context = scope.ServiceProvider.GetRequiredService<Context>();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger>();
+            var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
             if (context.Database.CanConnect()) return;
 
-            logger.Debug("Database does not exist. Creating and initializing database from scratch...");
-
+            logger.Debug(
+                "Database does not exist. Creating and initializing database from scratch...");
             context.Database.EnsureCreated();
 
-            context.Locations.AddRange(InitialLocations);
-            context.Detectors.AddRange(InitialDetectors);
+            if (env.IsDevelopment())
+            {
+                logger.Debug("Loading seed data");
+                new SeedLoader(context, env, logger).Load();
+            }
 
-            context.SaveChanges();
             logger.Debug("Database initialization finished");
         }
 

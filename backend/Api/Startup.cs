@@ -54,9 +54,10 @@ namespace Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
             IConfigurationProvider mapperConfiguration)
         {
+            app.InitializeDatabase();
+
             if (env.IsDevelopment())
             {
-                app.InitializeDatabase();
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {

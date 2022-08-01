@@ -11,6 +11,9 @@ namespace Api.Domain.Entities
         public int Height { get; set; }
         public int? OrderNum { get; set; }
 
+        public Task Task { get; set; } = default!;
+        public int TaskId { get; set; }
+
         public TemplateState ExpectedInitialState { get; set; }
         public TemplateState ExpectedSubsequentState { get; set; }
     }

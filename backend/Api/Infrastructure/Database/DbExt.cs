@@ -6,9 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Infrastructure.Database
 {
-    public static class DbServiceExt
+    public static class DbExt
     {
-        public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
+
+        public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             Action<DbContextOptionsBuilder> dbOptions = options =>
             {
@@ -23,6 +24,8 @@ namespace Api.Infrastructure.Database
 
             services.AddDbContext<Context>(dbOptions, optionsLifetime: ServiceLifetime.Singleton);
             services.AddDbContextFactory<Context>(dbOptions);
+
+            return services;
         }
 
         public static void InitializeDatabase(this IApplicationBuilder app)
