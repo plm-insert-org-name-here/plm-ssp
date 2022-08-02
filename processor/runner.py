@@ -10,7 +10,7 @@ class Runner:
         self._params = params
         self._sock = sock
         self._stopped_event = Event()
-        self._algorithm = get_algorithm(params, dummy)
+        self._algorithm = get_algorithm(task_id, params, dummy)
         self._thread = None
 
     def _run(self):

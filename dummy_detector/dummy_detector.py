@@ -11,6 +11,16 @@ from time import sleep
 from camera import Camera
 from threading import Lock, Thread
 import socket
+import argparse
+
+parser = argparse.ArgumentParser(description="PLM server side processing - dummy detector")
+parser.add_argument(
+        '--mac',
+        default='1234567890AB',
+        help="Mac address of dummy detector, in text format, without the separator colons (':')"
+        )
+
+args = parser.parse_args()
 
 DEST_IP = '127.0.0.1'
 DEST_PORT = 9697
@@ -33,7 +43,7 @@ def get_snapshot():
 
 class DummyDetector:
     async def __aenter__(self):
-        self.mac = '121212121212'
+        self.mac = args.mac
         self.lock = Lock()
         self.thread = None
         self._conn = websockets.connect("wss://localhost:9696/api/v1/detectors/controller", \

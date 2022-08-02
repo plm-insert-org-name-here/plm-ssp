@@ -3,14 +3,14 @@ import argparse
 parser = argparse.ArgumentParser(description="PLM server side processing - processor")
 parser.add_argument(
         '--dummy',
-        nargs='?',
-        const=False,
-        default=None,
-        help="Use dummy algorithms. If no argument is entered, the algorithms periodically produce\
-        the results preset in code. If the argument is a filename of a script inside the\
-        dummy_scripts/ folder, the script will be run")
+        action="store_true",
+        help="Use dummy algorithms")
 
 args = parser.parse_args()
+
+if args.dummy:
+    from utils.dummy_script_loader import load_scripts
+    load_scripts()
 
 from utils.types import PacketType, Template, Params, JobType
 from runner import Runner

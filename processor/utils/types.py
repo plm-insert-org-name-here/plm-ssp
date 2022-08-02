@@ -12,6 +12,7 @@ class KitResult:
         self.states = states
 
     def serialize(self):
+        print(self.states)
         buf = b'' 
         buf += to_bytes(len(self.states), 4)
         for state in self.states:
