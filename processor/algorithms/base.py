@@ -6,7 +6,7 @@ class TF_classifier:
     def __init__(self, path):
         interpreter = tf.lite.Interpreter(model_path=path)
         interpreter.allocate_tensors()
-        self.interpreter =  interpreter
+        self.interpreter = interpreter
 
     @abstractmethod
     def prep_image(self, sd_train):

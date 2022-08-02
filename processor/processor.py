@@ -1,16 +1,20 @@
-from utils.types import PacketType, Template, Params, JobType
-from runner import Runner
-from sock import Sock
 import argparse
 
 parser = argparse.ArgumentParser(description="PLM server side processing - processor")
-
 parser.add_argument(
         '--dummy',
-        action='store_true',
-        help="Use dummy algorithms")
+        nargs='?',
+        const=False,
+        default=None,
+        help="Use dummy algorithms. If no argument is entered, the algorithms periodically produce\
+        the results preset in code. If the argument is a filename of a script inside the\
+        dummy_scripts/ folder, the script will be run")
 
 args = parser.parse_args()
+
+from utils.types import PacketType, Template, Params, JobType
+from runner import Runner
+from sock import Sock
 
 sock = Sock('/tmp/plm-ssp-req.sock', '/tmp/plm-ssp-res.sock')
 runners = {}
@@ -22,8 +26,6 @@ def print_params(ps):
 
 def print_frame(frame):
     print(f'frame shape: {frame.shape}')
-
-
 
 def process_packet():
     packet_type = sock.read_packet_type()

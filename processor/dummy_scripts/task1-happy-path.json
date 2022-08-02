@@ -1,0 +1,77 @@
+{
+    "updatePeriod": 100,
+    "steps": [
+	{
+	    "elapsed": 0,
+	    "states": [
+		{
+		    "id": 1,
+		    "state": "Present"
+		}
+	    ]
+	},
+	{
+	    "elapsed": 3000,
+	    "states": [
+		{
+		    "id": 1,
+		    "state": "Missing"
+		}
+	    ]
+	},
+	{
+	    "elapsed": 3500,
+	    "states": [
+		{
+		    "id": 2,
+		    "state": "Missing"
+		}
+	    ]
+	},
+	{
+	    "elapsed": 6000,
+	    "states": [
+		{
+		    "id": 2,
+		    "state": "Present"
+		}
+	    ]
+	},
+	{
+	    "elapsed": 6300,
+	    "states": [
+		{
+		    "id": 3,
+		    "state": "Present"
+		}
+	    ]
+	},
+	{
+	    "elapsed": 9500,
+	    "states": [
+		{
+		    "id": 3,
+		    "state": "Missing"
+		}
+	    ]
+	},
+	{
+	    "elapsed": 10000,
+	    "states": [
+		{
+		    "id": 4,
+		    "state": "Missing"
+		}
+	    ]
+	},
+	{
+	    "elapsed": 13000,
+	    "states": [
+		{
+		    "id": 4,
+		    "state": "Present"
+		}
+	    ]
+	}
+    ]
+}

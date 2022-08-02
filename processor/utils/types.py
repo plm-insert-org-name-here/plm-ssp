@@ -7,7 +7,7 @@ Params = namedtuple("Params", "job_type templs")
 TemplateStateObj = namedtuple("TemplateStateObj", "id inner")
 
 # TODO: Result classes that know how to serialize themselves to socket
-class ToolKitResult:
+class KitResult:
     def __init__(self, states):
         self.states = states
 
@@ -17,18 +17,6 @@ class ToolKitResult:
         for state in self.states:
             buf += to_bytes(state.id, 4)
             buf += to_bytes(state.inner.value, 4)
-        return buf
-
-class ItemKitResult:
-    def __init__(self, states):
-        self.states = states
-
-    def serialize(self):
-        buf = b'' 
-        buf += to_bytes(len(states), 4)
-        for state in states:
-            buf += to_bytes(state.id, 4)
-            buf += to_butes(state.value, 4)
         return buf
 
 class QAResult:

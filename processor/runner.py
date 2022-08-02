@@ -20,11 +20,17 @@ class Runner:
 
             with self._queue.get_latest() as frame:
                 result = self._algorithm.run(frame)
+                if not result:
+                    break
+                    
+
             self._sock.send_result(
                     self._detector_id, 
                     self._task_id,
                     self._params.job_type, 
                     result)
+
+        self._thread = None
 
     def enqueue_frame(self, frame):
         self._queue.insert(frame)
