@@ -37,10 +37,16 @@ class DummyKitAlgorithm(TF_classifier):
         print(current_states)
         return KitResult(current_states)
 
+    def update_params(self, params):
+        self._params = params
+
 # TODO
 class DummyQAAlgorithm(TF_classifier):
     def __init__(self, params, task_id):
         self._params = params
 
     def run(self, img):
+        pass
+
+    def update_params(self, params):
         pass

@@ -4,14 +4,14 @@ namespace Api.Services.ProcessorHandler.Packets.Req
 {
     public class PausePacket : IReqPacket
     {
-        public PausePacket(int detectorId)
+        public PausePacket(int taskId)
         {
-            DetectorId = detectorId;
+            TaskId = taskId;
         }
 
         public ReqPacketType Type => ReqPacketType.Pause;
-        private int DetectorId { get; }
+        private int TaskId { get; }
 
-        public byte[] ToBytes() => BitConverter.GetBytes(DetectorId);
+        public byte[] ToBytes() => BitConverter.GetBytes(TaskId);
     }
 }

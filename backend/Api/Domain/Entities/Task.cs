@@ -9,6 +9,7 @@ namespace Api.Domain.Entities
         public TaskStatus Status { get; set; }
         public bool? Ordered { get; set; }
         public List<Template>? Templates { get; set; }
+        public List<TaskInstance>? TaskInstances { get; set; } = default!;
 
         public Job Job { get; set; } = default!;
         public int JobId { get; set; }

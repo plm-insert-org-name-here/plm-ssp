@@ -130,7 +130,7 @@ namespace Api.Services.ProcessorHandler
             }
 
             var taskInstance = await context.TaskInstances
-                .Where(ti => !ti.Finished)
+                .Where(ti => ti.FinalState == null)
                 .Include(ti => ti.Events)
                 .ThenInclude(e => e.Template)
                 .SingleOrDefaultAsync(ti => ti.Task.Id == packet.TaskId);

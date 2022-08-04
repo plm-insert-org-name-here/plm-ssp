@@ -56,12 +56,12 @@ namespace Api.Services.MonitoringHandler
 
             if (pause)
             {
-                await _sender.SendPacket(new PausePacket(detector.Id));
+                await _sender.SendPacket(new PausePacket(task.Id));
                 task.Status = TaskStatus.Paused;
             }
             else
             {
-                await _sender.SendPacket(new StopPacket(detector.Id));
+                await _sender.SendPacket(new StopPacket(task.Id));
                 task.Status = TaskStatus.Inactive;
             }
         }
@@ -136,7 +136,12 @@ namespace Api.Services.MonitoringHandler
                 }
 
                 var (id, newState) = packet.TemplateStates[0];
-                var template = task.Templates!.Single(t => t.Id == id);
+                var template = task.Templates!.SingleOrDefault(t => t.Id == id);
+                if (template is null)
+                {
+                    _logger.Error("Result packet contains invalid template id {Id}", id);
+                    return;
+                }
 
                 // Since the template order nums are a linear series starting from 1 with a step of 1, we can
                 // determine the next order num this way
@@ -156,9 +161,13 @@ namespace Api.Services.MonitoringHandler
 
                 if (template.Id != currentTemplate.Id)
                 {
-                    _logger.Error(
+                    // TODO(rg): check for desync in unordered case (also refactor and deduplicate stuff)
+                    // This is normal - when a new set of params is sent to the processor, we might receive a couple results
+                    // for the previous set of params, until the processor updates the runner to use the new set
+                    _logger.Debug(
                         "Next template order is desynced between backend and processor; Actual: {Actual}, Result: {Result}",
                         currentTemplate.OrderNum, template.OrderNum);
+                    return;
                 }
 
                 var historyExists = TemplateStates.TryGetValue(template.Id, out var history);
@@ -169,10 +178,10 @@ namespace Api.Services.MonitoringHandler
                 }
 
                 var success = HandleTemplate(template, newState, history!, ins);
-                _logger.Warning("HandleTemplate done: {Succ}", success);
 
                 if (success && isLast)
                 {
+                    ins.FinalState = TaskInstanceFinalState.Completed;
                     await StopMonitoring(det, task);
                 }
                 else if (success)
@@ -205,8 +214,6 @@ namespace Api.Services.MonitoringHandler
                         _logger.Error("{Ex}", ex);
                     }
                 }
-
-                _logger.Warning("Done with the result");
             }
             else
             {
@@ -232,6 +239,7 @@ namespace Api.Services.MonitoringHandler
 
                     if (remainingIds.Length == 0)
                     {
+                        ins.FinalState = TaskInstanceFinalState.Completed;
                         await StopMonitoring(det, task);
                     }
 
@@ -280,12 +288,12 @@ namespace Api.Services.MonitoringHandler
             }
 
             ins.Events.Add(ev);
-            ins.Finished = true;
+            ins.FinalState = TaskInstanceFinalState.Completed;
 
             await StopMonitoring(det, task);
 
             await context.SaveChangesAsync();
-            await _sender.SendPacket(new StopPacket(packet.DetectorId));
+            await _sender.SendPacket(new StopPacket(packet.TaskId));
         }
     }
 }

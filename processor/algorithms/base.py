@@ -34,3 +34,7 @@ class TF_classifier:
         result = self.predict(prep_img)
         #adapter function to make a uniqe value from the result
         return self.adapt(result)
+
+    @abstractmethod
+    def update_params(self, params):
+        self.params = params

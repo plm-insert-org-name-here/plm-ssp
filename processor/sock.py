@@ -67,12 +67,12 @@ class Sock:
         return detector_id, frame
 
     def read_stop(self):
-        detector_id = self._read_int(4)
-        return detector_id
+        task_id = self._read_int(4)
+        return task_id
 
     def read_pause(self):
-        detector_id = self._read_int(4)
-        return detector_id
+        task_id = self._read_int(4)
+        return task_id
 
     def send_result(self, detector_id, task_id, job_type, result):
         with self._res_lock:

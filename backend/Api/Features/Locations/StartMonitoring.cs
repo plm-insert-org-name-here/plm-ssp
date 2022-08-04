@@ -86,15 +86,14 @@ namespace Api.Features.Locations
             await _context.SaveChangesAsync(ct);
 
             var taskInstance = await _context.TaskInstances
-                .SingleOrDefaultAsync(ti => ti.Task.Id == task.Id, ct);
+                .SingleOrDefaultAsync(ti => ti.Task.Id == task.Id && ti.FinalState == null, ct);
 
             if (taskInstance is null)
             {
                 taskInstance = new TaskInstance
                 {
                     Events = new List<Event>(),
-                    Task = task,
-                    Finished = false
+                    Task = task
                 };
 
                 await _context.TaskInstances.AddAsync(taskInstance, ct);

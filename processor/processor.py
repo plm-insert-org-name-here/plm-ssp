@@ -18,6 +18,7 @@ from sock import Sock
 
 sock = Sock('/tmp/plm-ssp-req.sock', '/tmp/plm-ssp-res.sock')
 runners = {}
+runners_by_task_id = {}
 
 def print_params(ps):
     print(f'job type: {ps.job_type}')
@@ -33,10 +34,11 @@ def process_packet():
     if packet_type == PacketType.Params.value:
         detector_id, task_id, params = sock.read_params()
         try:
-            runners[detector_id].update_params(params)
+            runners[task_id].update_params(params)
         except KeyError:
             runner = Runner(detector_id, task_id, params, sock, args.dummy)
             runners[detector_id] = runner
+            runners_by_task_id[task_id] = runner
             runner.start()
 
     elif packet_type == PacketType.Frame.value:
@@ -51,13 +53,13 @@ def process_packet():
             pass
 
     elif packet_type == PacketType.Pause.value:
-        detector_id = sock.read_pause()
-        runners[detector_id].stop()
+        task_id = sock.read_pause()
+        runners_by_task_id[task_id].stop()
 
     elif packet_type == PacketType.Stop.value:
-        detector_id = sock.read_stop()
-        runners[detector_id].stop()
-        del runners[detector_id]
+        task_id = sock.read_stop()
+        runners_by_task_id[task_id].stop()
+        del runners[task_id]
 
     else:
         print(f'invalid packet type: {packet_type}')

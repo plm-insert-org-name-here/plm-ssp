@@ -45,5 +45,10 @@ class Runner:
             self._thread.join()
             self._thread = None
 
+    # Clearing the frame queue is not necessary
     def update_params(self, params):
-        pass
+        self.stop()
+        self._params = params
+        self._algorithm.update_params(params)
+        self._stopped_event.clear()
+        self.start()

@@ -47,6 +47,7 @@ namespace Api
             public const string Create = Prefix + "tasks";
             public const string Update = Prefix + "tasks/{id:int}";
             public const string Delete = Prefix + "tasks/{id:int}";
+            public const string AbandonInstance = Prefix + "tasks/{id:int}/abandon";
         }
 
         public static class Events

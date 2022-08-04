@@ -48,6 +48,9 @@ class Seeger_QA(TF_classifier):
     def run(self, img):
         return super().run(img)
 
+    def update_params(self, params):
+        pass
+
     '''
     OUTPUT CONVERTER FUNCTIONS
     '''

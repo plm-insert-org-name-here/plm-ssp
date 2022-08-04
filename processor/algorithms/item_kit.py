@@ -33,3 +33,6 @@ class Item_kit_algo(TF_classifier):
         output_neuron = np.argmax(probabilities)         
         
         return labels[output_neuron], probabilities[output_neuron]
+
+    def update_params(self, params):
+        self.params = params
