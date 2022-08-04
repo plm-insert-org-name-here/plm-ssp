@@ -70,6 +70,10 @@ class Sock:
         detector_id = self._read_int(4)
         return detector_id
 
+    def read_pause(self):
+        detector_id = self._read_int(4)
+        return detector_id
+
     def send_result(self, detector_id, task_id, job_type, result):
         with self._res_lock:
             self._write_int(detector_id, 4)

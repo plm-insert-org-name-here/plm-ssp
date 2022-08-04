@@ -14,7 +14,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Api.Services.MonitoringHandler
 {
-    using TemplateId = System.Int32;
+    using TemplateId = Int32;
 
     // TODO(rg): error checking (e.g. SingleOrDefault instead of Single)
     // TODO(rg): better failureReason for Failure events
@@ -44,7 +44,7 @@ namespace Api.Services.MonitoringHandler
             _mapper = mapper;
         }
 
-        public async Task StopMonitoring(Detector detector)
+        public async Task StopMonitoring(Detector detector, Domain.Entities.Task task, bool pause = false)
         {
             if (_groups.HasViewers(detector.Id))
                 detector.State = DetectorState.Streaming;
@@ -54,7 +54,16 @@ namespace Api.Services.MonitoringHandler
                 detector.State = DetectorState.Standby;
             }
 
-            await _sender.SendPacket(new StopPacket(detector.Id));
+            if (pause)
+            {
+                await _sender.SendPacket(new PausePacket(detector.Id));
+                task.Status = TaskStatus.Paused;
+            }
+            else
+            {
+                await _sender.SendPacket(new StopPacket(detector.Id));
+                task.Status = TaskStatus.Inactive;
+            }
         }
 
         private void SubmitEvent(TaskInstance ins, Template template, string? failureReason = null)
@@ -131,8 +140,18 @@ namespace Api.Services.MonitoringHandler
 
                 // Since the template order nums are a linear series starting from 1 with a step of 1, we can
                 // determine the next order num this way
-                var currentOrderNum = ins.Events.Select(e => e.Template!.OrderNum).Max() + 1;
-                var currentTemplate = task.Templates!.Single(t => t.OrderNum == currentOrderNum);
+                var currentOrderNum = ins.Events
+                    .Where(e => e.Result == EventResult.Success)
+                    .Select(e => e.Template!.OrderNum)
+                    .Max()
+                    .GetValueOrDefault(0) + 1;
+                var currentTemplate = task.Templates!.SingleOrDefault(t => t.OrderNum == currentOrderNum);
+                if (currentTemplate is null)
+                {
+                    _logger.Error("Couldn't find template with an OrderNum of {Ord}", currentOrderNum);
+                    return;
+                }
+
                 var isLast = task.Templates!.Count == currentOrderNum;
 
                 if (template.Id != currentTemplate.Id)
@@ -142,31 +161,52 @@ namespace Api.Services.MonitoringHandler
                         currentTemplate.OrderNum, template.OrderNum);
                 }
 
-                var history = TemplateStates[template.Id];
-                var success = HandleTemplate(template, newState, history, ins);
-
-                if (isLast)
+                var historyExists = TemplateStates.TryGetValue(template.Id, out var history);
+                if (!historyExists)
                 {
-                    await StopMonitoring(det);
-                    task.Status = TaskStatus.Inactive;
+                    history = new TemplateStateHistory();
+                    TemplateStates.Add(template.Id, history);
+                }
+
+                var success = HandleTemplate(template, newState, history!, ins);
+                _logger.Warning("HandleTemplate done: {Succ}", success);
+
+                if (success && isLast)
+                {
+                    await StopMonitoring(det, task);
                 }
                 else if (success)
                 {
                     // We're in !isLast, so this is guaranteed to return with a template
-                    var nextTemplate = task.Templates!.Single(t => t.OrderNum == currentOrderNum + 1);
-
-                    var nextParams = new ParamsPacket
+                    var nextTemplate = task.Templates!.SingleOrDefault(t => t.OrderNum == currentOrderNum + 1);
+                    if (nextTemplate is null)
                     {
-                        DetectorId = packet.DetectorId,
-                        TaskId = packet.TaskId,
-                        JobType = packet.JobType,
-                        Templates = new List<ParamsPacketTemplate>
+                        _logger.Error("Couldn't find next template with an OrderNum of {Ord}", currentOrderNum + 1);
+                        return;
+                    }
+
+                    try
+                    {
+                        var nextParams = new ParamsPacket
                         {
-                            _mapper.Map<ParamsPacketTemplate>(nextTemplate)
-                        }
-                    };
-                    await _sender.SendPacket(nextParams);
+                            DetectorId = packet.DetectorId,
+                            TaskId = packet.TaskId,
+                            JobType = packet.JobType,
+                            Templates = new List<ParamsPacketTemplate>
+                            {
+                                _mapper.Map<ParamsPacketTemplate>(nextTemplate)
+                            }
+                        };
+
+                        await _sender.SendPacket(nextParams);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error("{Ex}", ex);
+                    }
                 }
+
+                _logger.Warning("Done with the result");
             }
             else
             {
@@ -174,8 +214,14 @@ namespace Api.Services.MonitoringHandler
                 foreach (var (id, newState) in packet.TemplateStates)
                 {
                     var template = task.Templates!.Single(t => t.Id == id);
-                    var history = TemplateStates[template.Id];
-                    var success = HandleTemplate(template, newState, history, ins);
+                    var historyExists = TemplateStates.TryGetValue(template.Id, out var history);
+                    if (!historyExists)
+                    {
+                        history = new TemplateStateHistory();
+                        TemplateStates.Add(template.Id, history);
+                    }
+
+                    var success = HandleTemplate(template, newState, history!, ins);
                     if (success)
                         successIds.Add(id);
                 }
@@ -186,8 +232,7 @@ namespace Api.Services.MonitoringHandler
 
                     if (remainingIds.Length == 0)
                     {
-                        await StopMonitoring(det);
-                        task.Status = TaskStatus.Inactive;
+                        await StopMonitoring(det, task);
                     }
 
                     var remainingTemplates = task.Templates!.Where(t => remainingIds.Contains(t.Id)).ToArray();
@@ -237,8 +282,7 @@ namespace Api.Services.MonitoringHandler
             ins.Events.Add(ev);
             ins.Finished = true;
 
-            await StopMonitoring(det);
-            task.Status = TaskStatus.Inactive;
+            await StopMonitoring(det, task);
 
             await context.SaveChangesAsync();
             await _sender.SendPacket(new StopPacket(packet.DetectorId));

@@ -12,7 +12,6 @@ class KitResult:
         self.states = states
 
     def serialize(self):
-        print(self.states)
         buf = b'' 
         buf += to_bytes(len(self.states), 4)
         for state in self.states:
@@ -36,6 +35,7 @@ class PacketType(Enum):
     Params = 0
     Frame = 1
     Stop = 2
+    Pause = 3
 
 class TemplateState(Enum):
     Present = 0

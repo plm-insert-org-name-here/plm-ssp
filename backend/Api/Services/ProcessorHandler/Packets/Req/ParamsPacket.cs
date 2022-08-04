@@ -89,9 +89,11 @@ namespace Api.Services.ProcessorHandler.Packets.Req
 
         public class MappingProfile : Profile
         {
-            public MappingProfile() =>
-                CreateProjection<Template, ParamsPacketTemplate>()
+            public MappingProfile()
+            {
+                CreateMap<Template, ParamsPacketTemplate>()
                     .ForMember(src => src.OrderNum, opt => opt.NullSubstitute(0));
+            }
         }
 
         public byte[] ToBytes()

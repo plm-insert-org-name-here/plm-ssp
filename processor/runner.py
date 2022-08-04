@@ -22,7 +22,6 @@ class Runner:
                 result = self._algorithm.run(frame)
                 if not result:
                     break
-                    
 
             self._sock.send_result(
                     self._detector_id, 
@@ -45,3 +44,6 @@ class Runner:
         if self._thread is not None:
             self._thread.join()
             self._thread = None
+
+    def update_params(self, params):
+        pass

@@ -33,12 +33,11 @@ def process_packet():
     if packet_type == PacketType.Params.value:
         detector_id, task_id, params = sock.read_params()
         try:
-            runners[detector_id].stop()
+            runners[detector_id].update_params(params)
         except KeyError:
-            pass
-        runner = Runner(detector_id, task_id, params, sock, args.dummy)
-        runners[detector_id] = runner
-        runner.start()
+            runner = Runner(detector_id, task_id, params, sock, args.dummy)
+            runners[detector_id] = runner
+            runner.start()
 
     elif packet_type == PacketType.Frame.value:
         detector_id, frame = sock.read_frame()
@@ -51,9 +50,14 @@ def process_packet():
             print('error: frame received, but no params')
             pass
 
+    elif packet_type == PacketType.Pause.value:
+        detector_id = sock.read_pause()
+        runners[detector_id].stop()
+
     elif packet_type == PacketType.Stop.value:
         detector_id = sock.read_stop()
         runners[detector_id].stop()
+        del runners[detector_id]
 
     else:
         print(f'invalid packet type: {packet_type}')

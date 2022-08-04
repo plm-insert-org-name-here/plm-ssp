@@ -20,11 +20,20 @@ using TaskStatus = Api.Domain.Common.TaskStatus;
 namespace Api.Features.Locations
 {
     public class StopMonitoring : EndpointBaseAsync
-        .WithRequest<int>
+        .WithRequest<StopMonitoring.Req>
         .WithActionResult
     {
         private readonly Context _context;
         private readonly MonitoringHandler _monitoringHandler;
+
+        public class Req
+        {
+            [FromRoute(Name = "id")] public int Id { get; set; }
+
+            [FromBody] public ReqBody Body { get; set; } = default!;
+
+            public record ReqBody(bool Pause);
+        }
 
         public StopMonitoring(Context context, DetectorCommandQueues queues, StreamViewerGroups groups,
             PacketSender sender, MonitoringHandler monitoringHandler)
@@ -40,10 +49,10 @@ namespace Api.Features.Locations
             OperationId = "Locations.StopMonitoring",
             Tags = new[] { "Locations" })
         ]
-        public override async Task<ActionResult> HandleAsync(int id, CancellationToken ct = new())
+        public override async Task<ActionResult> HandleAsync([FromRoute] Req req, CancellationToken ct = new())
         {
             var location = await _context.Locations
-                .Where(l => l.Id == id)
+                .Where(l => l.Id == req.Id)
                 .Include(l => l.Detector)
                 .Include(l => l.Job!)
                 .ThenInclude(j => j.Tasks)
@@ -62,8 +71,7 @@ namespace Api.Features.Locations
             var activeTask = location.Job.Tasks.SingleOrDefault(t => t.Status is TaskStatus.Active);
             if (activeTask is null) return BadRequest("Active task not found on location");
 
-            await _monitoringHandler.StopMonitoring(location.Detector);
-            activeTask.Status = TaskStatus.Paused;
+            await _monitoringHandler.StopMonitoring(location.Detector, activeTask, true);
 
             await _context.SaveChangesAsync(ct);
             return NoContent();

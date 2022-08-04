@@ -2,14 +2,14 @@ using System;
 
 namespace Api.Services.ProcessorHandler.Packets.Req
 {
-    public class StopPacket : IReqPacket
+    public class PausePacket : IReqPacket
     {
-        public StopPacket(int detectorId)
+        public PausePacket(int detectorId)
         {
             DetectorId = detectorId;
         }
 
-        public ReqPacketType Type => ReqPacketType.Stop;
+        public ReqPacketType Type => ReqPacketType.Pause;
         private int DetectorId { get; }
 
         public byte[] ToBytes() => BitConverter.GetBytes(DetectorId);

@@ -4,6 +4,7 @@ namespace Api.Services.ProcessorHandler.Packets.Req
     {
         Params = 0,
         Frame = 1,
-        Stop = 2
+        Stop = 2,
+        Pause = 3
     }
 }
