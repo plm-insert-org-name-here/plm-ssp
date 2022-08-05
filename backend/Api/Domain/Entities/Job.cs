@@ -9,8 +9,8 @@ namespace Api.Domain.Entities
         public JobType Type { get; set; }
         public byte[] Snapshot { get; set; } = default!;
 
-        public Location? Location { get; set; }
-        public int? LocationId { get; set; }
+        public Location Location { get; set; } = default!;
+        public int LocationId { get; set; }
 
         public List<Task> Tasks { get; set; } = default!;
     }
