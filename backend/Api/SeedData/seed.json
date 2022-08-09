@@ -52,12 +52,14 @@
       "id": 1,
       "name": "Task 1-1",
       "ordered": true,
+      "status": "Inactive",
       "jobId": 1
     },
     {
       "id": 2,
       "name": "Task 2-1",
       "ordered": false,
+      "status": "Inactive",
       "jobId": 2
     }
   ],

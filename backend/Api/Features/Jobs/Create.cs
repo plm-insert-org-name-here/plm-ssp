@@ -49,8 +49,8 @@ namespace Api.Features.Jobs
                 _context = context;
 
                 RuleFor(j => j.Name).MaximumLength(64).NotEmpty();
-                // NOTE(rg): NotEmpty would reject the "0" enum value
                 RuleFor(j => j).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+                // NOTE(rg): NotEmpty would reject the "0" enum value
                 RuleFor(j => j.Type).NotNull();
                 RuleFor(j => j.LocationId).NotEmpty();
             }

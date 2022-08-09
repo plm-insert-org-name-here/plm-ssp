@@ -45,7 +45,7 @@ namespace Api.Features.Tasks
             if (task.Status is TaskStatus.Active)
                 return BadRequest("The task currently is active");
 
-            var instance = task.TaskInstances?.Single(ti => ti.FinalState == null);
+            var instance = task.TaskInstances?.SingleOrDefault(ti => ti.FinalState == null);
 
             if (instance is null)
                 return BadRequest("The task does not have any unfinished instances");

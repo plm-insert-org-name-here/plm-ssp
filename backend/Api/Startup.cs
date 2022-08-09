@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 using Api.Infrastructure.Database;
 using Api.Services;
@@ -26,6 +27,8 @@ namespace Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<HostOptions>(opt => opt.ShutdownTimeout = TimeSpan.FromSeconds(1));
+
             services.AddControllers()
                 .AddJsonOptions(opts =>
                 {

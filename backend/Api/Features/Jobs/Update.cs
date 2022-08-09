@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,12 +76,18 @@ namespace Api.Features.Jobs
                 .SingleOrDefaultAsync(ct);
 
             if (job is null) return NotFound();
-            if (job.Location?.Detector?.State == DetectorState.Streaming)
+            if (job.Location?.Detector?.State is DetectorState.Streaming or DetectorState.Monitoring)
                 return BadRequest("The detector attached to the location of the job is busy");
 
             job.Name = req.Body.Name;
-            // TODO(rg): if there are no tasks
-            job.Type = req.Body.Type!.Value;
+
+            var newType = req.Body.Type!.Value;
+            if (newType != job.Type)
+            {
+                if (job.Tasks.Count != 0)
+                    return BadRequest("The job has tasks, and thus it's type cannot be changed");
+                job.Type = req.Body.Type!.Value;
+            }
 
             await _context.SaveChangesAsync(ct);
             return NoContent();

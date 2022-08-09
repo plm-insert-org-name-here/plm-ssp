@@ -39,7 +39,7 @@ namespace Api.Features.Detectors
             if (detector is null) return NotFound();
             if (detector.Location is null)
                 return BadRequest("The specified detector is not attached to a location");
-            if (detector.State is DetectorState.Streaming)
+            if (detector.State is DetectorState.Streaming or DetectorState.Monitoring)
                 return BadRequest("The specified detector is busy");
 
             detector.Location = null;

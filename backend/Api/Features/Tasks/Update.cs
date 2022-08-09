@@ -47,7 +47,7 @@ namespace Api.Features.Tasks
 
         public class Validator : AbstractValidator<Req>
         {
-            public Validator(Context context)
+            public Validator()
             {
                 RuleFor(t => t.Body.Name).NotEmpty().MaximumLength(64);
                 RuleFor(t => t.Body.Templates).Must(HaveUniqueNamesWithinTask)
@@ -86,9 +86,13 @@ namespace Api.Features.Tasks
         {
             public TemplateValidator()
             {
+                RuleFor(t => t.Name).NotEmpty().MaximumLength(64);
                 RuleFor(t => t).Must(BeWithinBounds)
                     .WithMessage("All Templates must fit within the 640x480 snapshot area");
-                // TODO(rg): NotNull for x,y,w,h?
+                RuleFor(t => t.X).NotNull();
+                RuleFor(t => t.Y).NotNull();
+                RuleFor(t => t.Width).NotNull();
+                RuleFor(t => t.Height).NotNull();
                 RuleFor(t => t.ExpectedInitialState).NotNull();
                 RuleFor(t => t.ExpectedSubsequentState).NotNull();
             }
