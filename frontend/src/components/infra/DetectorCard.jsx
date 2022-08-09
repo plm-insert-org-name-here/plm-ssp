@@ -111,7 +111,7 @@ const DetectorCard = ({ detector, onAttach, onDetach, onDelete, onRename }) => {
                     className="hidden-icon"
                     bgcolor="#eeeeee"
                 >
-                    <Tooltip title="Rename" placement="right">
+                    <Tooltip followCursor title="Rename" placement="right">
                         <IconButton
                             size="small"
                             color="secondary"
@@ -121,7 +121,7 @@ const DetectorCard = ({ detector, onAttach, onDetach, onDelete, onRename }) => {
                         </IconButton>
                     </Tooltip>
                     {detector.location ? (
-                        <Tooltip title="Detach detector" placement="right">
+                        <Tooltip followCursor title="Detach detector" placement="right">
                             <IconButton
                                 size="small"
                                 color="info"
@@ -131,13 +131,18 @@ const DetectorCard = ({ detector, onAttach, onDetach, onDelete, onRename }) => {
                             </IconButton>
                         </Tooltip>
                     ) : (
-                        <Tooltip title="Attach detector" placement="right">
+                        <Tooltip followCursor title="Attach detector" placement="right">
                             <IconButton size="small" color="info" onClick={onAttachPopupOpen}>
                                 <PowerIcon />
                             </IconButton>
                         </Tooltip>
                     )}
-                    <Tooltip title="Delete" placement="right" onClick={() => deletePopup.open()}>
+                    <Tooltip
+                        followCursor
+                        title="Delete"
+                        placement="right"
+                        onClick={() => deletePopup.open()}
+                    >
                         <IconButton size="small" color="error">
                             <DeleteIcon />
                         </IconButton>
