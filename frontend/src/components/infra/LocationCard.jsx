@@ -74,9 +74,9 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
                     mr: 3,
                     my: 1,
                     width: "auto",
-                    height: "120px",
+                    height: "100px",
                     borderRadius: "8px",
-                    border: selection.locationId === location.id ? "1px solid black" : "none",
+                    border: selection?.locationId === location.id ? "1px solid black" : "none",
                 }}
             >
                 <CardActionArea
@@ -122,6 +122,7 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
                 <Box
                     display="flex"
                     flexDirection="column"
+                    justifyContent="center"
                     className="hidden-icon"
                     bgcolor="#eeeeee"
                     zIndex={1}

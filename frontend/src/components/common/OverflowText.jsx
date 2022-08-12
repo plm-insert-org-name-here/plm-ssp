@@ -20,6 +20,13 @@ const OverflowText = ({ text, ...props }) => {
             enterDelay={500}
             enterTouchDelay={500}
             disableHoverListener={!showTooltip}
+            componentsProps={{
+                tooltip: {
+                    sx: {
+                        bgcolor: "black",
+                    },
+                },
+            }}
         >
             <Typography
                 ref={textRef}

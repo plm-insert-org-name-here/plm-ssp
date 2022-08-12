@@ -67,9 +67,13 @@ const Infrastructure = () => {
     }, []);
 
     return (
-        <Paper elevation={8} sx={{ display: "flex", flexDirection: "column", m: 2, flexGrow: 1 }}>
+        <Paper elevation={8} sx={{ display: "flex", flexGrow: 1, flexDirection: "column" }}>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <Tabs value={selectedTab} onChange={(_, v) => setSelectedTab(v)}>
+                <Tabs
+                    variant="fullWidth"
+                    value={selectedTab}
+                    onChange={(_, v) => setSelectedTab(v)}
+                >
                     <Tab label="Locations" />
                     <Tab label="Detectors" />
                 </Tabs>
