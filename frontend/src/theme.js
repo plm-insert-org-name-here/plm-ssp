@@ -12,6 +12,7 @@ const theme = createTheme({
         },
         background: {
             default: "#eaeaea",
+            panel: "#f0f0f0",
         },
         text: {
             lighter: grey[500],

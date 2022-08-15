@@ -74,7 +74,7 @@ const LocationCard = ({ location, onAttach, onDetach, onDelete, onRename }) => {
                     mr: 3,
                     my: 1,
                     width: "auto",
-                    height: "100px",
+                    height: "120px",
                     borderRadius: "8px",
                     border: selection?.locationId === location.id ? "1px solid black" : "none",
                 }}

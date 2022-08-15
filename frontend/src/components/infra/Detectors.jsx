@@ -27,7 +27,12 @@ const Detectors = ({ detectors, setDetectors, onAttach, onDetach }) => {
     return (
         <Box sx={{ flexGrow: 1, height: 0 }}>
             <Box
-                sx={{ height: "100%", bgcolor: "#f6f6f6", overflowY: "auto", borderRadius: "8px" }}
+                sx={{
+                    height: "100%",
+                    bgcolor: "background.panel",
+                    overflowY: "auto",
+                    borderRadius: "8px",
+                }}
             >
                 {detectors.map((d) => (
                     <DetectorCard

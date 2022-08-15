@@ -136,7 +136,7 @@ function App() {
                                         <Box sx={{ width: 0, flexGrow: 1 }}>
                                             <OverflowText
                                                 text="Station 1234 yada yada"
-                                                sx={{ fontSize: "1.2rem", fontWeight: "bold" }}
+                                                sx={{ fontSize: "1.1rem", fontWeight: "bold" }}
                                             ></OverflowText>
                                             <Typography sx={{ fontSize: "0.6rem" }}>
                                                 (Click to select)

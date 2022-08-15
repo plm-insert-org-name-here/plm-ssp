@@ -46,7 +46,7 @@ const Locations = ({ locations, setLocations, onAttach, onDetach }) => {
                 <Box
                     sx={{
                         height: "100%",
-                        bgcolor: "#f6f6f6",
+                        bgcolor: "background.panel",
                         overflowY: "auto",
                         borderRadius: "8px",
                     }}
