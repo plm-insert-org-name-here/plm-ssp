@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Api.Domain.Common;
 using Api.Domain.Entities;
 using AutoMapper;
@@ -13,7 +14,8 @@ namespace Api.Services.ProcessorHandler.Packets.Req
         public int DetectorId { get; set; }
         public int TaskId { get; set; }
         public JobType JobType {get; set; }
-        public List<ParamsPacketTemplate>? Templates { get; set; } = default!;
+        // NOTE(rg): for simplicity, templates and expected state changes for kit tasks are merged
+        public List<ParamsPacketTemplate>? Templates { get; set; }
 
         public class MappingProfile : Profile
         {
@@ -23,8 +25,9 @@ namespace Api.Services.ProcessorHandler.Packets.Req
                     .ForMember(dest => dest.DetectorId, opt => opt.MapFrom(src => src.Job.Location!.Detector!.Id))
                     .ForMember(dest => dest.TaskId, opt => opt.MapFrom(src => src.Id))
                     .ForMember(dest => dest.JobType, opt => opt.MapFrom(src => src.Job.Type))
-                    .ForMember(dest => dest.Templates, opt => opt.MapFrom(src => src.Templates));
-            }
+                    .ForMember(dest => dest.Templates, opt =>
+                        opt.MapFrom(src => src.Templates!.SelectMany(t => t.StateChanges)));
+                }
         }
 
         private int GetSizeInBytes()
@@ -78,21 +81,24 @@ namespace Api.Services.ProcessorHandler.Packets.Req
 
     public class ParamsPacketTemplate
     {
-        public static int SizeInBytes = 24;
+        public static int SizeInBytes = 20;
 
         public int Id { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
-        public int OrderNum { get; set; }
 
         public class MappingProfile : Profile
         {
             public MappingProfile()
             {
-                CreateMap<Template, ParamsPacketTemplate>()
-                    .ForMember(src => src.OrderNum, opt => opt.NullSubstitute(0));
+                CreateMap<StateChange, ParamsPacketTemplate>()
+                    .ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id))
+                    .ForMember(dst => dst.X, opt => opt.MapFrom(src => src.Template.X))
+                    .ForMember(dst => dst.Y, opt => opt.MapFrom(src => src.Template.Y))
+                    .ForMember(dst => dst.Width, opt => opt.MapFrom(src => src.Template.Width))
+                    .ForMember(dst => dst.Height, opt => opt.MapFrom(src => src.Template.Height));
             }
         }
 
@@ -105,14 +111,12 @@ namespace Api.Services.ProcessorHandler.Packets.Req
             var yBytes = BitConverter.GetBytes(Y);
             var wBytes = BitConverter.GetBytes(Width);
             var hBytes = BitConverter.GetBytes(Height);
-            var orderBytes = BitConverter.GetBytes(OrderNum);
 
             Buffer.BlockCopy(idBytes, 0, bytes, 0, 4);
             Buffer.BlockCopy(xBytes, 0, bytes, 4, 4);
             Buffer.BlockCopy(yBytes, 0, bytes, 8, 4);
             Buffer.BlockCopy(wBytes, 0, bytes, 12, 4);
             Buffer.BlockCopy(hBytes, 0, bytes, 16, 4);
-            Buffer.BlockCopy(orderBytes, 0, bytes, 20, 4);
 
             return bytes;
         }

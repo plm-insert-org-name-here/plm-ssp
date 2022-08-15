@@ -106,6 +106,7 @@ namespace Api.Features.Locations
                 .ThenInclude(j => j.Location!)
                 .ThenInclude(l => l.Detector)
                 .Include(t => t.Templates)
+                .ThenInclude(t => t.StateChanges)
                 .ProjectTo<ParamsPacket>(_mapperConfig)
                 .SingleOrDefaultAsync(ct);
 

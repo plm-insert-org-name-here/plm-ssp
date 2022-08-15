@@ -50,8 +50,7 @@ class Sock:
                 y = self._read_int(4)
                 w = self._read_int(4)
                 h = self._read_int(4)
-                order = self._read_int(4)
-                templs.append(Template(id, x, y, w, h, order))
+                templs.append(Template(id, x, y, w, h))
 
             params = Params(job_type, templs)
 

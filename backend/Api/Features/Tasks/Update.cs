@@ -35,11 +35,18 @@ namespace Api.Features.Tasks
 
             [FromBody] public ReqBody Body { get; set; } = default!;
 
-            public record ReqBody(string Name, bool? Ordered, List<Template>? Templates);
+            public record ReqBody(
+                string Name,
+                bool? Ordered,
+                List<Template>? Templates,
+                List<StateChange>? StateChanges);
 
             public record Template(
                 string Name,
-                int? X, int? Y, int? Width, int? Height,
+                int? X, int? Y, int? Width, int? Height);
+
+            public record StateChange(
+                string TemplateName,
                 int? OrderNum,
                 TemplateState? ExpectedInitialState,
                 TemplateState? ExpectedSubsequentState);
@@ -52,17 +59,18 @@ namespace Api.Features.Tasks
                 RuleFor(t => t.Body.Name).NotEmpty().MaximumLength(64);
                 RuleFor(t => t.Body.Templates).Must(HaveUniqueNamesWithinTask)
                     .WithMessage("All Template must have unique names within the parent Task");
-                RuleFor(t => t.Body.Templates).Must(HaveTemplatesInOrder).When(t => t.Body.Ordered.HasValue && t.Body.Ordered.Value)
+                RuleFor(t => t.Body.StateChanges).Must(HaveTemplatesInOrder).When(t => t.Body.Ordered.HasValue && t.Body.Ordered.Value)
                     .WithMessage("Templates' order numbers must be in ascending order, with starting index 1 and step 1, if the Task is Ordered.");
-                RuleFor(t => t.Body.Templates).Must(BeUnordered).When(t => t.Body.Ordered.HasValue && !t.Body.Ordered.Value)
+                RuleFor(t => t.Body.StateChanges).Must(BeUnordered).When(t => t.Body.Ordered.HasValue && !t.Body.Ordered.Value)
                     .WithMessage("Templates' order numbers must all be null, if the Task is not Ordered.");
                 RuleForEach(t => t.Body.Templates).SetValidator(new TemplateValidator());
+                RuleForEach(t => t.Body.StateChanges).SetValidator(new StateChangeValidator());
             }
 
-            private bool BeUnordered(List<Req.Template>? ts) =>
+            private bool BeUnordered(List<Req.StateChange>? ts) =>
                 ts is null || ts.All(t => t.OrderNum is null);
 
-            private bool HaveTemplatesInOrder(List<Req.Template>? ts)
+            private bool HaveTemplatesInOrder(List<Req.StateChange>? ts)
             {
                 if (ts is null) return true;
 
@@ -93,8 +101,6 @@ namespace Api.Features.Tasks
                 RuleFor(t => t.Y).NotNull();
                 RuleFor(t => t.Width).NotNull();
                 RuleFor(t => t.Height).NotNull();
-                RuleFor(t => t.ExpectedInitialState).NotNull();
-                RuleFor(t => t.ExpectedSubsequentState).NotNull();
             }
 
             private bool BeWithinBounds(Req.Template t)
@@ -107,7 +113,15 @@ namespace Api.Features.Tasks
 
                 return true;
             }
+        }
 
+        public class StateChangeValidator : AbstractValidator<Req.StateChange>
+        {
+            public StateChangeValidator()
+            {
+                RuleFor(c => c.ExpectedInitialState).NotNull();
+                RuleFor(c => c.ExpectedSubsequentState).NotNull();
+            }
         }
 
         [HttpPut(Routes.Tasks.Update)]
@@ -151,7 +165,7 @@ namespace Api.Features.Tasks
                 task.Ordered = req.Body.Ordered!.Value;
             }
 
-            if (req.Body.Templates is not null)
+            if (req.Body.Templates is not null && req.Body.StateChanges is not null)
             {
                 if (qa)
                     return BadRequest("QA tasks cannot have templates");
@@ -160,11 +174,29 @@ namespace Api.Features.Tasks
 
                 var newTemplates = MapTemplates(req);
                 task.Templates = newTemplates;
+
+                var newStateChanges = MapStateChanges(req);
+                for (int i = 0; i < req.Body.StateChanges.Count; i++)
+                {
+                    newStateChanges[i].TemplateId = task.Templates
+                        .Single(t => t.Name == req.Body.StateChanges[i].TemplateName)
+                        .Id;
+                }
+
+                await _context.StateChanges.AddRangeAsync(newStateChanges, ct);
             }
 
             await _context.SaveChangesAsync(ct);
             return NoContent();
         }
+
+        private static List<StateChange> MapStateChanges(Req req) =>
+        req.Body.StateChanges!.Select(c => new StateChange
+        {
+                OrderNum = c.OrderNum,
+                ExpectedInitialState = c.ExpectedInitialState!.Value,
+                ExpectedSubsequentState = c.ExpectedSubsequentState!.Value
+        }).ToList();
 
         private static List<Template> MapTemplates(Req req) =>
             req.Body.Templates!.Select(t => new Template
@@ -174,9 +206,6 @@ namespace Api.Features.Tasks
                 Y = t.Y!.Value,
                 Width = t.Width!.Value,
                 Height = t.Height!.Value,
-                OrderNum = t.OrderNum,
-                ExpectedInitialState = t.ExpectedInitialState!.Value,
-                ExpectedSubsequentState = t.ExpectedSubsequentState!.Value
             }).ToList();
 
         private static bool ValidateTaskNamesUniqueness(Req req, Task task) =>

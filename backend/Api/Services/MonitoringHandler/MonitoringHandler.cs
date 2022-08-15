@@ -66,12 +66,12 @@ namespace Api.Services.MonitoringHandler
             }
         }
 
-        private void SubmitEvent(TaskInstance ins, Template template, string? failureReason = null)
+        private void SubmitEvent(TaskInstance ins, StateChange change, string? failureReason = null)
         {
             var ev = new Event
             {
                 Timestamp = DateTime.Now,
-                Template = template,
+                StateChange = change,
                 TaskInstance = ins,
                 Result = failureReason is null ? EventResult.Success : EventResult.Failure,
                 FailureReason = failureReason
@@ -80,7 +80,7 @@ namespace Api.Services.MonitoringHandler
         }
 
         private bool HandleTemplate(
-            Template template,
+            StateChange stateChange,
             TemplateState newState,
             TemplateStateHistory history,
             TaskInstance ins)
@@ -89,22 +89,22 @@ namespace Api.Services.MonitoringHandler
 
             if (newState is TemplateState.UnknownObject &&
                 history.PreviousState is not TemplateState.UnknownObject)
-                SubmitEvent(ins, template, $"Detected an unknown object at template (name: '${template.Name}')");
+                SubmitEvent(ins, stateChange, $"Detected an unknown object at template (name: '${stateChange.Template.Name}')");
 
             if (history.PreviousValidState is null)
             {
-                if ((newState is TemplateState.Missing && template.ExpectedInitialState is TemplateState.Present) ||
-                    (newState is TemplateState.Present && template.ExpectedInitialState is TemplateState.Missing))
-                    SubmitEvent(ins, template, $"Incorrect initial state for template (name: '${template.Name}')");
+                if ((newState is TemplateState.Missing && stateChange.ExpectedInitialState is TemplateState.Present) ||
+                    (newState is TemplateState.Present && stateChange.ExpectedInitialState is TemplateState.Missing))
+                    SubmitEvent(ins, stateChange, $"Incorrect initial state for template (name: '${stateChange.Template.Name}')");
 
                 UpdateTemplateStateHistory(history, newState);
                 return false;
             }
 
-            if (history.PreviousValidState == template.ExpectedInitialState
-                && newState == template.ExpectedSubsequentState)
+            if (history.PreviousValidState == stateChange.ExpectedInitialState
+                && newState == stateChange.ExpectedSubsequentState)
             {
-                SubmitEvent(ins, template);
+                SubmitEvent(ins, stateChange);
                 ret = true;
             }
 
@@ -136,48 +136,52 @@ namespace Api.Services.MonitoringHandler
                 }
 
                 var (id, newState) = packet.TemplateStates[0];
-                var template = task.Templates!.SingleOrDefault(t => t.Id == id);
-                if (template is null)
+                var stateChange = task.Templates!
+                    .SelectMany(t => t.StateChanges)
+                    .SingleOrDefault(c => c.Id == id);
+                if (stateChange is null)
                 {
-                    _logger.Error("Result packet contains invalid template id {Id}", id);
+                    _logger.Error("Result packet contains invalid state change id {Id}", id);
                     return;
                 }
 
-                // Since the template order nums are a linear series starting from 1 with a step of 1, we can
+                // Since the state change order nums are a linear series starting from 1 with a step of 1, we can
                 // determine the next order num this way
                 var currentOrderNum = ins.Events
                     .Where(e => e.Result == EventResult.Success)
-                    .Select(e => e.Template!.OrderNum)
+                    .Select(e => e.StateChange!.OrderNum)
                     .Max()
                     .GetValueOrDefault(0) + 1;
-                var currentTemplate = task.Templates!.SingleOrDefault(t => t.OrderNum == currentOrderNum);
-                if (currentTemplate is null)
+                var currentStateChange = task.Templates!
+                    .SelectMany(t => t.StateChanges)
+                    .SingleOrDefault(c => c.OrderNum == currentOrderNum);
+                if (currentStateChange is null)
                 {
-                    _logger.Error("Couldn't find template with an OrderNum of {Ord}", currentOrderNum);
+                    _logger.Error("Couldn't find state change with an OrderNum of {Ord}", currentOrderNum);
                     return;
                 }
 
                 var isLast = task.Templates!.Count == currentOrderNum;
 
-                if (template.Id != currentTemplate.Id)
+                if (stateChange.Id != currentStateChange.Id)
                 {
                     // TODO(rg): check for desync in unordered case (also refactor and deduplicate stuff)
                     // This is normal - when a new set of params is sent to the processor, we might receive a couple results
                     // for the previous set of params, until the processor updates the runner to use the new set
                     _logger.Debug(
-                        "Next template order is desynced between backend and processor; Actual: {Actual}, Result: {Result}",
-                        currentTemplate.OrderNum, template.OrderNum);
+                        "Next state change order is desynced between backend and processor; Actual: {Actual}, Result: {Result}",
+                        currentStateChange.OrderNum, stateChange.OrderNum);
                     return;
                 }
 
-                var historyExists = TemplateStates.TryGetValue(template.Id, out var history);
+                var historyExists = TemplateStates.TryGetValue(stateChange.Template.Id, out var history);
                 if (!historyExists)
                 {
                     history = new TemplateStateHistory();
-                    TemplateStates.Add(template.Id, history);
+                    TemplateStates.Add(stateChange.Template.Id, history);
                 }
 
-                var success = HandleTemplate(template, newState, history!, ins);
+                var success = HandleTemplate(stateChange, newState, history!, ins);
 
                 if (success && isLast)
                 {
@@ -187,7 +191,9 @@ namespace Api.Services.MonitoringHandler
                 else if (success)
                 {
                     // We're in !isLast, so this is guaranteed to return with a template
-                    var nextTemplate = task.Templates!.SingleOrDefault(t => t.OrderNum == currentOrderNum + 1);
+                    var nextTemplate = task.Templates!
+                        .SelectMany(t => t.StateChanges)
+                        .SingleOrDefault(c => c.OrderNum == currentOrderNum + 1);
                     if (nextTemplate is null)
                     {
                         _logger.Error("Couldn't find next template with an OrderNum of {Ord}", currentOrderNum + 1);
@@ -220,15 +226,23 @@ namespace Api.Services.MonitoringHandler
                 var successIds = new List<int>(packet.TemplateStates.Count);
                 foreach (var (id, newState) in packet.TemplateStates)
                 {
-                    var template = task.Templates!.Single(t => t.Id == id);
-                    var historyExists = TemplateStates.TryGetValue(template.Id, out var history);
+                    var stateChange = task.Templates!
+                        .SelectMany(t => t.StateChanges)
+                        .SingleOrDefault(c => c.Id == id);
+                    if (stateChange is null)
+                    {
+                        _logger.Error("Result packet contains invalid state change id {Id}", id);
+                        return;
+                    }
+
+                    var historyExists = TemplateStates.TryGetValue(stateChange.Template.Id, out var history);
                     if (!historyExists)
                     {
                         history = new TemplateStateHistory();
-                        TemplateStates.Add(template.Id, history);
+                        TemplateStates.Add(stateChange.Template.Id, history);
                     }
 
-                    var success = HandleTemplate(template, newState, history!, ins);
+                    var success = HandleTemplate(stateChange, newState, history!, ins);
                     if (success)
                         successIds.Add(id);
                 }
@@ -272,7 +286,7 @@ namespace Api.Services.MonitoringHandler
             var ev = new Event
             {
                 Timestamp = DateTime.Now,
-                Template = null,
+                StateChange = null,
                 TaskInstance = ins,
             };
 

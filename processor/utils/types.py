@@ -2,7 +2,7 @@ from collections import namedtuple
 from utils.serialization import to_bytes
 from enum import Enum
 
-Template = namedtuple("Template", "id x y w h order")
+Template = namedtuple("Template", "id x y w h")
 Params = namedtuple("Params", "job_type templs")
 TemplateStateObj = namedtuple("TemplateStateObj", "id inner")
 

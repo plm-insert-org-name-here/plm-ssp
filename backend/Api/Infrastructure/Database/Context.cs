@@ -20,6 +20,7 @@ namespace Api.Infrastructure.Database
         public DbSet<Task> Tasks => Set<Task>();
         public DbSet<TaskInstance> TaskInstances => Set<TaskInstance>();
         public DbSet<Template> Templates => Set<Template>();
+        public DbSet<StateChange> StateChanges => Set<StateChange>();
 
     }
 }

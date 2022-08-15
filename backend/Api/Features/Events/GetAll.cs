@@ -19,19 +19,19 @@ namespace Api.Features.Events
     {
         private readonly Context _context;
         private readonly IConfigurationProvider _mapperConfig;
-        
+
         public GetAll(Context context, IConfigurationProvider mapperConfig)
         {
             _context = context;
             _mapperConfig = mapperConfig;
         }
-        public record Res(int Id, DateTime TimeStamp, Template Template );
-        
+        public record Res(int Id, DateTime TimeStamp, StateChange? StateChange);
+
         private class MappingProfile : Profile
         {
             public MappingProfile() => CreateProjection<Event, Res>();
         }
-        
+
         [HttpGet(Routes.Events.GetAll)]
         [SwaggerOperation(
             Summary = "Get all events",
@@ -39,7 +39,7 @@ namespace Api.Features.Events
             OperationId = "Events.GetAll",
             Tags = new[] { "Events" })
         ]
-        
+
         public override async Task<List<Res>> HandleAsync(CancellationToken ct = new())
         {
             return await _context.Events.ProjectTo<Res>(_mapperConfig).ToListAsync(ct);

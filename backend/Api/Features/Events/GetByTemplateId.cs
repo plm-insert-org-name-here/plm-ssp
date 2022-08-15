@@ -27,14 +27,13 @@ namespace Api.Features.Events
             _mapperConfig = mapperConfig;
         }
 
-        public record Res(int Id, DateTime TimeStamp, Template Template);
-        
+        public record Res(int Id, DateTime TimeStamp, StateChange? StateChange);
+
         private class MappingProfile : Profile
         {
             public MappingProfile() => CreateProjection<Event, Res>();
-
         }
-        
+
         [HttpGet(Routes.Events.GetByTemplateId, Name = Routes.Events.GetByTemplateId)]
         [SwaggerOperation(
             Summary = "Get event by template id",
@@ -42,11 +41,15 @@ namespace Api.Features.Events
             OperationId = "Events.GetByTemplateId",
             Tags = new[] { "Events" })
         ]
-        
+
         public override async Task<ActionResult<List<Res>>> HandleAsync(int id, CancellationToken ct = new())
         {
-            var result = await _context.Events
-                .Where(j => j.Template.Id == id)
+            var result = await _context.Templates
+                .Where(t => t.Id == id)
+                .Include(t => t.StateChanges)
+                .ThenInclude(c => c.Events)
+                .SelectMany(t => t.StateChanges)
+                .SelectMany(c => c.Events)
                 .ProjectTo<Res>(_mapperConfig)
                 .ToListAsync(ct);
 

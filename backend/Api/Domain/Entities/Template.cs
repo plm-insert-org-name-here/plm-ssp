@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Api.Domain.Common;
 
 namespace Api.Domain.Entities
@@ -9,12 +10,11 @@ namespace Api.Domain.Entities
         public int Y { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
-        public int? OrderNum { get; set; }
 
         public Task Task { get; set; } = default!;
         public int TaskId { get; set; }
 
-        public TemplateState ExpectedInitialState { get; set; }
-        public TemplateState ExpectedSubsequentState { get; set; }
+        public List<Event> Events { get; set; } = default!;
+        public List<StateChange> StateChanges { get; set; } = default!;
     }
 }

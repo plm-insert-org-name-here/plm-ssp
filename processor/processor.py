@@ -23,7 +23,7 @@ runners_by_task_id = {}
 def print_params(ps):
     print(f'job type: {ps.job_type}')
     for t in ps.templs:
-        print(f'templ: id: {t.id} x: {t.x} y: {t.y} w: {t.w} h: {t.h} order: {t.order}')
+        print(f'templ: id: {t.id} x: {t.x} y: {t.y} w: {t.w} h: {t.h}')
 
 def print_frame(frame):
     print(f'frame shape: {frame.shape}')
