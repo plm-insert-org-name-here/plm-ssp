@@ -15,6 +15,7 @@ import { InfrastructureContext } from "../../App";
 import LabeledValues from "../common/LabeledValues.jsx";
 import OverflowText from "../common/OverflowText.jsx";
 import DetectorStream from "../stream/DetectorStream.jsx";
+import InstancesPanel from "./InstancesPanel.jsx";
 import StatusPanel from "./StatusPanel.jsx";
 
 const Dashboard = () => {
@@ -180,12 +181,12 @@ const Dashboard = () => {
                     item
                     xs={4}
                     sx={{
-                        backgroundColor: "lightblue",
                         height: "100%",
                         borderRadius: "0 0 8px 0",
+                        p: 2,
                     }}
                 >
-                    x
+                    <InstancesPanel />
                 </Grid>
             </Grid>
         </Paper>

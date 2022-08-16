@@ -5,16 +5,9 @@ import { Box, Paper, Tab, Tabs } from "@mui/material";
 
 import useMounted from "../../hooks/useMounted";
 import { Routes } from "../../routes";
+import TabPanel from "../common/TabPanel.jsx";
 import Detectors from "./Detectors";
 import Locations from "./Locations";
-
-function TabPanel({ children, value, index, ...other }) {
-    return (
-        <Box flex={1} display={value === index ? "flex" : "none"} flexDirection="column" {...other}>
-            {children}
-        </Box>
-    );
-}
 
 const Infrastructure = () => {
     const [selectedTab, setSelectedTab] = useState(0);

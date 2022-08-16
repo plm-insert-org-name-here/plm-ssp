@@ -48,7 +48,7 @@ const Locations = ({ locations, setLocations, onAttach, onDetach }) => {
                         height: "100%",
                         bgcolor: "background.panel",
                         overflowY: "auto",
-                        borderRadius: "8px",
+                        borderRadius: "0 0 8px 8px",
                     }}
                 >
                     {locations.map((l) => (
