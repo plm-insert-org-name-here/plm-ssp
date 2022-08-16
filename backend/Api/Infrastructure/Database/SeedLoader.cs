@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text.Json;
+using Api.Domain.Common;
 using Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -22,7 +23,7 @@ namespace Api.Infrastructure.Database
         private const string SeedDataPath = "SeedData";
         private const string FilesPath = "Files";
 
-        private Dictionary<PropertyInfo, Func<object, object>> SpecialParsers { get; }
+        private Dictionary<PropertyInfo, Func<object?, object?>> SpecialParsers { get; }
 
         private readonly Dictionary<string, Type> _contextDbSets = typeof(Context).GetProperties()
             .Where(p => p.PropertyType.Name == typeof(DbSet<>).Name)
@@ -35,12 +36,18 @@ namespace Api.Infrastructure.Database
             Env = env;
             Logger = logger;
 
-            SpecialParsers = new Dictionary<PropertyInfo, Func<object, object>>
+            SpecialParsers = new Dictionary<PropertyInfo, Func<object?, object?>>
             {
                 { typeof(Job).GetProperty(nameof(Job.Snapshot))!, ParseJobSnapshot },
                 {
                     typeof(Detector).GetProperty(nameof(Detector.MacAddress))!,
-                    obj => PhysicalAddress.Parse(obj.ToString()!)
+                    obj => PhysicalAddress.Parse(obj!.ToString()!)
+                },
+                {
+                    typeof(Event).GetProperty(nameof(Event.Timestamp))!, obj => DateTime.Parse(obj!.ToString()!)
+                },
+                {
+                    typeof(TaskInstance).GetProperty(nameof(TaskInstance.FinalState))!, obj => obj == null ? null : Enum.Parse<TaskInstanceFinalState>(obj.ToString()!)
                 }
             };
         }
@@ -51,13 +58,13 @@ namespace Api.Infrastructure.Database
             return (T?)prop?.GetValue(obj, null);
         }
 
-        private object ParseJobSnapshot(object snapshotPath)
+        private object ParseJobSnapshot(object? snapshotPath)
         {
             var fullPath = Path.Combine(
                 Env.ContentRootPath,
                 SeedDataPath,
                 FilesPath,
-                snapshotPath.ToString()!);
+                snapshotPath!.ToString()!);
 
             var bytes = File.ReadAllBytes(fullPath);
             return bytes;
@@ -92,22 +99,13 @@ namespace Api.Infrastructure.Database
 
                     foreach (var (parsedPropName, parsedPropValue) in obj)
                     {
-                        if (parsedPropName == "expectedInitialState")
-                        {
-
-                            foreach (var pp in dbSetInnerTypeProps)
-                            {
-                                Console.WriteLine(pp.Name);
-                            }
-                        }
-
                         var prop = dbSetInnerTypeProps
                             .SingleOrDefault(p => string.Equals(p.Name, parsedPropName,
                                 StringComparison.CurrentCultureIgnoreCase));
 
                         if (prop is null)
                         {
-                            Logger.Error("Unknown property name: {Prop}", parsedPropName);
+                            Logger.Error("Unknown property name: '{Prop}'", parsedPropName);
                             return false;
                         }
 
@@ -124,7 +122,7 @@ namespace Api.Infrastructure.Database
                                 prop.SetValue(inst, parsedPropValue.GetInt32(), null);
                             }
                             else if (prop.PropertyType == typeof(bool?) ||
-                                prop.PropertyType == typeof(bool))
+                                     prop.PropertyType == typeof(bool))
                             {
                                 prop.SetValue(inst, parsedPropValue.GetBoolean(), null);
                             }

@@ -13,8 +13,6 @@ namespace Api.Domain.Entities
 
         public Task Task { get; set; } = default!;
         public int TaskId { get; set; }
-
-        public List<Event> Events { get; set; } = default!;
         public List<StateChange> StateChanges { get; set; } = default!;
     }
 }

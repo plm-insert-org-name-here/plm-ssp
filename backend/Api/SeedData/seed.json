@@ -120,57 +120,127 @@
     }
   ],
   "StateChanges": [
-      { 
-	  "id": 1,
-	  "orderNum": 1,
-	  "expectedInitialState": "Present",
-	  "expectedSubsequentState": "Missing",
-	  "templateId": 1
-      },
-      { 
-	  "id": 2,
-	  "orderNum": 2,
-	  "expectedInitialState": "Missing",
-	  "expectedSubsequentState": "Present",
-	  "templateId": 1
-      },
-      { 
-	  "id": 3,
-	  "orderNum": 3,
-	  "expectedInitialState": "Present",
-	  "expectedSubsequentState": "Missing",
-	  "templateId": 2
-      },
-      { 
-	  "id": 4,
-	  "orderNum": 4,
-	  "expectedInitialState": "Missing",
-	  "expectedSubsequentState": "Present",
-	  "templateId": 2
-      },
-      { 
-	  "id": 5,
-	  "expectedInitialState": "Present",
-	  "expectedSubsequentState": "Missing",
-	  "templateId": 3
-      },
-      { 
-	  "id": 6,
-	  "expectedInitialState": "Present",
-	  "expectedSubsequentState": "Missing",
-	  "templateId": 4
-      },
-      { 
-	  "id": 7,
-	  "expectedInitialState": "Present",
-	  "expectedSubsequentState": "Missing",
-	  "templateId": 5
-      },
-      { 
-	  "id": 8,
-	  "expectedInitialState": "Present",
-	  "expectedSubsequentState": "Missing",
-	  "templateId": 6
-      }
+    {
+      "id": 1,
+      "orderNum": 1,
+      "expectedInitialState": "Present",
+      "expectedSubsequentState": "Missing",
+      "templateId": 1
+    },
+    {
+      "id": 2,
+      "orderNum": 2,
+      "expectedInitialState": "Missing",
+      "expectedSubsequentState": "Present",
+      "templateId": 1
+    },
+    {
+      "id": 3,
+      "orderNum": 3,
+      "expectedInitialState": "Present",
+      "expectedSubsequentState": "Missing",
+      "templateId": 2
+    },
+    {
+      "id": 4,
+      "orderNum": 4,
+      "expectedInitialState": "Missing",
+      "expectedSubsequentState": "Present",
+      "templateId": 2
+    },
+    {
+      "id": 5,
+      "expectedInitialState": "Present",
+      "expectedSubsequentState": "Missing",
+      "templateId": 3
+    },
+    {
+      "id": 6,
+      "expectedInitialState": "Present",
+      "expectedSubsequentState": "Missing",
+      "templateId": 4
+    },
+    {
+      "id": 7,
+      "expectedInitialState": "Present",
+      "expectedSubsequentState": "Missing",
+      "templateId": 5
+    },
+    {
+      "id": 8,
+      "expectedInitialState": "Present",
+      "expectedSubsequentState": "Missing",
+      "templateId": 6
+    }
+  ],
+  "Events": [
+    {
+      "timestamp": "2022-08-16 15:42:12.587785",
+      "result": "Success",
+      "stateChangeId": 1,
+      "taskInstanceId": 1
+    },
+    {
+      "timestamp": "2022-08-16 15:42:15.620900",
+      "result": "Success",
+      "stateChangeId": 2,
+      "taskInstanceId": 1
+    },
+    {
+      "timestamp": "2022-08-16 15:42:19.049049",
+      "result": "Success",
+      "stateChangeId": 3,
+      "taskInstanceId": 1
+    },
+    {
+      "timestamp": "2022-08-16 15:42:22.666138",
+      "result": "Success",
+      "stateChangeId": 4,
+      "taskInstanceId": 1
+    },
+    {
+      "timestamp": "2022-08-16 15:42:46.788960",
+      "result": "Success",
+      "stateChangeId": 1,
+      "taskInstanceId": 2
+    },
+    {
+      "timestamp": "2022-08-16 15:43:00.422375",
+      "result": "Success",
+      "stateChangeId": 1,
+      "taskInstanceId": 3
+    },
+    {
+      "timestamp": "2022-08-16 15:43:03.439515",
+      "result": "Success",
+      "stateChangeId": 2,
+      "taskInstanceId": 3
+    },
+    {
+      "timestamp": "2022-08-16 15:43:06.858951",
+      "result": "Success",
+      "stateChangeId": 3,
+      "taskInstanceId": 3
+    },
+    {
+      "timestamp": "2022-08-16 15:43:10.478650",
+      "result": "Success",
+      "stateChangeId": 4,
+      "taskInstanceId": 3
+    }
+  ],
+  "TaskInstances": [
+    {
+      "taskId": 1,
+      "finalState": "Completed"
+    },
+    {
+      "taskId": 1,
+      "finalState":  "Abandoned"
+    },
+    {
+      "taskId": 1,
+      "finalState": "Completed"
+    }
   ]
 }

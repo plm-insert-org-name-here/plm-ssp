@@ -11,5 +11,6 @@ namespace Api.Domain.Entities
         public StateChange? StateChange { get; set; }
         public int StateChangeId { get;set; }
         public TaskInstance TaskInstance { get; set; } = default!;
+        public int TaskInstanceId { get; set; }
     }
 }
