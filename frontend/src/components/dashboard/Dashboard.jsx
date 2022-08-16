@@ -1,4 +1,3 @@
-import useResizeObserver from "@react-hook/resize-observer";
 import React, { useContext, useEffect, useRef } from "react";
 
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -14,68 +13,12 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { InfrastructureContext } from "../../App";
 import LabeledValues from "../common/LabeledValues.jsx";
 import OverflowText from "../common/OverflowText.jsx";
+import DetectorStream from "../stream/DetectorStream.jsx";
 import DeviceStream from "../stream/DeviceStream";
 import StatusPanel from "./StatusPanel.jsx";
-import placeholderImageUrl from "/public/640x480.jpg";
 
 const Dashboard = () => {
     const { selection, _ } = useContext(InfrastructureContext);
-    const canvasRef = useRef();
-    const canvasContainerRef = useRef();
-
-    const img = new Image();
-    img.src = placeholderImageUrl;
-
-    useResizeObserver(canvasContainerRef, (_) => {
-        console.count("canvas container resize");
-        const canvas = canvasRef.current;
-        const canvasContainer = canvasContainerRef.current;
-        draw(canvas, canvasContainer);
-    });
-
-    const draw = (canvas, canvasContainer) => {
-        const contw = canvasContainer.clientWidth;
-        const conth = canvasContainer.clientHeight;
-        const ardiff = contw / conth - 4 / 3;
-
-        if (ardiff > 0) {
-            canvas.style.width = "auto";
-            canvas.style.height = conth + "px";
-        } else {
-            canvas.style.width = contw + "px";
-            canvas.style.height = "auto";
-        }
-        canvas.width = 640;
-        canvas.height = 480;
-
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-
-        // draw checker pattern
-        // ctx.fillStyle = "#a22";
-        // ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // ctx.fillStyle = "#22a";
-        // const rect_size = 20;
-        // for (let j = 0; j < Math.ceil(canvas.height / rect_size); j++) {
-        //     for (let i = 0; i < Math.ceil(canvas.width / rect_size); i++) {
-        //         if ((j + i) % 2 === 1) {
-        //             ctx.fillRect(
-        //                 i * rect_size,
-        //                 j * rect_size,
-        //                 Math.min(rect_size, canvas.width - i * rect_size),
-        //                 Math.min(rect_size, canvas.height - j * rect_size)
-        //             );
-        //         }
-        //     }
-        // }
-    };
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const canvasContainer = canvasContainerRef.current;
-
-        draw(canvas, canvasContainer);
-    }, []);
 
     return (
         <Paper elevation={8} sx={{ flexGrow: 1 }}>
@@ -93,21 +36,8 @@ const Dashboard = () => {
                         p: 2,
                     }}
                 >
-                    <Box
-                        ref={canvasContainerRef}
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        sx={{
-                            backgroundColor: "black",
-                            height: "calc(100% - 200px + 16px)",
-                        }}
-                    >
-                        <Box
-                            component="canvas"
-                            ref={canvasRef}
-                            sx={{ maxHeight: "100%", maxWidth: "100%", aspectRatio: "4/3" }}
-                        />
+                    <Box sx={{ height: "calc(100% - 200px)" }}>
+                        <DetectorStream />
                     </Box>
                     <Box
                         sx={{
