@@ -95,11 +95,13 @@ const DetectorStream = ({ setFps, active, detectorId }) => {
 
         // NOTE(rg): if we're immediately clearing the canvas when stopping the stream,
         // the last frame will arrive after the canvas is cleared and will overwrite it,
-        // hence the timeout
+        // hence the timeout. We also clear the frameRef to make sure subsequent calls to
+        // drawFrame draw the placeholder image
         window.setTimeout(() => {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext("2d");
 
+            frameRef.current = null;
             ctx.drawImage(placeholder, 0, 0);
         }, 500);
     }, [active]);
