@@ -12,12 +12,25 @@ import placeholderImageUrl from "/public/640x480.jpg";
 const placeholder = new Image();
 placeholder.src = placeholderImageUrl;
 
-const DetectorStream = ({ active, detectorId }) => {
+const DetectorStream = ({ setFps, active, detectorId }) => {
     const [streamSrc, setStreamSrc] = useState(null);
     const canvasContainerRef = useRef();
     const canvasRef = useRef();
     const frameRef = useRef();
+    const fpsRef = useRef(0);
+    const fpsTimerRef = useRef();
     const isMounted = useMounted();
+
+    useEffect(() => {
+        if (active) {
+            fpsTimerRef.current = window.setInterval(() => {
+                setFps(fpsRef.current);
+                fpsRef.current = 0;
+            }, 1000);
+        } else {
+            if (fpsTimerRef.current) window.clearInterval(fpsTimerRef.current);
+        }
+    }, [active]);
 
     const drawFrame = () => {
         const canvas = canvasRef.current;
@@ -62,6 +75,7 @@ const DetectorStream = ({ active, detectorId }) => {
 
             const ctx = canvas.getContext("2d");
             ctx.drawImage(image, 0, 0);
+            fpsRef.current += 1;
         };
 
         if (isMounted()) {

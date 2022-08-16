@@ -19,6 +19,7 @@ import StatusPanel from "./StatusPanel.jsx";
 
 const Dashboard = () => {
     const [streamActive, setStreamActive] = useState(false);
+    const [streamFps, setStreamFps] = useState(0);
     const [streamControlsDisabled, setStreamControlsDisabled] = useState(false);
     const { selection, _ } = useContext(InfrastructureContext);
 
@@ -75,7 +76,11 @@ const Dashboard = () => {
                     }}
                 >
                     <Box sx={{ height: "calc(100% - 200px)" }}>
-                        <DetectorStream active={streamActive} detectorId={selection?.detectorId} />
+                        <DetectorStream
+                            setFps={setStreamFps}
+                            active={streamActive}
+                            detectorId={selection?.detectorId}
+                        />
                     </Box>
                     <Box
                         sx={{
@@ -88,7 +93,11 @@ const Dashboard = () => {
                         <StatusPanel
                             title="Stream"
                             width_ratio={1}
-                            stats={<LabeledValues values={[{ label: "FPS", inner: "24" }]} />}
+                            stats={
+                                streamActive && (
+                                    <LabeledValues values={[{ label: "FPS", inner: streamFps }]} />
+                                )
+                            }
                             actions={
                                 <>
                                     {!streamActive ? (
