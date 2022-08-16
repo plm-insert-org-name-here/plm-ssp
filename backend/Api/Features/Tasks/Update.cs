@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -178,9 +179,8 @@ namespace Api.Features.Tasks
                 var newStateChanges = MapStateChanges(req);
                 for (int i = 0; i < req.Body.StateChanges.Count; i++)
                 {
-                    newStateChanges[i].TemplateId = task.Templates
-                        .Single(t => t.Name == req.Body.StateChanges[i].TemplateName)
-                        .Id;
+                    newStateChanges[i].Template = task.Templates
+                        .Single(t => t.Name == req.Body.StateChanges[i].TemplateName);
                 }
 
                 await _context.StateChanges.AddRangeAsync(newStateChanges, ct);

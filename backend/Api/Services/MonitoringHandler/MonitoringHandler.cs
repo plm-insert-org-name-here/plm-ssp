@@ -161,7 +161,13 @@ namespace Api.Services.MonitoringHandler
                     return;
                 }
 
-                var isLast = task.Templates!.Count == currentOrderNum;
+                var stateChangesCount = task.Templates!
+                    .SelectMany(t => t.StateChanges)
+                    .Count();
+
+                Console.WriteLine("State changes count: " + stateChangesCount);
+
+                var isLast = stateChangesCount == currentOrderNum;
 
                 if (stateChange.Id != currentStateChange.Id)
                 {

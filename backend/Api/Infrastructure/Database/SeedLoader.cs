@@ -77,7 +77,7 @@ namespace Api.Infrastructure.Database
 
             foreach (var (objectTypePlural, objects) in data)
             {
-                var dbSetName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(objectTypePlural);
+                var dbSetName = objectTypePlural;
                 var dbSetType = _contextDbSets[dbSetName];
                 var dbSetInnerType = dbSetType.GenericTypeArguments[0];
                 var dbSetInnerTypeProps = dbSetInnerType.GetProperties();
@@ -92,6 +92,15 @@ namespace Api.Infrastructure.Database
 
                     foreach (var (parsedPropName, parsedPropValue) in obj)
                     {
+                        if (parsedPropName == "expectedInitialState")
+                        {
+
+                            foreach (var pp in dbSetInnerTypeProps)
+                            {
+                                Console.WriteLine(pp.Name);
+                            }
+                        }
+
                         var prop = dbSetInnerTypeProps
                             .SingleOrDefault(p => string.Equals(p.Name, parsedPropName,
                                 StringComparison.CurrentCultureIgnoreCase));

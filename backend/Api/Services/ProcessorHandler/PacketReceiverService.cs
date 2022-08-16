@@ -122,6 +122,7 @@ namespace Api.Services.ProcessorHandler
             // and they can't be modified while monitoring is active)
             var task = await context.Tasks
                 .Include(t => t.Templates)
+                .ThenInclude(t => t.StateChanges)
                 .SingleOrDefaultAsync(t => t.Id == packet.TaskId);
             if (task is null)
             {

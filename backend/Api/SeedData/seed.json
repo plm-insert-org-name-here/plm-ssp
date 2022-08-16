@@ -1,5 +1,5 @@
 {
-  "locations": [
+  "Locations": [
     {
       "id": 1,
       "name": "Location 1"
@@ -13,7 +13,7 @@
       "name": "Location 3"
     }
   ],
-  "detectors": [
+  "Detectors": [
     {
       "id": 1,
       "name": "Detector 1",
@@ -31,7 +31,7 @@
       "macAddress": "333333333333"
     }
   ],
-  "jobs": [
+  "Jobs": [
     {
       "id": 1,
       "name": "Job 1",
@@ -47,7 +47,7 @@
       "locationId": 2
     }
   ],
-  "tasks": [
+  "Tasks": [
     {
       "id": 1,
       "name": "Task 1-1",
@@ -63,7 +63,7 @@
       "jobId": 2
     }
   ],
-  "templates": [
+  "Templates": [
     {
       "id": 1,
       "name": "Template 1-1",
@@ -71,90 +71,106 @@
       "y": 20,
       "width": 50,
       "height": 80,
-      "orderNum": 1,
-      "expectedInitialState": "Present",
-      "expectedSubsequentState": "Missing",
       "taskId": 1
     },
     {
       "id": 2,
       "name": "Template 1-2",
-      "x": 20,
-      "y": 20,
-      "width": 50,
-      "height": 80,
-      "orderNum": 2,
-      "expectedInitialState": "Missing",
-      "expectedSubsequentState": "Present",
+      "x": 180,
+      "y": 60,
+      "width": 100,
+      "height": 40,
       "taskId": 1
     },
     {
       "id": 3,
-      "name": "Template 1-3",
-      "x": 180,
-      "y": 60,
-      "width": 100,
-      "height": 40,
-      "orderNum": 3,
-      "expectedInitialState": "Present",
-      "expectedSubsequentState": "Missing",
-      "taskId": 1
-    },
-    {
-      "id": 4,
-      "name": "Template 1-4",
-      "x": 180,
-      "y": 60,
-      "width": 100,
-      "height": 40,
-      "orderNum": 4,
-      "expectedInitialState": "Missing",
-      "expectedSubsequentState": "Present",
-      "taskId": 1
-    },
-    {
-      "id": 5,
       "name": "Template 2-1",
       "x": 100,
       "y": 100,
       "width": 50,
       "height": 50,
-      "expectedInitialState": "Present",
-      "expectedSubsequentState": "Missing",
       "taskId": 2
     },
     {
-      "id": 6,
+      "id": 4,
       "name": "Template 2-2",
       "x": 200,
       "y": 120,
       "width": 20,
       "height": 30,
-      "expectedInitialState": "Present",
-      "expectedSubsequentState": "Missing",
       "taskId": 2
     },
     {
-      "id": 7,
+      "id": 5,
       "name": "Template 2-3",
       "x": 150,
       "y": 150,
       "width": 100,
       "height": 120,
-      "expectedInitialState": "Present",
-      "expectedSubsequentState": "Missing",
       "taskId": 2
     },
     {
-      "id": 8,
+      "id": 6,
       "name": "Template 2-4",
       "x": 10,
       "y": 70,
       "width": 30,
       "height": 70,
-      "expectedInitialState": "Present",
-      "expectedSubsequentState": "Missing",
       "taskId": 2
     }
+  ],
+  "StateChanges": [
+      { 
+	  "id": 1,
+	  "orderNum": 1,
+	  "expectedInitialState": "Present",
+	  "expectedSubsequentState": "Missing",
+	  "templateId": 1
+      },
+      { 
+	  "id": 2,
+	  "orderNum": 2,
+	  "expectedInitialState": "Missing",
+	  "expectedSubsequentState": "Present",
+	  "templateId": 1
+      },
+      { 
+	  "id": 3,
+	  "orderNum": 3,
+	  "expectedInitialState": "Present",
+	  "expectedSubsequentState": "Missing",
+	  "templateId": 2
+      },
+      { 
+	  "id": 4,
+	  "orderNum": 4,
+	  "expectedInitialState": "Missing",
+	  "expectedSubsequentState": "Present",
+	  "templateId": 2
+      },
+      { 
+	  "id": 5,
+	  "expectedInitialState": "Present",
+	  "expectedSubsequentState": "Missing",
+	  "templateId": 3
+      },
+      { 
+	  "id": 6,
+	  "expectedInitialState": "Present",
+	  "expectedSubsequentState": "Missing",
+	  "templateId": 4
+      },
+      { 
+	  "id": 7,
+	  "expectedInitialState": "Present",
+	  "expectedSubsequentState": "Missing",
+	  "templateId": 5
+      },
+      { 
+	  "id": 8,
+	  "expectedInitialState": "Present",
+	  "expectedSubsequentState": "Missing",
+	  "templateId": 6
+      }
   ]
 }
