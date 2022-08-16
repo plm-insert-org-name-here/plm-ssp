@@ -8,9 +8,10 @@ import ffmpeg
 
 class MjpegCamera(BaseCamera):
 
-    def __init__(self, movie_full_filename):
+    def __init__(self, file, fps_override):
         super().__init__()
-        self.movie_full_filename = movie_full_filename
+        self.file = file
+        self.fps_override = fps_override
         self.current_position = 0
         self.cap = None
 
@@ -79,29 +80,26 @@ class MjpegCamera(BaseCamera):
     # ffmpeg instead
     # TODO(rg): test properly
     def _determine_video_duration(self):
-        probe = ffmpeg.probe(self.movie_full_filename)
+        probe = ffmpeg.probe(self.file)
         return float(probe['streams'][0]['duration'])
 
     def _open_file(self):
 
         if self.cap is None:
-            self.cap = cv2.VideoCapture(self.movie_full_filename)
+            self.cap = cv2.VideoCapture(self.file)
             if not self.cap.isOpened():
-                raise CameraError("Error opening video file: " + self.movie_full_filename)
+                raise CameraError("Error opening video file: " + self.file)
 
             self.frame_count = self._determine_actual_frame_count()
             duration = self._determine_video_duration()
 
             fps = None
-            fps_override = Config['MjpegFpsOverride']
-            if fps_override:
-                fps = fps_override
+            if self.fps_override:
+                fps = self.fps_override
             else:
                 fps = self.frame_count / duration
 
             self.frame_time = 1 / fps
-            self.logger.debug('Frame count: ' + str(self.frame_count))
-            self.logger.debug('Fps: ' + str(fps))
 
             # Reset to beginning of file
             self.cap.set(cv2.CAP_PROP_POS_AVI_RATIO, 0)

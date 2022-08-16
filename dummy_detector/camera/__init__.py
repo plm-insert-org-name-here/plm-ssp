@@ -4,16 +4,6 @@ from threading import Thread, Event, Lock
 from utils.rwlock import ReadWriteLock, ReadRWLock, WriteRWLock
 from time import sleep
 
-Config = {
-    'Type': 'Web',
-    'WebcamSource': 0,
-    'BufferSize': 4,
-    'FileListDirectory': '',
-    'FileListFps': 4,
-    'MjpegFile': '',
-    'MjpegFpsOverride': 30
-}
-
 class Frame:
     def __init__(self):
         self.lock = ReadWriteLock()
@@ -24,8 +14,7 @@ class Camera:
     INSTANCE_LOCK = Lock()
     INSTANCE = None
 
-    def __init__(self):
-        buffer_size = Config['BufferSize']
+    def __init__(self, buffer_size):
 
         self._subscribers = 0
         self._subscribers_lock = Lock()
@@ -62,22 +51,25 @@ class Camera:
 
     # TODO(rg): error handling
     @staticmethod
-    def get_instance():
+    def get_instance(config):
         with Camera.INSTANCE_LOCK:
             if Camera.INSTANCE is None:
-                camera_type = Config['Type']
+                camera_type = config.camera_type
                 camera = None
 
                 if "Web" == camera_type:
                     from camera.sources.web_camera import WebCamera
-                    camera = WebCamera()
+                    camera = WebCamera(
+                            config.camera_webcam_source)
                 elif "Mjpeg" == camera_type:
                     from camera.sources.mjpeg import MjpegCamera
-                    camera = MjpegCamera(Config['MjpegFile'])
+                    camera = MjpegCamera(
+                            config.camera_mjpeg_file,
+                            config.camera_mjpeg_fps_override)
                 else:
                     raise CameraError('Unknown camera type: ' + camera_type)
 
-                instance = Camera()
+                instance = Camera(config.camera_buffer_size)
                 instance._camera = camera
                 Camera.INSTANCE = instance
             return Camera.INSTANCE

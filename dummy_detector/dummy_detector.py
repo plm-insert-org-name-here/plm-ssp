@@ -12,6 +12,15 @@ from camera import Camera
 from threading import Lock, Thread
 import socket
 import argparse
+from pathlib import Path
+import json
+
+config_path = Path.home() / ".config/plm/detector.json"
+
+with (open(str(config_path), 'r') as config_file):
+    contents = config_file.read()
+    config = json.loads(contents)
+
 
 parser = argparse.ArgumentParser(description="PLM server side processing - dummy detector")
 parser.add_argument(
@@ -19,15 +28,47 @@ parser.add_argument(
         default='1234567890AB',
         help="Mac address of dummy detector, in text format, without the separator colons (':')"
         )
+parser.add_argument(
+        '--camera_type',
+        choices=["Web", "Mjpeg"],
+        default=config.get('camera').get('Type'),
+        help="Camera type"
+        )
+parser.add_argument(
+        '--camera_webcam_source',
+        type=int,
+        default=config.get('camera').get('WebcamSource'),
+        help="Webcam source identifier (/dev/videoX)"
+        )
+parser.add_argument(
+        '--camera_buffer_size',
+        type=int,
+        default=config.get('camera').get('BufferSize'),
+        help="Camera provider buffer size"
+        )
+parser.add_argument(
+        '--camera_mjpeg_file',
+        default=config.get('camera').get('MjpegFile'),
+        help="Video file the camera reads the frames from in Mjpeg mode"
+        )
+parser.add_argument(
+        '--camera_mjpeg_fps_override',
+        type=int,
+        default=config.get('camera').get('MjpegFpsOverride'),
+        help="Video file FPS override, in case the video metadata contains incorrect FPS"
+        )
+
+
 
 args = parser.parse_args()
+print(args)
 
 DEST_IP = '127.0.0.1'
 DEST_PORT = 9697
 
 
 def get_snapshot():
-    camera = Camera.get_instance()
+    camera = Camera.get_instance(args)
     camera.start()
 
     # TODO: Capture a couple frames before taking the snapshot to make sure the camera exposure or
@@ -98,7 +139,7 @@ class DummyDetector:
         dest = (DEST_IP, DEST_PORT)
         id_bytes = np.frombuffer((self.detector_id).to_bytes(4, byteorder='little'),
                 dtype='uint8')
-        camera = Camera.get_instance()
+        camera = Camera.get_instance(args)
         camera.start()
 
         # TODO: catch ConnectionRefused and clean up

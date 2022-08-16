@@ -6,11 +6,11 @@ from time import time
 
 class WebCamera(BaseCamera):
 
-    def __init__(self):
+    def __init__(self, source):
         super().__init__()
 
     def start(self):
-        self.camera = VideoCapture(0)
+        self.camera = VideoCapture(source)
         self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.camera.set(cv2.CAP_PROP_SATURATION, 0.2)
