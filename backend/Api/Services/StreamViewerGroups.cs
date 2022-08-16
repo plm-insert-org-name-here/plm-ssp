@@ -77,7 +77,7 @@ namespace Api.Services
             var groupName = Routes.Detectors.StreamGroupPrefix + detectorId;
             if (_viewersPerGroup.ContainsKey(groupName))
                 await _hubContext.Clients.Group(groupName)
-                    .SendAsync("ReceiveStreamFrame", frame);
+                    .SendAsync("StreamFrame", frame);
         }
 
         public bool HasViewers(int detectorId) => _viewersPerGroup.ContainsKey(Routes.Detectors.StreamGroupPrefix + detectorId);

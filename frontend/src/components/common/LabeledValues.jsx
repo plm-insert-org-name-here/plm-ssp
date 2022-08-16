@@ -8,8 +8,8 @@ const LabeledValues = ({ values }) => {
     return (
         <Box display="flex" gap={2}>
             {values.map((v, i) => (
-                <>
-                    <Box key={i} display="flex" flexDirection="column" alignItems="center">
+                <React.Fragment key={i}>
+                    <Box display="flex" flexDirection="column" alignItems="center">
                         <Typography variant="caption">
                             {v.icon &&
                                 React.cloneElement(v.icon, {
@@ -22,7 +22,7 @@ const LabeledValues = ({ values }) => {
                     {i !== values.length - 1 && (
                         <Divider orientation="vertical" variant="middle" flexItem />
                     )}
-                </>
+                </React.Fragment>
             ))}
         </Box>
     );

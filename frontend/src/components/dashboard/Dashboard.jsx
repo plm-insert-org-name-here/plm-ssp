@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import EditIcon from "@mui/icons-material/Edit";
 import GridViewIcon from "@mui/icons-material/GridView";
 import PlayIcon from "@mui/icons-material/PlayArrow";
+import StopIcon from "@mui/icons-material/Stop";
 import { Fab, IconButton, Paper, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -14,11 +15,48 @@ import { InfrastructureContext } from "../../App";
 import LabeledValues from "../common/LabeledValues.jsx";
 import OverflowText from "../common/OverflowText.jsx";
 import DetectorStream from "../stream/DetectorStream.jsx";
-import DeviceStream from "../stream/DeviceStream";
 import StatusPanel from "./StatusPanel.jsx";
 
 const Dashboard = () => {
+    const [streamActive, setStreamActive] = useState(false);
+    const [streamControlsDisabled, setStreamControlsDisabled] = useState(false);
     const { selection, _ } = useContext(InfrastructureContext);
+
+    // Close the stream on exiting the page. If the stream is not closed, the stream subscriber
+    // count on the backend gets messed up
+    useEffect(() => {
+        const handler = (e) => {
+            if (streamActive) {
+                e.preventDefault();
+                onStopStream();
+            }
+        };
+
+        window.addEventListener("beforeunload", handler);
+        return () => window.removeEventListener("beforeunload", handler);
+    }, [streamActive]);
+
+    const onStartStream = async () => {
+        setStreamActive(true);
+        setStreamControlsDisabled(true);
+
+        window.setTimeout(() => {
+            setStreamControlsDisabled(false);
+        }, 1000);
+    };
+
+    const onStopStream = async () => {
+        setStreamActive(false);
+        setStreamControlsDisabled(true);
+
+        window.setTimeout(() => {
+            setStreamControlsDisabled(false);
+        }, 1000);
+    };
+
+    if (!selection.detectorId) {
+        return "";
+    }
 
     return (
         <Paper elevation={8} sx={{ flexGrow: 1 }}>
@@ -37,7 +75,7 @@ const Dashboard = () => {
                     }}
                 >
                     <Box sx={{ height: "calc(100% - 200px)" }}>
-                        <DetectorStream />
+                        <DetectorStream active={streamActive} detectorId={selection?.detectorId} />
                     </Box>
                     <Box
                         sx={{
@@ -53,9 +91,25 @@ const Dashboard = () => {
                             stats={<LabeledValues values={[{ label: "FPS", inner: "24" }]} />}
                             actions={
                                 <>
-                                    <Fab size="small" color="primary">
-                                        <PlayIcon />
-                                    </Fab>
+                                    {!streamActive ? (
+                                        <Fab
+                                            onClick={onStartStream}
+                                            size="small"
+                                            color="primary"
+                                            disabled={streamControlsDisabled}
+                                        >
+                                            <PlayIcon />
+                                        </Fab>
+                                    ) : (
+                                        <Fab
+                                            onClick={onStopStream}
+                                            size="small"
+                                            color="error"
+                                            disabled={streamControlsDisabled}
+                                        >
+                                            <StopIcon />
+                                        </Fab>
+                                    )}
                                 </>
                             }
                         />
@@ -125,7 +179,6 @@ const Dashboard = () => {
                     x
                 </Grid>
             </Grid>
-            {/*  selection?.detectorId && <DeviceStream enabled detectorId={selection.detectorId} /> */}
         </Paper>
     );
 };

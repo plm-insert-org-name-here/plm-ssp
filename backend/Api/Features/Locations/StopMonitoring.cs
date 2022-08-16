@@ -71,7 +71,7 @@ namespace Api.Features.Locations
             var activeTask = location.Job.Tasks.SingleOrDefault(t => t.Status is TaskStatus.Active);
             if (activeTask is null) return BadRequest("Active task not found on location");
 
-            await _monitoringHandler.StopMonitoring(location.Detector, activeTask, true);
+            await _monitoringHandler.StopMonitoring(location.Detector, activeTask, req.Body.Pause);
 
             await _context.SaveChangesAsync(ct);
             return NoContent();

@@ -164,9 +164,6 @@ namespace Api.Services.MonitoringHandler
                 var stateChangesCount = task.Templates!
                     .SelectMany(t => t.StateChanges)
                     .Count();
-
-                Console.WriteLine("State changes count: " + stateChangesCount);
-
                 var isLast = stateChangesCount == currentOrderNum;
 
                 if (stateChange.Id != currentStateChange.Id)

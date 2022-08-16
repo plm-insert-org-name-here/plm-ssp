@@ -23,7 +23,7 @@ class MjpegCamera(BaseCamera):
 
     def acquire(self):
         next = int(self.cap.get(cv2.CAP_PROP_POS_FRAMES))
-        print(f'Next: {next}, Count: {self.frame_count}, eq: {next == self.frame_count}')
+        # print(f'Next: {next}, Count: {self.frame_count}, eq: {next == self.frame_count}')
         if next == self.frame_count:
             self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 

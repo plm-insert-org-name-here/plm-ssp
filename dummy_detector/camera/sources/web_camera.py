@@ -8,9 +8,10 @@ class WebCamera(BaseCamera):
 
     def __init__(self, source):
         super().__init__()
+        self.source = source;
 
     def start(self):
-        self.camera = VideoCapture(source)
+        self.camera = VideoCapture(self.source)
         self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.camera.set(cv2.CAP_PROP_SATURATION, 0.2)
