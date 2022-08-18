@@ -3,6 +3,16 @@ namespace Api
     public static class Routes
     {
         private const string Prefix = "api/v1/";
+
+        public static class Sites
+        {
+            public const string GetAll = Prefix + "sites";
+            public const string GetById = Prefix + "sites/{id:int}";
+            public const string Create = Prefix + "sites";
+            public const string Update = Prefix + "sites/{id:int}";
+            public const string Delete = Prefix + "sites/{id:int}";
+        }
+
         public static class Locations
         {
             public const string GetAll = Prefix + "locations";
