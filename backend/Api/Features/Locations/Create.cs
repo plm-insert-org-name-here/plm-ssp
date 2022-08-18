@@ -8,6 +8,7 @@ using Ardalis.ApiEndpoints;
 using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Features.Locations
@@ -20,7 +21,7 @@ namespace Api.Features.Locations
         private readonly IMapper _mapper;
         private readonly IValidator<Req> _validator;
 
-        public record Req(string Name);
+        public record Req(int ParentId, string Name);
         public record Res(int Id, string Name);
 
         public Create(Context context, IMapper mapper, IValidator<Req> validator)
@@ -38,10 +39,11 @@ namespace Api.Features.Locations
                 _context = context;
 
                 RuleFor(l => l.Name).MaximumLength(64).NotEmpty();
-                RuleFor(l => l).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+                RuleFor(l => l).Must(HaveUniqueNameWithinParent).WithMessage("'Name' must be unique within the Station.");
 
             }
-            private bool HaveUniqueName(Req req) => _context.Locations.All(l => l.Name != req.Name);
+            private bool HaveUniqueNameWithinParent(Req req) =>
+                _context.Locations.Where(l => l.StationId == req.ParentId).All(l => l.Name != req.Name);
         }
 
         private class MappingProfile : Profile
@@ -65,12 +67,19 @@ namespace Api.Features.Locations
             if (!validation.IsValid)
                 return ValidationProblem();
 
+            var parentStation = await _context.Stations
+                .Include(s => s.Locations)
+                .SingleOrDefaultAsync(s => s.Id == req.ParentId, ct);
+
+            if (parentStation is null)
+                return BadRequest("Parent Station does not exist!");
+
             var location = new Location
             {
                 Name = req.Name
             };
 
-            await _context.Locations.AddAsync(location, ct);
+            parentStation.Locations.Add(location);
             await _context.SaveChangesAsync(ct);
 
             return CreatedAtRoute(Routes.Locations.GetById, new { location.Id }, _mapper.Map<Res>(location));

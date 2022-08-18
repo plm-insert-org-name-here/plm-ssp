@@ -6,6 +6,7 @@ using Api.Infrastructure.Validation;
 using Ardalis.ApiEndpoints;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Features.Locations
@@ -40,13 +41,18 @@ namespace Api.Features.Locations
                 _context = context;
 
                 RuleFor(l => l.Body.Name).MaximumLength(64).NotEmpty();
-                RuleFor(l => l).Must(HaveUniqueName).WithMessage("'Name' must be unique.");
+                RuleFor(l => l).Must(HaveUniqueNameWithinParent).WithMessage("'Name' must be unique within the Station.");
             }
 
-            private bool HaveUniqueName(Req req) =>
-                _context.Locations
-                    .Where(l => l.Id != req.Id)
+            private bool HaveUniqueNameWithinParent(Req req)
+            {
+                var location = _context.Locations.SingleOrDefault(l => l.Id == req.Id);
+                if (location is null) return false;
+
+                return _context.Locations
+                    .Where(l => l.StationId == location.StationId)
                     .All(l => l.Name != req.Body.Name);
+            }
         }
 
         [HttpPut(Routes.Locations.Update)]

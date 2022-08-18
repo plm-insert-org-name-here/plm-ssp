@@ -49,7 +49,7 @@ namespace Api.Features.Lines
                 var line = _context.Lines.SingleOrDefault(l => l.Id == req.Id);
                 if (line is null) return false;
 
-                return _context.Lines.Where(l => l.OPUId == line.OPUId).All(o => o.Name != req.Body.Name);
+                return _context.Lines.Where(l => l.OPUId == line.OPUId).All(l => l.Name != req.Body.Name);
             }
         }
 

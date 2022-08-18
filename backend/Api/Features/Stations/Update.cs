@@ -46,10 +46,10 @@ namespace Api.Features.Stations
 
             private bool HaveUniqueNameWithinParent(Req req)
             {
-                var station = _context.Stations.SingleOrDefault(l => l.Id == req.Id);
+                var station = _context.Stations.SingleOrDefault(s => s.Id == req.Id);
                 if (station is null) return false;
 
-                return _context.Stations.Where(s => s.LineId == station.LineId).All(o => o.Name != req.Body.Name);
+                return _context.Stations.Where(s => s.LineId == station.LineId).All(s => s.Name != req.Body.Name);
             }
         }
 
