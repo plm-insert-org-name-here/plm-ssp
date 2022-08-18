@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Api.Features.OPUs
+namespace Api.Features.Lines
 {
     public class Create : EndpointBaseAsync
         .WithRequest<Create.Req>
@@ -39,28 +39,28 @@ namespace Api.Features.OPUs
             {
                 _context = context;
                 
-                RuleFor(o => o.Name).MaximumLength(64).NotEmpty();
-                RuleFor(o => o).Must(HaveUniqueNameWithinParent).WithMessage("'Name' must be unique within the Site.");
+                RuleFor(l => l.Name).MaximumLength(64).NotEmpty();
+                RuleFor(l => l).Must(HaveUniqueNameWithinParent).WithMessage("'Name' must be unique within the OPU.");
             }
 
             private bool HaveUniqueNameWithinParent(Req req) =>
-                _context.OPUs.Where(o => o.SiteId == req.ParentId).All(o => o.Name != req.Name);
+                _context.Lines.Where(l => l.OPUId == req.ParentId).All(l => l.Name != req.Name);
         }
 
         private class MappingProfile : Profile
         {
             public MappingProfile()
             {
-                CreateMap<OPU, Res>();
+                CreateMap<Line, Res>();
             }
         }
 
-        [HttpPost(Routes.OPUs.Create)]
+        [HttpPost(Routes.Lines.Create)]
         [SwaggerOperation(
-            Summary = "Create new OPU",
-            Description = "Create new OPU",
-            OperationId = "OPUs.Create",
-            Tags = new[] { "OPUs" })
+            Summary = "Create new Line",
+            Description = "Create new Line",
+            OperationId = "Lines.Create",
+            Tags = new[] { "Lines" })
         ]
         public override async Task<ActionResult<Res>> HandleAsync(Req req, CancellationToken ct = new())
         {
@@ -68,23 +68,23 @@ namespace Api.Features.OPUs
             if (!validation.IsValid)
                 return ValidationProblem();
 
-            var parentSite = await _context.Sites
-                .Include(s => s.OPUs)
-                .SingleOrDefaultAsync(s => s.Id == req.ParentId, ct);
+            var parentOPU = await _context.OPUs
+                .Include(o => o.Lines)
+                .SingleOrDefaultAsync(o => o.Id == req.ParentId, ct);
 
-            if (parentSite is null)
-                return BadRequest("Parent site does not exist!");
+            if (parentOPU is null)
+                return BadRequest("Parent OPU does not exist!");
 
-            var opu = new OPU
+            var line = new Line
             {
                 Name = req.Name,
             };
 
-            parentSite.OPUs.Add(opu);
+            parentOPU.Lines.Add(line);
             await _context.SaveChangesAsync(ct);
 
-            return CreatedAtRoute(Routes.Locations.GetById, new { opu.Id },
-                _mapper.Map<Res>(opu));
+            return CreatedAtRoute(Routes.Locations.GetById, new { line.Id },
+                _mapper.Map<Res>(line));
         }
     }
 }

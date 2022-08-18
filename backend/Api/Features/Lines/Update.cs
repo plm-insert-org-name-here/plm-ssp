@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Api.Features.OPUs
+namespace Api.Features.Lines
 {
     public class Update : EndpointBaseAsync
         .WithRequest<Update.Req>
@@ -40,25 +40,25 @@ namespace Api.Features.OPUs
             {
                 _context = context;
 
-                RuleFor(o => o.Body.Name).MaximumLength(64).NotEmpty();
-                RuleFor(o => o).Must(HaveUniqueNameWithinParent).WithMessage("'Name' must be unique within the Site.");
+                RuleFor(l => l.Body.Name).MaximumLength(64).NotEmpty();
+                RuleFor(l => l).Must(HaveUniqueNameWithinParent).WithMessage("'Name' must be unique within the OPU.");
             }
 
             private bool HaveUniqueNameWithinParent(Req req)
             {
-                var opu = _context.OPUs.SingleOrDefault(o => o.Id == req.Id);
-                if (opu is null) return false;
+                var line = _context.Lines.SingleOrDefault(l => l.Id == req.Id);
+                if (line is null) return false;
 
-                return _context.OPUs.Where(o => o.SiteId == opu.SiteId).All(o => o.Name != req.Body.Name);
+                return _context.Lines.Where(l => l.OPUId == line.OPUId).All(o => o.Name != req.Body.Name);
             }
         }
 
-        [HttpPut(Routes.OPUs.Update)]
+        [HttpPut(Routes.Lines.Update)]
         [SwaggerOperation(
-            Summary = "Update an existing OPU",
-            Description = "Update an existing OPU",
-            OperationId = "OPUs.Update",
-            Tags = new[] { "OPUs" })
+            Summary = "Update an existing Line",
+            Description = "Update an existing Line",
+            OperationId = "Lines.Update",
+            Tags = new[] { "Lines" })
         ]
         public override async Task<ActionResult> HandleAsync([FromRoute] Req req, CancellationToken ct = new())
         {
@@ -66,10 +66,10 @@ namespace Api.Features.OPUs
             if (!validation.IsValid)
                 return ValidationProblem();
 
-            var opu = await _context.OPUs.FindAsync(new object[] { req.Id }, ct);
-            if (opu is null) return NotFound();
+            var line = await _context.Lines.FindAsync(new object[] { req.Id }, ct);
+            if (line is null) return NotFound();
 
-            opu.Name = req.Body.Name;
+            line.Name = req.Body.Name;
             await _context.SaveChangesAsync(ct);
 
             return NoContent();
