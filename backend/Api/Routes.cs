@@ -13,6 +13,30 @@ namespace Api
             public const string Delete = Prefix + "sites/{id:int}";
         }
 
+        public static class OPUs
+        {
+            public const string GetById = Prefix + "opus/{id:int}";
+            public const string Create = Prefix + "opus";
+            public const string Update = Prefix + "opus/{id:int}";
+            public const string Delete = Prefix + "opus/{id:int}";
+        }
+
+        public static class Lines
+        {
+            public const string GetById = Prefix + "lines/{id:int}";
+            public const string Create = Prefix + "lines";
+            public const string Update = Prefix + "lines/{id:int}";
+            public const string Delete = Prefix + "lines/{id:int}";
+        }
+
+        public static class Stations
+        {
+            public const string GetById = Prefix + "stations/{id:int}";
+            public const string Create = Prefix + "stations";
+            public const string Update = Prefix + "stations/{id:int}";
+            public const string Delete = Prefix + "stations/{id:int}";
+        }
+
         public static class Locations
         {
             public const string GetAll = Prefix + "locations";

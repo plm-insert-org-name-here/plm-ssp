@@ -29,7 +29,6 @@
 
     <ItemGroup>
       <Folder Include="Features\Lines" />
-      <Folder Include="Features\OPUs" />
       <Folder Include="Features\Stations" />
     </ItemGroup>
 
