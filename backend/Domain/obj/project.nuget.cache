@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "uWHio91snL/y0vMcqj5BFzZ1+XPeNFG1TDvVayeVQWmmKPuSLayupekI5T895H8UkRmeSCXUpNPRnd80vM/kJQ==",
+  "success": true,
+  "projectFilePath": "/home/rg/Repos/plm-ssp/backend/Domain/Domain.csproj",
+  "expectedPackageFiles": [
+    "/home/rg/.local/share/NuGet/packages/microsoft.aspnetcore.app.ref/6.0.10/microsoft.aspnetcore.app.ref.6.0.10.nupkg.sha512"
+  ],
+  "logs": []
+}
