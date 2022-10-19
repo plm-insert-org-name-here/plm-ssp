@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Http;
@@ -31,12 +32,12 @@ public class Create : Endpoint<Create.Req, Create.Res>
     {
         Post(Api.Routes.OPUs.Create);
         AllowAnonymous();
-        Options(x => x.WithTags("OPU"));
+        Options(x => x.WithTags("OPUs"));
     }
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var site = await SiteRepo.GetByIdAsync(req.ParentSiteId, ct);
+        var site = await SiteRepo.FirstOrDefaultAsync(new SiteWithOPUsSpec(req.ParentSiteId), ct);
 
         if (site is null)
         {

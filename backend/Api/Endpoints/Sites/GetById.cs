@@ -49,7 +49,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
         if (site is null)
         {
-            await SendNotFoundAsync();
+            await SendNotFoundAsync(ct);
             return;
         }
 
