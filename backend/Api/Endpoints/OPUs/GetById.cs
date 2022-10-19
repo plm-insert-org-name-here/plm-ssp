@@ -19,18 +19,16 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
     {
         public int Id { get; set; }
         public string Name { get; set; } = default!;
-        // public List<Line> Lines { get; set; } = default!;
-        // public Site Site { get; set; } = default!;
-        // public int SiteId { get; set; }
+        public IEnumerable<LineRes> Lines { get; set; } = default!;
+
+        public record LineRes(int Id, string Name);
     }
 
     private static Res MapOut(OPU o) => new()
     {
         Id = o.Id,
         Name = o.Name,
-        // Lines = o.Lines,
-        // Site = o.Site,
-        // SiteId = o.SiteId
+        Lines = o.Lines.Select(l => new Res.LineRes(l.Id, l.Name))
     };
 
     public override void Configure()
