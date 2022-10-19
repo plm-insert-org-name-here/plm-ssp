@@ -17,12 +17,6 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
         public string Name { get; set; } = default!;
     }
 
-    public class Res
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = default!;
-    }
-
     public override void Configure()
     {
         Put(Api.Routes.Sites.Update);

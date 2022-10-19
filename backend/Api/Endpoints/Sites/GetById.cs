@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.CompanyHierarchy;
@@ -19,12 +21,19 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
     {
         public int Id { get; set; }
         public string Name { get; set; } = default!;
+
+        public IEnumerable<ResOPU> OPUs { get; set; } = default!;
+
+        public record ResOPU(int Id, string Name);
+
     }
+
 
     private static Res MapOut(Site s) => new()
     {
         Id = s.Id,
-        Name = s.Name
+        Name = s.Name,
+        OPUs = s.OPUs.Select(o => new Res.ResOPU(o.Id, o.Name))
     };
 
     public override void Configure()

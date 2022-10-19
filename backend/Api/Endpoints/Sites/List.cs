@@ -13,18 +13,19 @@ public class List : EndpointWithoutRequest<IEnumerable<List.Res>>
 {
     public IRepository<Site> SiteRepo { get; set; } = default!;
 
-    public Res MapFromEntity(Site s) =>
-        new()
-        {
-            Id = s.Id,
-            Name = s.Name
-        };
 
     public class Res
     {
         public int Id { get; set; }
         public string Name { get; set; } = default!;
     }
+
+    private static Res MapOut(Site s) =>
+        new()
+        {
+            Id = s.Id,
+            Name = s.Name
+        };
 
     public override void Configure()
     {
@@ -37,6 +38,6 @@ public class List : EndpointWithoutRequest<IEnumerable<List.Res>>
     {
         var sites = await SiteRepo.ListAsync(ct);
 
-        await SendOkAsync(sites.Select(MapFromEntity), ct);
+        await SendOkAsync(sites.Select(MapOut), ct);
     }
 }
