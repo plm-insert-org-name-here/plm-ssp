@@ -4,11 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.Infrastructure.Database;
+namespace Infrastructure.Database;
 
 public static class DbExt
 {
-
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         Action<DbContextOptionsBuilder> dbOptions = options =>
@@ -19,11 +18,11 @@ public static class DbExt
             var serverVersion = ServerVersion.AutoDetect(connString);
 
             options.UseMySql(connString, serverVersion);
-
         };
 
-        services.AddDbContext<Context>(dbOptions, optionsLifetime: ServiceLifetime.Singleton);
-        services.AddDbContextFactory<Context>(dbOptions);
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddDbContext<Context>(dbOptions);
+        // services.AddDbContextFactory<Context>(dbOptions);
 
         return services;
     }

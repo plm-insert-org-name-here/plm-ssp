@@ -1,8 +1,7 @@
-namespace Domain.Common
+namespace Domain.Common;
+
+public enum EventResult
 {
-    public enum EventResult
-    {
-        Success,
-        Failure,
-    }
+    Success,
+    Failure,
 }

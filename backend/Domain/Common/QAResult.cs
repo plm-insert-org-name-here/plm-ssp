@@ -1,9 +1,8 @@
-namespace Domain.Common
+namespace Domain.Common;
+
+public enum QAResult
 {
-    public enum QAResult
-    {
-        Success,
-        Failure,
-        Uncertain
-    }
+    Success,
+    Failure,
+    Uncertain
 }

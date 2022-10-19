@@ -1,9 +1,8 @@
-namespace Domain.Common
+namespace Domain.Common;
+
+public enum TaskStatus
 {
-    public enum TaskStatus
-    {
-        Active,
-        Paused,
-        Inactive
-    }
+    Active,
+    Paused,
+    Inactive
 }

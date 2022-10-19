@@ -1,8 +1,7 @@
-namespace Domain.Common
+namespace Domain.Common;
+
+public enum TaskInstanceFinalState
 {
-    public enum TaskInstanceFinalState
-    {
-        Completed,
-        Abandoned
-    }
+    Completed,
+    Abandoned
 }

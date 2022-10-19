@@ -1,10 +1,9 @@
-namespace Domain.Common
+namespace Domain.Common;
+
+public enum DetectorState
 {
-    public enum DetectorState
-    {
-        Off,
-        Standby,
-        Streaming,
-        Monitoring
-    }
+    Off,
+    Standby,
+    Streaming,
+    Monitoring
 }

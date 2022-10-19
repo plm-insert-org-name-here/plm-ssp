@@ -3,7 +3,7 @@ using Domain.Entities.CompanyHierarchy;
 using Domain.Entities.TaskAggregate;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Infrastructure.Database;
+namespace Infrastructure.Database;
 
 public class Context : DbContext
 {

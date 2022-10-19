@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace Application.Infrastructure.Database;
+namespace Infrastructure.Database;
 
 public static class DbInitializer
 {
@@ -20,11 +20,11 @@ public static class DbInitializer
             "Database does not exist. Creating and initializing database from scratch...");
         context.Database.EnsureCreated();
 
-        if (env.IsDevelopment())
-        {
-            logger.Debug("Loading seed data");
-            new SeedLoader(context, env, logger).Load();
-        }
+        // if (env.IsDevelopment())
+        // {
+        //     logger.Debug("Loading seed data");
+        //     new SeedLoader(context, env, logger).Load();
+        // }
 
         logger.Debug("Database initialization finished");
     }

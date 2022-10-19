@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace Application.Infrastructure.Database;
+namespace Infrastructure.Database;
 
 public class SeedLoader
 {

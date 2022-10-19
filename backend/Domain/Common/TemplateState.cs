@@ -1,21 +1,20 @@
-namespace Domain.Common
+namespace Domain.Common;
+
+public enum TemplateState
 {
-    public enum TemplateState
-    {
-        // Valid states
-        Present,
-        Missing,
+    // Valid states
+    Present,
+    Missing,
 
-        // "Invalid" states
-        Uncertain,
-        UnknownObject
-    }
+    // "Invalid" states
+    Uncertain,
+    UnknownObject
+}
 
-    public static class TemplateStateExt
+public static class TemplateStateExt
+{
+    public static bool IsValid(this TemplateState state)
     {
-        public static bool IsValid(this TemplateState state)
-        {
-            return state is TemplateState.Present or TemplateState.Missing;
-        }
+        return state is TemplateState.Present or TemplateState.Missing;
     }
 }

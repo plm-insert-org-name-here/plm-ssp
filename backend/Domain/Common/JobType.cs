@@ -1,9 +1,8 @@
-namespace Domain.Common
+namespace Domain.Common;
+
+public enum JobType
 {
-    public enum JobType
-    {
-        ToolKit,
-        ItemKit,
-        QA,
-    }
+    ToolKit,
+    ItemKit,
+    QA,
 }
