@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Domain.Entities.CompanyHierarchy;
 
 public class Station : BaseEntity

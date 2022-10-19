@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Domain.Entities.TaskAggregate;
 
 public class Template : BaseEntity

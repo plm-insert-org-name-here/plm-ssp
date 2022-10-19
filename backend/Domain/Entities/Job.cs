@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
 using Task = Domain.Entities.TaskAggregate.Task;
