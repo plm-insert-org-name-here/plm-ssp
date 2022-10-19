@@ -1,4 +1,5 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure.Database;
 
@@ -6,7 +7,8 @@ namespace Api.Endpoints.Lines;
 
 public class Create : Endpoint<Create.Req, Create.Res>
 {
-    public IRepository<Line> LineRepo { get; set; } = default!;
+    public IRepository<OPU> OpuRepo { get; set; } = default!;
+
     public class Req
     {
         public string Name { get; set; } = default!;
@@ -26,13 +28,6 @@ public class Create : Endpoint<Create.Req, Create.Res>
         Options(x => x.WithTags("Lines"));
     }
 
-    private static Line MapIn(Req r) => 
-        new()
-        {
-            Name = r.Name,
-            OPUId = r.OPUId
-        };
-
     private static Res MapOut(Line l) =>
         new()
         {
@@ -42,9 +37,21 @@ public class Create : Endpoint<Create.Req, Create.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var line = MapIn(req);
+        var opu = await OpuRepo.FirstOrDefaultAsync(new OPUWithLinesSpec(req.OPUId), ct);
 
-        await LineRepo.AddAsync(line, ct);
+        if (opu is null)
+        {
+            await SendNotFoundAsync(ct);
+            return;
+        }
+
+        var line = new Line
+        {
+            Name = req.Name
+        };
+
+        opu.Lines.Add(line);
+        await OpuRepo.SaveChangesAsync(ct);
 
         var res = MapOut(line);
         await SendCreatedAtAsync<Create>(new { line.Id }, res, null, null, false, ct);

@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Http;
@@ -40,11 +41,11 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var opu = await OPURepo.GetByIdAsync(req.Id, ct);
+        var opu = await OPURepo.FirstOrDefaultAsync(new OPUWithLinesSpec(req.Id), ct);
 
         if (opu is null)
         {
-            await SendNotFoundAsync();
+            await SendNotFoundAsync(ct);
             return;
         }
 

@@ -1,4 +1,5 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure.Database;
 
@@ -38,7 +39,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var station = await StationRepo.GetByIdAsync(req.Id, ct);
+        var station = await StationRepo.FirstOrDefaultAsync(new StationWithLocationsSpec(req.Id), ct);
 
         if (station is null)
         {

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Http;
@@ -44,7 +45,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var site = await SiteRepo.GetByIdAsync(req.Id, ct);
+        var site = await SiteRepo.FirstOrDefaultAsync(new SiteWithOPUsSpec(req.Id), ct);
 
         if (site is null)
         {
