@@ -1,7 +1,7 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
 
 namespace Api.Endpoints.Stations;
 
@@ -48,7 +48,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
             Name = req.Name
         };
 
-        line.Stations.Add(station);
+        line.Children.Add(station);
 
         await LineRepo.SaveChangesAsync(ct);
 

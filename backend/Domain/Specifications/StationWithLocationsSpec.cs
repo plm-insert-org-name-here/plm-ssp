@@ -7,6 +7,6 @@ public sealed class StationWithLocationsSpec : Specification<Station>
 {
     public StationWithLocationsSpec(int id)
     {
-        Query.Where(s => s.Id == id).Include(s => s.Locations);
+        Query.Where(s => s.Id == id).Include(s => s.Children);
     }
 }

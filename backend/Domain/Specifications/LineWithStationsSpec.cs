@@ -7,6 +7,6 @@ public sealed class LineWithStationsSpec : Specification<Line>
 {
     public LineWithStationsSpec(int id)
     {
-        Query.Where(l => l.Id == id).Include(l => l.Stations);
+        Query.Where(l => l.Id == id).Include(l => l.Children);
     }
 }

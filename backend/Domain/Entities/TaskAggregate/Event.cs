@@ -1,10 +1,10 @@
-using System;
 using Domain.Common;
 
 namespace Domain.Entities.TaskAggregate;
 
-public class Event : BaseEntity
+public class Event : IBaseEntity
 {
+    public int Id { get; set; }
     public DateTime Timestamp { get; set; }
     public EventResult Result { get; set; }
     public string? FailureReason { get; set; }

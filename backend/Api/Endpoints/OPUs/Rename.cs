@@ -1,9 +1,6 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using FastEndpoints;
-using Infrastructure.Database;
-using Microsoft.AspNetCore.Http;
 
 namespace Api.Endpoints.OPUs;
 

@@ -1,10 +1,10 @@
-using System.Collections.Generic;
 using TaskStatus = Domain.Common.TaskStatus;
 
 namespace Domain.Entities.TaskAggregate;
 
-public class Task : BaseEntity
+public class Task : IBaseEntity
 {
+    public int Id { get; set; }
     public string Name { get; set; } = default!;
     public TaskStatus Status { get; set; }
     public bool? Ordered { get; set; }

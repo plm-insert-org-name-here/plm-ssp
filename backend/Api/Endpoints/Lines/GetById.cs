@@ -1,7 +1,7 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
 
 namespace Api.Endpoints.Lines;
 
@@ -25,7 +25,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
     {
         Id = l.Id,
         Name = l.Name,
-        Stations = l.Stations.Select(s => new Res.ResStation(s.Id, s.Name))
+        Stations = l.Children.Select(s => new Res.ResStation(s.Id, s.Name))
     };
 
     public override void Configure()

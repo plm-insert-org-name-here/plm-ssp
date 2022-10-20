@@ -1,10 +1,7 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
-using Microsoft.AspNetCore.Http;
 
 namespace Api.Endpoints.OPUs;
 public class Create : Endpoint<Create.Req, Create.Res>
@@ -50,7 +47,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
             Name = req.Name
         };
 
-        site.OPUs.Add(opu);
+        site.Children.Add(opu);
 
         await SiteRepo.SaveChangesAsync(ct);
 

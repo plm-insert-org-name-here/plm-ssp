@@ -1,9 +1,8 @@
-using System.Collections.Generic;
-
 namespace Domain.Entities.TaskAggregate;
 
-public class Template : BaseEntity
+public class Template : IBaseEntity
 {
+    public int Id { get; set; }
     public string Name { get; set; } = default!;
     public int X { get; set; }
     public int Y { get; set; }

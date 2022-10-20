@@ -1,6 +1,5 @@
 using Ardalis.Specification;
 using Domain.Entities.CompanyHierarchy;
-using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Specifications;
 

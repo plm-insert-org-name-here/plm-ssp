@@ -1,12 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
-using Microsoft.AspNetCore.Http;
 
 namespace Api.Endpoints.Sites;
 
@@ -33,7 +28,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
     {
         Id = s.Id,
         Name = s.Name,
-        OPUs = s.OPUs.Select(o => new Res.ResOPU(o.Id, o.Name))
+        OPUs = s.Children.Select(o => new Res.ResOPU(o.Id, o.Name))
     };
 
     public override void Configure()

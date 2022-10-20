@@ -1,12 +1,12 @@
-using System.Collections.Generic;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
 using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Domain.Entities;
 
-public class Job : BaseEntity
+public class Job : IBaseEntity
 {
+    public int Id { get; set; }
     public string Name { get; set; } = default!;
     public JobType Type { get; set; }
     public byte[] Snapshot { get; set; } = default!;

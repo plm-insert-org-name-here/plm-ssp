@@ -4,8 +4,9 @@ using Domain.Entities.CompanyHierarchy;
 
 namespace Domain.Entities;
 
-public class Detector : BaseEntity
+public class Detector : IBaseEntity
 {
+    public int Id { get; set; }
     public string Name { get; set; } = default!;
     public PhysicalAddress MacAddress { get; set; } = default!;
     public DetectorState State { get; set; }

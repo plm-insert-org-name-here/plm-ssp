@@ -1,14 +1,8 @@
-using System.Collections.Generic;
-
 namespace Domain.Entities.CompanyHierarchy;
 
-public class Site : BaseEntity
+public class Site : ICompanyHierarchyNodeWithChildren<OPU>
 {
+    public int Id { get; set; }
     public string Name { get; set; } = default!;
-
-    public List<OPU> OPUs { get; set; } = default!;
-
-    public Site()
-    {
-    }
+    public List<OPU> Children { get; set; } = default!;
 }

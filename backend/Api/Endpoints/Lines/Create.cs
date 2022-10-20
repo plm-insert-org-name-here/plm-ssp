@@ -1,7 +1,7 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
 
 namespace Api.Endpoints.Lines;
 
@@ -50,7 +50,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
             Name = req.Name
         };
 
-        opu.Lines.Add(line);
+        opu.Children.Add(line);
         await OpuRepo.SaveChangesAsync(ct);
 
         var res = MapOut(line);

@@ -1,10 +1,10 @@
-using System.Collections.Generic;
 using Domain.Common;
 
 namespace Domain.Entities.TaskAggregate;
 
-public class Step : BaseEntity
+public class Step : IBaseEntity
 {
+    public int Id { get; set; }
     public int? OrderNum { get; set; }
     public TemplateState ExpectedInitialState { get; set; }
     public TemplateState ExpectedSubsequentState { get; set; }

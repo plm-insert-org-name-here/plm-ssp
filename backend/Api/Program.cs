@@ -1,12 +1,8 @@
 global using FluentValidation;
-using System;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Infrastructure.Database;
 using Infrastructure.Logging;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
