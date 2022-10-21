@@ -1,12 +1,19 @@
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Locations;
 
 public class Rename : Endpoint<Rename.Req, EmptyResponse>
 {
     public IRepository<Location> LocationRepo { get; set; } = default!;
+
+    public ICHNameUniquenessChecker<ICHNodeWithChildren<Location>, Location> NameUniquenessChecker
+    {
+        get;
+        set;
+    } = default!;
 
     public class Req
     {
@@ -31,7 +38,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
             return;
         }
 
-        location.Name = req.Name;
+        location.Rename(req.Name, NameUniquenessChecker).Unwrap();
 
         await LocationRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);

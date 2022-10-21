@@ -38,7 +38,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var opu = await OPURepo.FirstOrDefaultAsync(new OPUWithLinesSpec(req.Id), ct);
+        var opu = await OPURepo.FirstOrDefaultAsync(new CHNodeWithChildrenSpec<OPU, Line>(req.Id), ct);
 
         if (opu is null)
         {

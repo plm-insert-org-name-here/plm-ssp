@@ -5,8 +5,8 @@ using Domain.Specifications;
 namespace Domain.Services;
 
 public class CHNameUniquenessChecker<TParent, T> : ICHNameUniquenessChecker<TParent, T>
-    where TParent: class, ICompanyHierarchyNodeWithChildren<T>
-    where T: class, ICompanyHierarchyNode
+    where TParent: class, ICHNodeWithChildren<T>
+    where T: class, ICHNode
 {
     private readonly IRepository<TParent> _repo;
 
@@ -15,9 +15,8 @@ public class CHNameUniquenessChecker<TParent, T> : ICHNameUniquenessChecker<TPar
         _repo = repo;
     }
 
-    public async Task<bool> Check(TParent parentNode, string name, T? existingNode)
+    public async Task<bool> IsDuplicate(TParent parentNode, string name, T? existingNode)
     {
-        var parentWithChildren = await _repo.ListAsync(new CHNameUniquenessSpec<TParent, T>(parentNode, name, existingNode));
-        var children = parentWithChildren.SelectMany(p => p.Children);
+        return await _repo.AnyAsync(new CHNameUniquenessSpec<TParent, T>(parentNode, name, existingNode));
     }
 }

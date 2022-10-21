@@ -40,7 +40,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var site = await SiteRepo.FirstOrDefaultAsync(new SiteWithOPUsSpec(req.Id), ct);
+        var site = await SiteRepo.FirstOrDefaultAsync(new CHNodeWithChildrenSpec<Site, OPU>(req.Id), ct);
 
         if (site is null)
         {

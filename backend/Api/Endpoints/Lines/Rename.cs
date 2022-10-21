@@ -1,12 +1,14 @@
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Lines;
 
 public class Rename : Endpoint<Rename.Req, EmptyResponse>
 {
     public IRepository<Line> LineRepo { get; set; } = default!;
+    public ICHNameUniquenessChecker<OPU, Line> NameUniquenessChecker { get; set; } = default!;
 
     public class Req
     {
@@ -31,7 +33,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
             return;
         }
 
-        line.Name = req.Name;
+        line.Rename(req.Name, NameUniquenessChecker).Unwrap();
 
         await LineRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);

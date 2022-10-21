@@ -3,9 +3,9 @@ using Domain.Entities.CompanyHierarchy;
 
 namespace Domain.Specifications;
 
-public sealed class CHNameUniquenessSpec<TParent, T> : Specification<TParent, List<T>>
-    where TParent: class, ICompanyHierarchyNodeWithChildren<T>
-    where T: class, ICompanyHierarchyNode
+public sealed class CHNameUniquenessSpec<TParent, T> : Specification<TParent>
+    where TParent: class, ICHNodeWithChildren<T>
+    where T: class, ICHNode
 {
     public CHNameUniquenessSpec(TParent parentNode, string name, T? node)
     {
@@ -13,7 +13,13 @@ public sealed class CHNameUniquenessSpec<TParent, T> : Specification<TParent, Li
             .Where(x => x.Id == parentNode.Id)
             .Include(x => x.Children);
 
-        Query.Select(x => x.Children);
-        Query.
+        if (node is null)
+        {
+            Query.Where(x => x.Children.Any(c => c.Name == name));
+        }
+        else
+        {
+            Query.Where(x => x.Children.Any(c => c.Id != node.Id && c.Name == name));
+        }
     }
 }

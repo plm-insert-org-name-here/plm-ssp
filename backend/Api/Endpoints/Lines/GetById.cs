@@ -37,7 +37,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var line = await LineRepo.FirstOrDefaultAsync(new LineWithStationsSpec(req.Id), ct);
+        var line = await LineRepo.FirstOrDefaultAsync(new CHNodeWithChildrenSpec<Line, Station>(req.Id), ct);
 
         if (line is null)
         {

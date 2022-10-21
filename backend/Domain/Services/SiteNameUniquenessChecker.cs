@@ -13,7 +13,7 @@ public class SiteNameUniquenessChecker : ICHNameUniquenessChecker<Site>
         _siteRepo = siteRepo;
     }
 
-    public async Task<bool> Check(string name, Site? site)
+    public async Task<bool> IsDuplicate(string name, Site? site)
     {
         return await _siteRepo.AnyAsync(new SiteNameUniquenessSpec<Site>(name, site));
     }

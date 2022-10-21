@@ -4,7 +4,7 @@ using Domain.Entities.CompanyHierarchy;
 namespace Domain.Specifications;
 
 public sealed class SiteNameUniquenessSpec<T> : Specification<T>
-    where T : ICompanyHierarchyNode
+    where T : ICHNode
 {
     public SiteNameUniquenessSpec(string name, T? node)
     {
