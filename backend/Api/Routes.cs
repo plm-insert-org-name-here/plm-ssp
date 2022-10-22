@@ -65,11 +65,11 @@ public static class Routes
 
     public static class Jobs
     {
-        public const string GetAll = "jobs";
         public const string GetById = "jobs/{id:int}";
         public const string Create = "jobs";
         public const string Update = "jobs/{id:int}";
         public const string Delete = "jobs/{id:int}";
+        public const string List = "jobs";
     }
 
     public static class Tasks
