@@ -6,18 +6,19 @@ namespace Domain.Entities.CompanyHierarchy;
 public class OPU : ICHNodeWithParent<Site>, ICHNodeWithChildren<Line>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = default!;
     public List<Line> Children { get; set; } = default!;
     public Site Parent { get; set; } = default!;
     public int ParentId { get; set; }
+
+    private OPU() {}
 
     public OPU(string name)
     {
         Name = name;
     }
 
-    public Result<Line> AddChildNode<TParent>(string lineName, ICHNameUniquenessChecker<TParent, Line> nameUniquenessChecker)
-        where TParent: class, ICHNodeWithChildren<Line>
+    public Result<Line> AddChildNode(string lineName, ICHNameUniquenessChecker<OPU, Line> nameUniquenessChecker)
     {
         if (nameUniquenessChecker.IsDuplicate(this, lineName, null).GetAwaiter().GetResult())
         {

@@ -9,7 +9,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
 {
     public IRepository<Station> StationRepo { get; set; } = default!;
 
-    public ICHNameUniquenessChecker<ICHNodeWithChildren<Station>, Station> NameUniquenessChecker
+    public ICHNameUniquenessChecker<Line, Station> NameUniquenessChecker
     {
         get;
         set;

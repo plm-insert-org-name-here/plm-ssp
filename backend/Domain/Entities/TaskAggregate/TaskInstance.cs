@@ -9,4 +9,8 @@ public class TaskInstance : IBaseEntity
     public List<Event> Events { get; set; } = default!;
     public Task Task { get; set; } = default!;
     public int TaskId { get; set; }
+
+    private TaskInstance()
+    {
+    }
 }

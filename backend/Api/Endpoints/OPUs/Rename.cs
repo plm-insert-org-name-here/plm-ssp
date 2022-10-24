@@ -10,7 +10,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
 {
     public IRepository<OPU> OpuRepo { get; set; } = default!;
 
-    public ICHNameUniquenessChecker<ICHNodeWithChildren<OPU>, OPU> NameUniquenessChecker
+    public ICHNameUniquenessChecker<Site, OPU> NameUniquenessChecker
     {
         get;
         set;

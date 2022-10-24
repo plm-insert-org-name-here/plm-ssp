@@ -6,20 +6,21 @@ namespace Domain.Entities.CompanyHierarchy;
 public class Line : ICHNode<OPU, Station>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = default!;
     public List<Station> Children { get; set; } = default!;
 
     public OPU Parent { get; set; } = default!;
     public int ParentId { get; set; }
+
+    private Line() {}
 
     public Line(string name)
     {
         Name = name;
     }
 
-    public Result<Station> AddChildNode<TParent>(string stationName,
-        ICHNameUniquenessChecker<TParent, Station> nameUniquenessChecker)
-        where TParent: class, ICHNodeWithChildren<Station>
+    public Result<Station> AddChildNode(string stationName,
+        ICHNameUniquenessChecker<Line, Station> nameUniquenessChecker)
     {
         if (nameUniquenessChecker.IsDuplicate(this, stationName, null).GetAwaiter().GetResult())
         {

@@ -6,8 +6,10 @@ namespace Domain.Entities.CompanyHierarchy;
 public class Site : ICHNodeWithChildren<OPU>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = default!;
     public List<OPU> Children { get; set; } = default!;
+
+    private Site() {}
 
     private Site(string name)
     {
@@ -26,8 +28,7 @@ public class Site : ICHNodeWithChildren<OPU>
         return site;
     }
 
-    public Result<OPU> AddChildNode<TParent>(string opuName, ICHNameUniquenessChecker<TParent, OPU> nameUniquenessChecker)
-        where TParent: class, ICHNodeWithChildren<OPU>
+    public Result<OPU> AddChildNode(string opuName, ICHNameUniquenessChecker<Site, OPU> nameUniquenessChecker)
     {
         if (nameUniquenessChecker.IsDuplicate(this, opuName, null).GetAwaiter().GetResult())
         {

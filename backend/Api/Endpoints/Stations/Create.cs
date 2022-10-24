@@ -20,7 +20,7 @@ public class CreateValidator : Validator<Create.Req> {
 public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<Line> LineRepo { get; set; } = default!;
-    public ICHNameUniquenessChecker<ICHNodeWithChildren<Station>, Station> NameUniquenessChecker { get; set; } = default!;
+    public ICHNameUniquenessChecker<Line, Station> NameUniquenessChecker { get; set; } = default!;
 
     public class Req
     {

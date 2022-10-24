@@ -6,19 +6,20 @@ namespace Domain.Entities.CompanyHierarchy;
 public class Station : ICHNode<Line, Location>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = default!;
     public List<Location> Children { get; set; } = default!;
 
     public Line Parent { get; set; } = default!;
     public int ParentId { get; set; }
+
+    private Station() {}
 
     public Station(string name)
     {
         Name = name;
     }
 
-    public Result<Location> AddChildNode<TParent>(string locationName, ICHNameUniquenessChecker<TParent, Location> nameUniquenessChecker)
-        where TParent: class, ICHNodeWithChildren<Location>
+    public Result<Location> AddChildNode(string locationName, ICHNameUniquenessChecker<Station, Location> nameUniquenessChecker)
     {
         if (nameUniquenessChecker.IsDuplicate(this, locationName, null).GetAwaiter().GetResult())
         {

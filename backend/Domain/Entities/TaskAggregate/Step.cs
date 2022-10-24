@@ -11,4 +11,8 @@ public class Step : IBaseEntity
     public List<Event> Events { get; set; } = default!;
     public Template Template { get; set; } = default!;
     public int TemplateId { get; set; }
+
+    private Step()
+    {
+    }
 }

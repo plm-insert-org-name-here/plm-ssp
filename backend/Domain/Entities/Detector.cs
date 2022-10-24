@@ -13,4 +13,6 @@ public class Detector : IBaseEntity
 
     public Location? Location { get; set; }
     public int? LocationId { get; set; }
+
+    private Detector() { }
 }

@@ -10,7 +10,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<OPU> OpuRepo { get; set; } = default!;
 
-    public ICHNameUniquenessChecker<ICHNodeWithChildren<Line>, Line> NameUniquenessChecker
+    public ICHNameUniquenessChecker<OPU, Line> NameUniquenessChecker
     {
         get;
         set;

@@ -12,4 +12,8 @@ public class Template : IBaseEntity
     public Task Task { get; set; } = default!;
     public int TaskId { get; set; }
     public List<Step> StateChanges { get; set; } = default!;
+
+    private Template()
+    {
+    }
 }

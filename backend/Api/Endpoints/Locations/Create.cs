@@ -10,7 +10,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<Station> StationRepo { get; set; } = default!;
 
-    public ICHNameUniquenessChecker<ICHNodeWithChildren<Location>, Location> NameUniquenessChecker
+    public ICHNameUniquenessChecker<Station, Location> NameUniquenessChecker
     {
         get;
         set;

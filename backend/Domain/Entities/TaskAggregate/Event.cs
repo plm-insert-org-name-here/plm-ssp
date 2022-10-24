@@ -12,4 +12,6 @@ public class Event : IBaseEntity
     public int StateChangeId { get;set; }
     public TaskInstance TaskInstance { get; set; } = default!;
     public int TaskInstanceId { get; set; }
+
+    private Event() { }
 }

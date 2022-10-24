@@ -1,7 +1,3 @@
-using System.ComponentModel;
-using Domain.Interfaces;
-using FluentResults;
-
 namespace Domain.Entities.CompanyHierarchy;
 
 public interface ICHNode<TParent, TChild>
@@ -22,10 +18,6 @@ public interface ICHNodeWithChildren<TChild> : ICHNode
     where TChild : class, ICHNode
 {
     public List<TChild> Children { get; set; }
-
-    public Result<TChild> AddChildNode<TParent>(string childNodeName,
-        ICHNameUniquenessChecker<TParent, TChild> nameUniquenessChecker)
-        where TParent : class, ICHNodeWithChildren<TChild>;
 }
 
 public interface ICHNode : IBaseEntity

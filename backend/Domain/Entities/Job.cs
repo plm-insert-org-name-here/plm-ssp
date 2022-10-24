@@ -15,4 +15,6 @@ public class Job : IBaseEntity
     public int LocationId { get; set; }
 
     public List<Task> Tasks { get; set; } = default!;
+
+    private Job() { }
 }
