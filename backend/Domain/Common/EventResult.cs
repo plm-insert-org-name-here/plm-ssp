@@ -1,7 +1,7 @@
 namespace Domain.Common;
 
-public enum EventResult
+public class EventResult
 {
-    Success,
-    Failure,
+    public bool Failure { get; set; }
+    public string FailureReason { get; set; } = default!;
 }

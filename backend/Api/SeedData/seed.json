@@ -121,14 +121,12 @@
       "id": 1,
       "name": "Job 1",
       "type": "ToolKit",
-      "snapshot": "640x480.bmp",
       "locationId": 1
     },
     {
       "id": 2,
       "name": "Job 2",
       "type": "ItemKit",
-      "snapshot": "640x480.bmp",
       "locationId": 2
     }
   ],

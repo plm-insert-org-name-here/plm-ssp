@@ -15,7 +15,6 @@ public class Create : Endpoint<Create.Req, Create.Res>
     public class Req
     {
         public string Name { get; set; } = default!;
-        public JobType Type { get; set; } = default!;
 
     }
 
@@ -24,24 +23,19 @@ public class Create : Endpoint<Create.Req, Create.Res>
         public int Id { get; set; }
         public string Name { get; set; } = default!;
 
-        public JobType Type { get; set; } = default!;
-        
-        
     }
     
     private static Job MapIn(Req r) =>
         new()
         {
-            Name = r.Name,
-            Type = r.Type
+            Name = r.Name
         };
 
     private static Res MapOut(Job j) =>
         new()
         {
             Id = j.Id,
-            Name = j.Name,
-            Type = j.Type
+            Name = j.Name
         };
     
     public override void Configure()
