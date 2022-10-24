@@ -95,7 +95,8 @@ public class SeedLoader
 
             foreach (var obj in objects)
             {
-                var inst = Activator.CreateInstance(dbSetInnerType);
+                var cons = dbSetInnerType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
+                var inst = cons.Invoke(null);
 
                 foreach (var (parsedPropName, parsedPropValue) in obj)
                 {
