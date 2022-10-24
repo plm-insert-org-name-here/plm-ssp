@@ -23,11 +23,17 @@ public class Delete : Endpoint<Delete.Req, EmptyResponse>
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
         var job = await JobRepo.GetByIdAsync(req.Id, ct);
-
+        
+        //TODO: check if it has any active detectors under it
         if (job is null)
         {
             await SendNotFoundAsync(ct);
             return;
+        }
+
+        foreach (var task in job.Tasks)
+        {
+            //TODO: delete task but, every child of it
         }
         
         await JobRepo.DeleteAsync(job, ct);
