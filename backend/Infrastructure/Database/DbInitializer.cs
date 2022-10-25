@@ -1,29 +1,36 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace Infrastructure.Database;
 
 public static class DbInitializer
 {
-
     public static void Initialize(IServiceScope scope)
     {
         var context = scope.ServiceProvider.GetRequiredService<Context>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger>();
         var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
+        var config = scope.ServiceProvider.GetRequiredService<IOptions<DbOpt>>().Value;
 
-        if (context.Database.CanConnect()) return;
+        if (config.DeleteFirst)
+            context.Database.EnsureDeleted();
+        else
+        {
+            if (context.Database.CanConnect()) return;
 
-        logger.Debug(
-            "Database does not exist. Creating and initializing database from scratch...");
+            logger.Debug(
+                "Database does not exist. Creating and initializing database from scratch...");
+        }
+
         context.Database.EnsureCreated();
 
         if (env.IsDevelopment())
         {
             logger.Debug("Loading seed data");
-            new SeedLoader(context, env, logger).Load();
+            new SeedLoader(context, env, logger).Load(config);
         }
 
         logger.Debug("Database initialization finished");

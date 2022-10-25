@@ -11,14 +11,18 @@ public static class DbExt
 {
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        var dbConfigSection = configuration.GetSection(DbOpt.SectionName);
+        services.Configure<DbOpt>(dbConfigSection);
+
         Action<DbContextOptionsBuilder> dbOptions = options =>
         {
             options.EnableSensitiveDataLogging();
 
-            var connString = configuration.GetConnectionString("Default");
-            var serverVersion = ServerVersion.AutoDetect(connString);
+            var config = dbConfigSection.Get<DbOpt>();
 
-            options.UseMySql(connString, serverVersion);
+            var serverVersion = ServerVersion.AutoDetect(config.ConnectionString);
+
+            options.UseMySql(config.ConnectionString, serverVersion);
         };
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

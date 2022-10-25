@@ -6,9 +6,7 @@ using Domain.Services;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Infrastructure.Database;
-using Infrastructure.Exceptions;
 using Infrastructure.Logging;
-using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +26,6 @@ builder.Services.AddSignalR();
 builder.Services.AddCors();
 
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {

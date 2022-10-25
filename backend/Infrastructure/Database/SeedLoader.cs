@@ -148,9 +148,9 @@ public class SeedLoader
         return true;
     }
 
-    public void Load()
+    public void Load(DbOpt config)
     {
-        var path = Path.Combine(Env.ContentRootPath, SeedDataPath);
+        var path = Path.Combine(Env.ContentRootPath, config.SeedFolderRelativePath);
         var jsonFiles = Directory.GetFiles(path).Where(f => f.EndsWith(".json")).ToArray();
 
         foreach (var jsonFile in jsonFiles)
@@ -158,6 +158,7 @@ public class SeedLoader
             var success = LoadFromJson(jsonFile);
             if (!success)
             {
+                // TODO(rg): if seeding failed, delete the database
                 Logger.Error("Seeding was cancelled due to errors");
                 return;
             }
