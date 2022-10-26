@@ -10,7 +10,6 @@ namespace Api.Endpoints.Jobs;
 public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<Job> JobRepo { get; set; } = default!;
-    public IRepository<Location> LocationRepo { get; set; } = default!;
 
     public class Req
     {
