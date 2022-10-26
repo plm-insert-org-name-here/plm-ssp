@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseLogging();
 
 builder.Services.Configure<HostOptions>(opt => opt.ShutdownTimeout = TimeSpan.FromSeconds(1));
+
 builder.Services.AddDatabase(builder.Configuration);
 
 builder.Services.AddScoped<ICHNameUniquenessChecker<Site>, SiteNameUniquenessChecker>();

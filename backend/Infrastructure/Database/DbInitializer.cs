@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,15 +16,16 @@ public static class DbInitializer
         var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
         var config = scope.ServiceProvider.GetRequiredService<IOptions<DbOpt>>().Value;
 
-        if (config.DeleteFirst)
-            context.Database.EnsureDeleted();
-        else
+        if (context.Database.CanConnect())
         {
-            if (context.Database.CanConnect()) return;
-
-            logger.Debug(
-                "Database does not exist. Creating and initializing database from scratch...");
+            if (config.DeleteFirst)
+                context.Database.EnsureDeleted();
+            else
+                return;
         }
+
+        logger.Debug(
+            "Database does not exist. Creating and initializing database from scratch...");
 
         context.Database.EnsureCreated();
 

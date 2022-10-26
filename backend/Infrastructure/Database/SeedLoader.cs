@@ -20,7 +20,7 @@ public class SeedLoader
     private IHostEnvironment Env { get; }
     private ILogger Logger { get; }
 
-    private const string SeedDataPath = "SeedData";
+    private string SeedDataPath = "SeedData";
     private const string FilesPath = "Files";
 
     private Dictionary<PropertyInfo, Func<object?, object?>> SpecialParsers { get; }
@@ -150,7 +150,8 @@ public class SeedLoader
 
     public void Load(DbOpt config)
     {
-        var path = Path.Combine(Env.ContentRootPath, config.SeedFolderRelativePath);
+        SeedDataPath = config.SeedFolderRelativePath;
+        var path = Path.Combine(Env.ContentRootPath, SeedDataPath);
         var jsonFiles = Directory.GetFiles(path).Where(f => f.EndsWith(".json")).ToArray();
 
         foreach (var jsonFile in jsonFiles)

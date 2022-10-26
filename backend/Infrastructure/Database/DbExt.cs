@@ -9,20 +9,21 @@ namespace Infrastructure.Database;
 
 public static class DbExt
 {
-    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration config)
     {
-        var dbConfigSection = configuration.GetSection(DbOpt.SectionName);
+        var dbConfigSection = config.GetSection(DbOpt.SectionName);
         services.Configure<DbOpt>(dbConfigSection);
+
+        var dbOpt = dbConfigSection.Get<DbOpt>();
+        Console.WriteLine("Connection string: " + dbOpt.ConnectionString);
 
         Action<DbContextOptionsBuilder> dbOptions = options =>
         {
             options.EnableSensitiveDataLogging();
 
-            var config = dbConfigSection.Get<DbOpt>();
 
-            var serverVersion = ServerVersion.AutoDetect(config.ConnectionString);
-
-            options.UseMySql(config.ConnectionString, serverVersion);
+            var serverVersion = ServerVersion.AutoDetect(dbOpt.ConnectionString);
+            options.UseMySql(dbOpt.ConnectionString, serverVersion);
         };
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
