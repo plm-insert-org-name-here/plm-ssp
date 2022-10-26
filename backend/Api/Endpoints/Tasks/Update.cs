@@ -48,8 +48,6 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         }
         
         var location = await LocationRepo.GetByIdAsync(req.LocationId, ct);
-        var objects = req.Objects.Select(o => Object.Create(o.Name, o.Coordinates)).ToList();
-        var steps = req.Steps.Select((s => Step.Create(s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId, s.Object))).ToList();
 
         if (location is null)
         {
@@ -58,8 +56,8 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         }
 
         task.Location = location;
-        task.Objects = objects;
-        task.Steps = steps;
+        task.Objects = req.Objects.Select(o => Object.Create(o.Name, o.Coordinates)).ToList();
+        task.Steps = req.Steps.Select((s => Step.Create(s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId, s.Object))).ToList();
 
         await JobRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);
