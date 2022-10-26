@@ -1,10 +1,12 @@
-﻿using Domain.Entities.CompanyHierarchy;
+﻿using System.Text;
+using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Services;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace ApiIntegrationTests;
 
@@ -23,7 +25,7 @@ public class Setup
             {
                 services.Configure<DbOpt>(opt =>
                 {
-                    opt.ConnectionString = "server=localhost;user=plm;password=plm;database=plm_ssp_testing";
+                    opt.ConnectionString = "server=localhost;user=plm;password=kiskacsa;database=plm_ssp_testing";
                     opt.SeedFolderRelativePath = "../ApiIntegrationTests/TestData";
                     opt.DeleteFirst = true;
                 });

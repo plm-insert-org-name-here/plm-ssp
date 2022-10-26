@@ -28,4 +28,12 @@ public class Context : DbContext
     public DbSet<Template> Templates => Set<Template>();
     public DbSet<Step> StateChanges => Set<Step>();
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Location>()
+            .HasOne(l => l.Detector)
+            .WithOne(d => d.Location)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+    }
 }
