@@ -22,10 +22,17 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         public int ParentJobId {get; set; }
         public int TaskId { get; set; }
         public int LocationId { get; set; }
-        public IEnumerable<ReqObject> Objects { get; set; } = default!;
-        public record ReqObject(string Name, ObjectCoordinates Coordinates);
-        public IEnumerable<ReqSteps> Steps { get; set; } = default!;
-        public record ReqSteps(int OrderNum, TemplateState ExpectedInitialState, TemplateState ExpectedSubsequentState, int ObjectId, Object Object);
+        public IEnumerable<NewObjectReq> NewObjects { get; set; } = default!;
+        public IEnumerable<ModObjectReq> ModifiedObjects { get; set; } = default!;
+        public List<int> DeletedObjects { get; set; } = default!;
+        public record NewObjectReq(string Name, ObjectCoordinates Coordinates);
+        public record ModObjectReq(int Id, string Name, ObjectCoordinates Coordinates);
+        
+        public IEnumerable<NewStepReq> NewSteps { get; set; } = default!;
+        public IEnumerable<ModStepReq> ModifiedSteps { get; set; } = default!;
+        public List<int> DeletedSteps { get; set; } = default!;
+        public record NewStepReq(int OrderNum, TemplateState ExpectedInitialState, TemplateState ExpectedSubsequentState, int ObjectId, Object Object);
+        public record ModStepReq(int Id, int OrderNum, TemplateState ExpectedInitialState, TemplateState ExpectedSubsequentState, int ObjectId, Object Object);
     }
 
     public override void Configure()
@@ -54,11 +61,19 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             await SendNotFoundAsync(ct);
             return;
         }
-
+        
         task.Location = location;
-        task.Objects = req.Objects.Select(o => Object.Create(o.Name, o.Coordinates)).ToList();
-        task.Steps = req.Steps.Select((s => Step.Create(s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId, s.Object))).ToList();
-
+        
+        //delete
+        task.Objects.RemoveAll(o => req.DeletedObjects.Contains(o.Id));
+        task.Steps.RemoveAll(s => req.DeletedSteps.Contains(s.Id));
+        //modify
+        task.Objects = task.Objects.Where(o => req.ModifiedObjects.Select(m => m.Id).Contains(o.Id)).ToList();
+        task.Steps = task.Steps.Where(s => req.ModifiedSteps.Select(m => m.Id).Contains(s.Id)).ToList();
+        //add
+        task.Objects.AddRange(req.NewObjects.Select(o => Object.Create(o.Name, o.Coordinates)));
+        task.Steps.AddRange(req.NewSteps.Select((s => Step.Create(s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId, s.Object))));
+        
         await JobRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);
     }
