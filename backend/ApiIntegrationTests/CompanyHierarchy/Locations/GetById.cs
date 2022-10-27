@@ -30,6 +30,7 @@ public class GetById : IClassFixture<Setup>
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         
+        Assert.NotNull(result);
         Assert.Equal("Location 1", result.Name);
         Assert.NotNull(result.Detector);
         Assert.Equal("Detector 1", result.Detector.Name);

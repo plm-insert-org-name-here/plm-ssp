@@ -30,6 +30,7 @@ public class GetById : IClassFixture<Setup>
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         
+        Assert.NotNull(result);
         Assert.Equal(2, result.Lines.Count());
     }
 }
