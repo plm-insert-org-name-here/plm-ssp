@@ -57,10 +57,13 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             return;
         }
 
-        //TODO: kényszerek
+        //TODO: check if the name is unique
         task.Name = req.NewName;
-        task.Type = req.NewType;
-        
+        if (!task.Objects.Any() && !task.Steps.Any())
+        {
+            task.Type = req.NewType;
+        }
+
         //need to check the object names
         
         var location = await LocationRepo.GetByIdAsync(req.LocationId, ct);
