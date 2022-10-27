@@ -27,7 +27,6 @@
 
     <ItemGroup>
       <Folder Include="CompanyHierarchy\Sites" />
-      <Folder Include="CompanyHierarchy\Stations" />
     </ItemGroup>
 
 </Project>

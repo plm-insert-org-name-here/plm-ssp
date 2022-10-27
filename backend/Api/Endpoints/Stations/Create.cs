@@ -6,15 +6,6 @@ using Infrastructure;
 
 namespace Api.Endpoints.Stations;
 
-public class CreateValidator : Validator<Create.Req> {
-
-    public CreateValidator()
-    {
-        RuleFor(x => x.Name).MaximumLength(8);
-        RuleFor(x => x.ParentLineId).LessThan(3);
-    }
-}
-
 public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<Line> LineRepo { get; set; } = default!;
