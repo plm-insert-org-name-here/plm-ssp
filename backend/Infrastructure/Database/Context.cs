@@ -25,8 +25,8 @@ public class Context : DbContext
     public DbSet<Job> Jobs => Set<Job>();
     public DbSet<Task> Tasks => Set<Task>();
     public DbSet<TaskInstance> TaskInstances => Set<TaskInstance>();
-    public DbSet<Template> Templates => Set<Template>();
-    public DbSet<Step> StateChanges => Set<Step>();
+    public DbSet<Step> Steps => Set<Step>();
+    public DbSet<Object> Objects => Set<Object>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

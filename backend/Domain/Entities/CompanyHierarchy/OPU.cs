@@ -42,5 +42,4 @@ public class OPU : ICHNodeWithParent<Site>, ICHNodeWithChildren<Line>
 
         return Result.Ok();
     }
-
 }

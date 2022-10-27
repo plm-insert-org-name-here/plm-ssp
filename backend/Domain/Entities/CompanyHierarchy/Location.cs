@@ -10,6 +10,9 @@ public class Location : ICHNodeWithParent<Station>
     public Station Parent { get; set; } = default!;
     public int ParentId { get; set; }
     public Detector? Detector { get; set; }
+    
+    public byte[]? Snapshot { get; set; }
+    
     public Job? Job { get; set; }
 
     private Location() {}
@@ -30,5 +33,4 @@ public class Location : ICHNodeWithParent<Station>
 
         return Result.Ok();
     }
-
 }

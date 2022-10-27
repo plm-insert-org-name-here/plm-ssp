@@ -5,5 +5,6 @@ public enum DetectorState
     Off,
     Standby,
     Streaming,
-    Monitoring
+    Monitoring,
+    Locating
 }

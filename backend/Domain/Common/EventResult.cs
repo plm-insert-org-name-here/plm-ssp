@@ -1,7 +1,10 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Domain.Common;
 
-public enum EventResult
+[Owned]
+public class EventResult
 {
-    Success,
-    Failure,
+    public bool Failure { get; set; }
+    public string FailureReason { get; set; } = default!;
 }

@@ -1,8 +1,6 @@
-using Domain.Common;
 using Domain.Entities;
 using Domain.Interfaces;
 using FastEndpoints;
-using Infrastructure.Database;
 using Domain.Specifications;
 using Task = System.Threading.Tasks.Task;
 
@@ -20,8 +18,6 @@ public class GetById: Endpoint<GetById.Req, GetById.Res>
     {
         public int Id { get; set; }
         public string Name { get; set; } = default!;
-        public JobType Type { get; set; }
-        public byte[] Snapshot { get; set; } = default!;
 
         //TODO Location
 
@@ -34,8 +30,6 @@ public class GetById: Endpoint<GetById.Req, GetById.Res>
     {
         Id = j.Id,
         Name = j.Name,
-        Type = j.Type,
-        Snapshot = j.Snapshot,
         Tasks = j.Tasks.Select(t => new Res.ResTask(t.Id, t.Name)),
     };
     

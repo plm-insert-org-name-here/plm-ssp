@@ -1,4 +1,5 @@
-using TaskStatus = Domain.Common.TaskStatus;
+using Domain.Common;
+using Domain.Entities.CompanyHierarchy;
 
 namespace Domain.Entities.TaskAggregate;
 
@@ -6,11 +7,25 @@ public class Task : IBaseEntity
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;
-    public TaskStatus Status { get; set; }
-    public bool? Ordered { get; set; }
-    public List<Template>? Templates { get; set; }
-    public List<TaskInstance> TaskInstances { get; set; } = default!;
+    public TaskType Type { get; set; } = default!;
+    public Location? Location { get; set; } = default!;
+    public int? LocationId { get; set; }
+    public List<TaskInstance> Instances { get; set; } = default!;
 
-    public Job Job { get; set; } = default!;
-    public int JobId { get; set; }
+    public List<Object> Objects { get; set; } = default!;
+    public List<Step> Steps { get; set; } = default!;
+    
+    private Task() {}
+
+    public Task(string name, List<Object> objects, List<Step> steps)
+    {
+        Name = name;
+        Objects = objects;
+        Steps = steps;
+    }
+
+    public bool IsObjectBelongsTo(int id)
+    {
+        return Objects.Select(o => o.Id).Contains(id);
+    }
 }

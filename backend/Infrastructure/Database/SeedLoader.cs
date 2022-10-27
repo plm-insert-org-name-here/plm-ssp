@@ -38,7 +38,6 @@ public class SeedLoader
 
         SpecialParsers = new Dictionary<PropertyInfo, Func<object?, object?>>
         {
-            { typeof(Job).GetProperty(nameof(Job.Snapshot))!, ParseJobSnapshot },
             {
                 typeof(Detector).GetProperty(nameof(Detector.MacAddress))!,
                 obj => PhysicalAddress.Parse(obj!.ToString()!)
@@ -56,18 +55,6 @@ public class SeedLoader
     {
         var prop = obj.GetType().GetProperty(propName);
         return (T?)prop?.GetValue(obj, null);
-    }
-
-    private object ParseJobSnapshot(object? snapshotPath)
-    {
-        var fullPath = Path.Combine(
-            Env.ContentRootPath,
-            SeedDataPath,
-            FilesPath,
-            snapshotPath!.ToString()!);
-
-        var bytes = File.ReadAllBytes(fullPath);
-        return bytes;
     }
 
     private bool LoadFromJson(string jsonFile)
