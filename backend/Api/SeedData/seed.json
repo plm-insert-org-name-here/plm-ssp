@@ -13,44 +13,44 @@
     {
       "id": 1,
       "name": "OPU 1-1",
-      "siteId": 1
+      "parentId": 1
     },
     {
       "id": 2,
       "name": "OPU 1-2",
-      "siteId": 1
+      "parentId": 1
     },
     {
       "id": 3,
       "name": "OPU 2-1",
-      "siteId": 2
+      "parentId": 2
     },
     {
       "id": 4,
       "name": "OPU 2-2",
-      "siteId": 2
+      "parentId": 2
     }
   ],
   "Lines": [
     {
       "id": 1,
       "name": "Line 1-1",
-      "opuId": 1
+      "parentId": 1
     },
     {
       "id": 2,
       "name": "Line 1-2",
-      "opuId": 1
+      "parentId": 1
     },
     {
       "id": 3,
       "name": "Line 2-1",
-      "opuId": 2
+      "parentId": 2
     },
     {
       "id": 4,
       "name": "Line 2-2",
-      "opuId": 2
+      "parentId": 2
     }
 
   ],
@@ -58,44 +58,44 @@
     {
       "id": 1,
       "name": "Station 1-1",
-      "lineId": 1
+      "parentId": 1
     },
     {
       "id": 2,
       "name": "Station 1-2",
-      "lineId": 1
+      "parentId": 1
     },
     {
       "id": 3,
       "name": "Station 2-1",
-      "lineId": 2
+      "parentId": 2
     },
     {
       "id": 4,
       "name": "Station 2-2",
-      "lineId": 2
+      "parentId": 2
     }
   ],
   "Locations": [
     {
       "id": 1,
       "name": "Location 1",
-      "stationId": 1
+      "parentId": 1
     },
     {
       "id": 2,
       "name": "Location 2",
-      "stationId": 1
+      "parentId": 1
     },
     {
       "id": 3,
       "name": "Location 3",
-      "stationId": 2
+      "parentId": 2
     },
     {
       "id": 4,
       "name": "Location 4",
-      "stationId": 2
+      "parentId": 2
     }
   ],
   "Detectors": [

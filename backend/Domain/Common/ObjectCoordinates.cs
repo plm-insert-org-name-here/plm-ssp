@@ -1,5 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Domain.Common;
 
+[Owned]
 public class ObjectCoordinates
 {
     public int X { get; set; }

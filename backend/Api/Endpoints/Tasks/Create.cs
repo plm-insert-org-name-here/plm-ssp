@@ -1,7 +1,9 @@
 using Domain.Entities;
+using Domain.Entities.TaskAggregate;
 using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure.Database;
+using Object = Domain.Entities.TaskAggregate.Object;
 using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Api.Endpoints.Tasks;
@@ -46,7 +48,9 @@ public class Create: Endpoint<Create.Req, Create.Res>
 
         var task = new Task
         {
-            Name = req.Name
+            Name = req.Name,
+            Objects = new List<Object>(),
+            Steps = new List<Step>()
         };
 
         job.Tasks.Add(task);

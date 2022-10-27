@@ -39,9 +39,9 @@ public static class DbInitializer
         // https://docs.microsoft.com/en-us/ef/core/what-is-new/ef-core-7.0/plan#bulk-updates
 
         // Reset detectors to Off
-        context.Database.ExecuteSqlRaw("UPDATE Detectors SET State = 0");
-
-        // Set Active tasks to Paused
-        context.Database.ExecuteSqlRaw("UPDATE Tasks SET Status = 1 WHERE Status = 0");
+        // context.Database.ExecuteSqlRaw("UPDATE Detectors SET State = 0");
+        //
+        // // Set Active tasks to Paused
+        // context.Database.ExecuteSqlRaw("UPDATE Tasks SET Status = 1 WHERE Status = 0");
     }
 }

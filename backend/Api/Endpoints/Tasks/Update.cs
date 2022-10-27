@@ -19,8 +19,8 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
 
     public class Req
     {
+        public int Id { get; set; }
         public int ParentJobId {get; set; }
-        public int TaskId { get; set; }
         public int LocationId { get; set; }
         public IEnumerable<NewObjectReq> NewObjects { get; set; } = default!;
         public IEnumerable<ModObjectReq> ModifiedObjects { get; set; } = default!;
@@ -40,7 +40,7 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
 
     public override void Configure()
     {
-        Post(Api.Routes.Tasks.Create);
+        Put(Api.Routes.Tasks.Update);
         AllowAnonymous();
         Options(x => x.WithTags("Tasks"));
     }
@@ -48,7 +48,7 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
         var job = await JobRepo.FirstOrDefaultAsync(new JobWithTasksSpec(req.ParentJobId), ct);
-        var task = job.Tasks.FirstOrDefault(t => t.Id == req.TaskId);
+        var task = job.Tasks.FirstOrDefault(t => t.Id == req.Id);
 
         //TODO: custom exceptions
         if (task is null)
@@ -64,7 +64,7 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             task.Type = req.NewType;
         }
 
-        //need to check the object names4
+        //need to check the object names
         
         var location = await LocationRepo.GetByIdAsync(req.LocationId, ct);
 
