@@ -30,9 +30,12 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         
         public IEnumerable<NewStepReq> NewSteps { get; set; } = default!;
         public IEnumerable<ModStepReq> ModifiedSteps { get; set; } = default!;
-        public List<int> DeletedSteps { get; set; } = default!;
-        public record NewStepReq(int OrderNum, TemplateState ExpectedInitialState, TemplateState ExpectedSubsequentState, int ObjectId, Object Object);
-        public record ModStepReq(int Id, int OrderNum, TemplateState ExpectedInitialState, TemplateState ExpectedSubsequentState, int ObjectId, Object Object);
+        public List<int> DeletedSteps { get; set; } = default!; 
+        public record NewStepReq(int OrderNum, TemplateState ExpectedInitialState, TemplateState ExpectedSubsequentState, int ObjectId);
+        public record ModStepReq(int Id, int OrderNum, TemplateState ExpectedInitialState, TemplateState ExpectedSubsequentState, int ObjectId);
+
+        public string NewName { get; set; } = default!;
+        public TaskType NewType { get; set; }
     }
 
     public override void Configure()
@@ -53,10 +56,30 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             await SendNotFoundAsync(ct);
             return;
         }
+
+        //TODO: kényszerek
+        task.Name = req.NewName;
+        task.Type = req.NewType;
+        
+        //need to check the object names
         
         var location = await LocationRepo.GetByIdAsync(req.LocationId, ct);
 
         if (location is null)
+        {
+            await SendNotFoundAsync(ct);
+            return;
+        }
+        
+        //check if steps' object belongs to this task
+        var modified = req.ModifiedSteps.Select(s => task.IsObjectBelongsTo(s.ObjectId));
+        var created = req.NewSteps.Select(s => task.IsObjectBelongsTo(s.ObjectId));
+        if (modified.Any(s => s == false))
+        {
+            await SendNotFoundAsync(ct);
+            return;
+        }
+        if (created.Any(s => s == false))
         {
             await SendNotFoundAsync(ct);
             return;
@@ -72,7 +95,7 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         task.Steps = task.Steps.Where(s => req.ModifiedSteps.Select(m => m.Id).Contains(s.Id)).ToList();
         //add
         task.Objects.AddRange(req.NewObjects.Select(o => Object.Create(o.Name, o.Coordinates)));
-        task.Steps.AddRange(req.NewSteps.Select((s => Step.Create(s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId, s.Object))));
+        task.Steps.AddRange(req.NewSteps.Select((s => Step.Create(s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId))));
         
         await JobRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);

@@ -15,15 +15,14 @@ public class Step : BaseEntity
     // public Template Template { get; set; } = default!;
     // public int TemplateId { get; set; }
 
-    public static Step Create(int newOrderNum, TemplateState newExpectedInitialState, TemplateState newExpectedSubsequentState, int newObjectId, Object newObject)
+    public static Step Create(int newOrderNum, TemplateState newExpectedInitialState, TemplateState newExpectedSubsequentState, int newObjectId)
     {
         return new Step()
         {
             OrderNum = newOrderNum,
             ExpectedInitialState = newExpectedInitialState,
             ExpectedSubsequentState = newExpectedSubsequentState,
-            ObjectId = newObjectId,
-            Object = newObject
+            ObjectId = newObjectId
         };
     }
 }

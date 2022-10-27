@@ -15,4 +15,9 @@ public class Task : BaseEntity
 
     public List<Object> Objects { get; set; } = default!;
     public List<Step> Steps { get; set; } = default!;
+
+    public bool IsObjectBelongsTo(int id)
+    {
+        return Objects.Select(o => o.Id).Contains(id);
+    }
 }
