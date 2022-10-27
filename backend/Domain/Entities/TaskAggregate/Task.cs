@@ -13,8 +13,4 @@ public class Task : IBaseEntity
 
     public Job Job { get; set; } = default!;
     public int JobId { get; set; }
-
-    private Task()
-    {
-    }
 }
