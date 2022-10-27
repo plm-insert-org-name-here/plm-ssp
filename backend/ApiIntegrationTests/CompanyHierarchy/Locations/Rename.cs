@@ -31,6 +31,21 @@ public class Rename : IClassFixture<Setup>
     }
 
     [Fact]
+    public async Task CanRenameSelfToSameName()
+    {
+        Endpoint.Req req = new()
+        {
+            Id = 1,
+            Name = "Location 1"
+        };
+        
+        var (response, result) = await _client.PUTAsync<Endpoint, Endpoint.Req, EmptyResponse>(req);
+        
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact]
     public async Task CantRenameNonexistent()
     {
         Endpoint.Req req = new()
