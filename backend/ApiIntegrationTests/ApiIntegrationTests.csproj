@@ -26,7 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="CompanyHierarchy\OPUs" />
       <Folder Include="CompanyHierarchy\Sites" />
       <Folder Include="CompanyHierarchy\Stations" />
     </ItemGroup>
