@@ -1,10 +1,11 @@
+using System.ComponentModel;
 using System.Net;
 using FastEndpoints;
 using Xunit;
 using Xunit.Priority;
-using Endpoint = Api.Endpoints.Lines.Create;
+using Endpoint = Api.Endpoints.Locations.Create;
 
-namespace ApiIntegrationTests.CompanyHierarchy.Lines;
+namespace ApiIntegrationTests.CompanyHierarchy.Locations;
 
 [Collection("Sequential")]
 [TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]
@@ -12,19 +13,18 @@ public class Create : IClassFixture<Setup>
 {
     private readonly HttpClient _client;
 
-
     public Create(Setup setup)
     {
         _client = setup.Client;
     }
-
+    
     [Fact, Priority(0)]
     public async Task CanCreate()
     {
         Endpoint.Req req = new()
         {
-            Name = "New Line",
-            OPUId = 1
+            Name = "New Location",
+            ParentStationId = 1
         };
 
         var (response, result) = await _client.POSTAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req);
@@ -34,7 +34,7 @@ public class Create : IClassFixture<Setup>
 
         Assert.NotNull(result);
         Assert.Equal(5, result.Id);
-        Assert.Equal("New Line", result.Name);
+        Assert.Equal("New Location", result.Name);
     }
 
     [Fact, Priority(10)]
@@ -42,8 +42,8 @@ public class Create : IClassFixture<Setup>
     {
         Endpoint.Req req = new()
         {
-            Name = "New Line 2",
-            OPUId = 10
+            Name = "New Location 2",
+            ParentStationId = 1000
         };
 
         var (response, result) = await _client.POSTAsync<Endpoint, Endpoint.Req, EmptyResponse>(req);
@@ -57,8 +57,8 @@ public class Create : IClassFixture<Setup>
     {
         Endpoint.Req req = new()
         {
-            Name = "Line 2-2",
-            OPUId = 2
+            Name = "Location 1",
+            ParentStationId = 1
         };
 
         var (response, result) = await _client.POSTAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req);
@@ -72,8 +72,8 @@ public class Create : IClassFixture<Setup>
     {
         Endpoint.Req req = new()
         {
-            Name = "Line 2-2",
-            OPUId = 1
+            Name = "Location 3",
+            ParentStationId = 1
         };
 
         var (response, result) = await _client.POSTAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req);

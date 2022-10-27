@@ -1,5 +1,6 @@
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
+using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure;
 
@@ -25,7 +26,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var line = await LineRepo.GetByIdAsync(req.Id, ct);
+        var line = await LineRepo.FirstOrDefaultAsync(new CHNodeWithParentSpec<OPU, Line>(req.Id), ct);
 
         if (line is null)
         {

@@ -1,4 +1,3 @@
-using FastEndpoints;
 using FluentResults;
 using Infrastructure.Exceptions;
 
