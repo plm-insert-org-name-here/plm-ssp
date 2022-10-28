@@ -1,6 +1,6 @@
 namespace Domain.Common;
 
-public enum TaskStatus
+public enum TaskState
 {
     Active,
     Paused,
