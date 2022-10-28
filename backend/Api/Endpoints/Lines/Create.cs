@@ -1,13 +1,20 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
+using Infrastructure;
 
 namespace Api.Endpoints.Lines;
 
 public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<OPU> OpuRepo { get; set; } = default!;
+
+    public ICHNameUniquenessChecker<OPU, Line> NameUniquenessChecker
+    {
+        get;
+        set;
+    } = default!;
 
     public class Req
     {
@@ -37,7 +44,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var opu = await OpuRepo.FirstOrDefaultAsync(new OPUWithLinesSpec(req.OPUId), ct);
+        var opu = await OpuRepo.FirstOrDefaultAsync(new CHNodeWithChildrenSpec<OPU, Line>(req.OPUId), ct);
 
         if (opu is null)
         {
@@ -45,15 +52,12 @@ public class Create : Endpoint<Create.Req, Create.Res>
             return;
         }
 
-        var line = new Line
-        {
-            Name = req.Name
-        };
+        var result = opu.AddChildNode(req.Name, NameUniquenessChecker);
+        var newLine = result.Unwrap();
 
-        opu.Lines.Add(line);
         await OpuRepo.SaveChangesAsync(ct);
 
-        var res = MapOut(line);
-        await SendCreatedAtAsync<Create>(new { line.Id }, res, null, null, false, ct);
+        var res = MapOut(newLine);
+        await SendCreatedAtAsync<Create>(new { newLine.Id }, res, null, null, false, ct);
     }
 }

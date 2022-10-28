@@ -1,6 +1,5 @@
-using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+using Domain.Interfaces;
 
 namespace Infrastructure.Database;
 

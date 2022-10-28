@@ -1,7 +1,7 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
 
 namespace Api.Endpoints.Stations;
 
@@ -27,7 +27,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
     {
         Id = s.Id,
         Name = s.Name,
-        Locations = s.Locations.Select(o => new Res.LocationRes(o.Id, o.Name))
+        Locations = s.Children.Select(o => new Res.LocationRes(o.Id, o.Name))
     };
 
     public override void Configure()
@@ -39,7 +39,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var station = await StationRepo.FirstOrDefaultAsync(new StationWithLocationsSpec(req.Id), ct);
+        var station = await StationRepo.FirstOrDefaultAsync(new CHNodeWithChildrenSpec<Station, Location>(req.Id), ct);
 
         if (station is null)
         {

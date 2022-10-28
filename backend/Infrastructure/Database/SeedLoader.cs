@@ -20,7 +20,7 @@ public class SeedLoader
     private IHostEnvironment Env { get; }
     private ILogger Logger { get; }
 
-    private const string SeedDataPath = "SeedData";
+    private string SeedDataPath = "SeedData";
     private const string FilesPath = "Files";
 
     private Dictionary<PropertyInfo, Func<object?, object?>> SpecialParsers { get; }
@@ -82,7 +82,8 @@ public class SeedLoader
 
             foreach (var obj in objects)
             {
-                var inst = Activator.CreateInstance(dbSetInnerType);
+                var cons = dbSetInnerType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
+                var inst = cons.Invoke(null);
 
                 foreach (var (parsedPropName, parsedPropValue) in obj)
                 {
@@ -134,8 +135,9 @@ public class SeedLoader
         return true;
     }
 
-    public void Load()
+    public void Load(DbOpt config)
     {
+        SeedDataPath = config.SeedFolderRelativePath;
         var path = Path.Combine(Env.ContentRootPath, SeedDataPath);
         var jsonFiles = Directory.GetFiles(path).Where(f => f.EndsWith(".json")).ToArray();
 
@@ -144,6 +146,7 @@ public class SeedLoader
             var success = LoadFromJson(jsonFile);
             if (!success)
             {
+                // TODO(rg): if seeding failed, delete the database
                 Logger.Error("Seeding was cancelled due to errors");
                 return;
             }

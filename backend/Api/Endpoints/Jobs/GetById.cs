@@ -1,7 +1,6 @@
-using Domain.Common;
 using Domain.Entities;
+using Domain.Interfaces;
 using FastEndpoints;
-using Infrastructure.Database;
 using Domain.Specifications;
 using Task = System.Threading.Tasks.Task;
 

@@ -1,12 +1,20 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
+using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
+using Infrastructure;
 
 namespace Api.Endpoints.Locations;
 
 public class Rename : Endpoint<Rename.Req, EmptyResponse>
 {
     public IRepository<Location> LocationRepo { get; set; } = default!;
+
+    public ICHNameUniquenessChecker<Station, Location> NameUniquenessChecker
+    {
+        get;
+        set;
+    } = default!;
 
     public class Req
     {
@@ -23,7 +31,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var location = await LocationRepo.GetByIdAsync(req.Id, ct);
+        var location = await LocationRepo.FirstOrDefaultAsync(new CHNodeWithParentSpec<Station, Location>(req.Id), ct);
 
         if (location is null)
         {
@@ -31,7 +39,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
             return;
         }
 
-        location.Name = req.Name;
+        location.Rename(req.Name, NameUniquenessChecker).Unwrap();
 
         await LocationRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);

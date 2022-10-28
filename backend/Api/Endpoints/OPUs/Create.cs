@@ -1,12 +1,19 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
+using Infrastructure;
 
 namespace Api.Endpoints.OPUs;
 public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<Site> SiteRepo { get; set; } = default!;
+    public ICHNameUniquenessChecker<Site, OPU> NameUniquenessChecker
+    {
+        get;
+        set;
+    } = default!;
+
     public class Req
     {
         public int ParentSiteId { get; set; }
@@ -34,7 +41,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var site = await SiteRepo.FirstOrDefaultAsync(new SiteWithOPUsSpec(req.ParentSiteId), ct);
+        var site = await SiteRepo.FirstOrDefaultAsync(new CHNodeWithChildrenSpec<Site, OPU>(req.ParentSiteId), ct);
 
         if (site is null)
         {
@@ -42,17 +49,13 @@ public class Create : Endpoint<Create.Req, Create.Res>
             return;
         }
 
-        var opu = new OPU
-        {
-            Name = req.Name
-        };
-
-        site.OPUs.Add(opu);
+        var result = site.AddChildNode(req.Name, NameUniquenessChecker);
+        var newOpu = result.Unwrap();
 
         await SiteRepo.SaveChangesAsync(ct);
 
-        var res = MapOut(opu);
+        var res = MapOut(newOpu);
 
-        await SendCreatedAtAsync<Create>(new { opu.Id }, res, null, null, false, ct);
+        await SendCreatedAtAsync<Create>(new { newOpu.Id }, res, null, null, false, ct);
     }
 }

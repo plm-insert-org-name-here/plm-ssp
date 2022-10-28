@@ -1,4 +1,5 @@
 using System;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,16 +9,21 @@ namespace Infrastructure.Database;
 
 public static class DbExt
 {
-    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration config)
     {
+        var dbConfigSection = config.GetSection(DbOpt.SectionName);
+        services.Configure<DbOpt>(dbConfigSection);
+
+        var dbOpt = dbConfigSection.Get<DbOpt>();
+        Console.WriteLine("Connection string: " + dbOpt.ConnectionString);
+
         Action<DbContextOptionsBuilder> dbOptions = options =>
         {
             options.EnableSensitiveDataLogging();
 
-            var connString = configuration.GetConnectionString("Default");
-            var serverVersion = ServerVersion.AutoDetect(connString);
 
-            options.UseMySql(connString, serverVersion);
+            var serverVersion = ServerVersion.AutoDetect(dbOpt.ConnectionString);
+            options.UseMySql(dbOpt.ConnectionString, serverVersion);
         };
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

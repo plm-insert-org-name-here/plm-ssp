@@ -1,6 +1,6 @@
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
 
 namespace Api.Endpoints.Tasks;
 

@@ -1,13 +1,21 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
+using Infrastructure;
 
 namespace Api.Endpoints.Locations;
 
 public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<Station> StationRepo { get; set; } = default!;
+
+    public ICHNameUniquenessChecker<Station, Location> NameUniquenessChecker
+    {
+        get;
+        set;
+    } = default!;
+
     public class Req
     {
         public int ParentStationId { get; set; }
@@ -35,7 +43,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var station = await StationRepo.FirstOrDefaultAsync(new StationWithLocationsSpec(req.ParentStationId), ct);
+        var station = await StationRepo.FirstOrDefaultAsync(new CHNodeWithChildrenSpec<Station, Location>(req.ParentStationId), ct);
 
         if (station is null)
         {
@@ -43,17 +51,13 @@ public class Create : Endpoint<Create.Req, Create.Res>
             return;
         }
 
-        var location = new Location
-        {
-            Name = req.Name
-        };
-
-        station.Locations.Add(location);
+        var result = station.AddChildNode(req.Name, NameUniquenessChecker);
+        var newLocation = result.Unwrap();
 
         await StationRepo.SaveChangesAsync(ct);
 
-        var res = MapOut(location);
+        var res = MapOut(newLocation);
 
-        await SendCreatedAtAsync<Create>(new { location.Id }, res, null, null, false, ct);
+        await SendCreatedAtAsync<Create>(new { newLocation.Id }, res, null, null, false, ct);
     }
 }

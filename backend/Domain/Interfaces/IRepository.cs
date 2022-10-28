@@ -1,6 +1,6 @@
 using Ardalis.Specification;
 
-namespace Infrastructure.Database;
+namespace Domain.Interfaces;
 
 public interface IRepository<T> : IRepositoryBase<T> where T : class
 {

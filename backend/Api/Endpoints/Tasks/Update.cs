@@ -2,11 +2,10 @@ using Domain.Common;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Entities.TaskAggregate;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
 using Object = Domain.Entities.TaskAggregate.Object;
-using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Api.Endpoints.Tasks;
 
@@ -48,7 +47,7 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
         var job = await JobRepo.FirstOrDefaultAsync(new JobWithTasksSpec(req.ParentJobId), ct);
-        var task = job.Tasks.FirstOrDefault(t => t.Id == req.Id);
+        var task = job!.Tasks.FirstOrDefault(t => t.Id == req.Id);
 
         //TODO: custom exceptions
         if (task is null)

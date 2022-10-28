@@ -1,15 +1,20 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
+using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
-using Microsoft.AspNetCore.Http;
+using Infrastructure;
 
 namespace Api.Endpoints.OPUs;
 
 public class Rename : Endpoint<Rename.Req, EmptyResponse>
 {
     public IRepository<OPU> OpuRepo { get; set; } = default!;
+
+    public ICHNameUniquenessChecker<Site, OPU> NameUniquenessChecker
+    {
+        get;
+        set;
+    } = default!;
 
     public class Req
     {
@@ -26,7 +31,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var opu = await OpuRepo.GetByIdAsync(req.Id, ct);
+        var opu = await OpuRepo.FirstOrDefaultAsync(new CHNodeWithParentSpec<Site, OPU>(req.Id), ct);
 
         if (opu is null)
         {
@@ -34,7 +39,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
             return;
         }
 
-        opu.Name = req.Name;
+        opu.Rename(req.Name, NameUniquenessChecker).Unwrap();
 
         await OpuRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);

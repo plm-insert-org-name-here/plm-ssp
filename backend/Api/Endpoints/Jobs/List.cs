@@ -1,7 +1,6 @@
-using Domain.Common;
 using Domain.Entities;
+using Domain.Interfaces;
 using FastEndpoints;
-using Infrastructure.Database;
 
 namespace Api.Endpoints.Jobs;
 

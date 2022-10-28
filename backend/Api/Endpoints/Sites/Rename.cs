@@ -1,15 +1,14 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using FastEndpoints;
-using Infrastructure.Database;
-using Microsoft.AspNetCore.Http;
+using Infrastructure;
 
 namespace Api.Endpoints.Sites;
 
 public class Rename : Endpoint<Rename.Req, EmptyResponse>
 {
     public IRepository<Site> SiteRepo { get; set; } = default!;
+    public ICHNameUniquenessChecker<Site> NameUniquenessChecker { get; set; } = default!;
 
     public class Req
     {
@@ -34,7 +33,7 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
             return;
         }
 
-        site.Name = req.Name;
+        site.Rename(req.Name, NameUniquenessChecker).Unwrap();
 
         await SiteRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);

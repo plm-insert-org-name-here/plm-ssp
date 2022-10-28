@@ -1,13 +1,16 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
-using Infrastructure.Database;
+using Infrastructure;
 
 namespace Api.Endpoints.Stations;
 
 public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<Line> LineRepo { get; set; } = default!;
+    public ICHNameUniquenessChecker<Line, Station> NameUniquenessChecker { get; set; } = default!;
+
     public class Req
     {
         public int ParentLineId { get; set; }
@@ -35,7 +38,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var line = await LineRepo.FirstOrDefaultAsync(new LineWithStationsSpec(req.ParentLineId), ct);
+        var line = await LineRepo.FirstOrDefaultAsync(new CHNodeWithChildrenSpec<Line, Station>(req.ParentLineId), ct);
 
         if (line is null)
         {
@@ -43,17 +46,13 @@ public class Create : Endpoint<Create.Req, Create.Res>
             return;
         }
 
-        var station = new Station
-        {
-            Name = req.Name
-        };
-
-        line.Stations.Add(station);
+        var result = line.AddChildNode(req.Name, NameUniquenessChecker);
+        var newStation = result.Unwrap();
 
         await LineRepo.SaveChangesAsync(ct);
 
-        var res = MapOut(station);
+        var res = MapOut(newStation);
 
-        await SendCreatedAtAsync<Create>(new { station.Id }, res, null, null, false, ct);
+        await SendCreatedAtAsync<Create>(new { newStation.Id }, res, null, null, false, ct);
     }
 }

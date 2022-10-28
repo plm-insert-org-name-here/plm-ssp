@@ -1,9 +1,6 @@
-using Ardalis.Specification;
-using Domain.Common;
 using Domain.Entities;
-using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using FastEndpoints;
-using Infrastructure.Database;
 
 namespace Api.Endpoints.Jobs;
 
@@ -25,10 +22,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
     }
     
     private static Job MapIn(Req r) =>
-        new()
-        {
-            Name = r.Name
-        };
+        new(name: r.Name);
 
     private static Res MapOut(Job j) =>
         new()

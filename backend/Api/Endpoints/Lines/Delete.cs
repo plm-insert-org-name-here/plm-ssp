@@ -1,6 +1,6 @@
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using FastEndpoints;
-using Infrastructure.Database;
 
 namespace Api.Endpoints.Lines;
 
