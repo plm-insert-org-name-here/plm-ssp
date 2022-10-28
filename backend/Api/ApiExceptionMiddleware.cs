@@ -55,7 +55,7 @@ public class ApiExceptionMiddleware
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            var res = new ApiExceptionResponse()
+            var res = new ApiExceptionResponse
             {
                 StatusCode = context.Response.StatusCode,
                 Description = "An unknown server error occurred."
