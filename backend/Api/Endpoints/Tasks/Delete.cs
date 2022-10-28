@@ -26,7 +26,7 @@ public class Delete: Endpoint<Delete.Req, EmptyResponse>
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
         var job = await JobRepo.GetByIdAsync(req.ParentJobId, ct);
-
+        
         if (job is null)
         {
             await SendNotFoundAsync(ct);
@@ -42,7 +42,8 @@ public class Delete: Endpoint<Delete.Req, EmptyResponse>
         }
         
         job.DeleteTask(task);
-
+        await TaskRepo.DeleteAsync(task);
+        await JobRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);
     }
 }

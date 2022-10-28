@@ -39,7 +39,6 @@ public class Create: Endpoint<Create.Req, Create.Res>
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
         var job = await JobRepo.FirstOrDefaultAsync(new JobWithTasksSpec(req.ParentJobId), ct);
-
         if (job is null)
         {
             await SendNotFoundAsync(ct);

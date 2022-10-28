@@ -7,7 +7,7 @@ public class Job : BaseEntity
     public string Name { get; set; } = default!;
     public List<Task> Tasks { get; set; } = default!;
 
-    public async void DeleteTask(Task task)
+    public void DeleteTask(Task task)
     {
         Tasks.Remove(task);
     }
