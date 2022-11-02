@@ -8,8 +8,8 @@ namespace Api.Endpoints.Detectors;
 
 public class Stream : Endpoint<Stream.Req>
 {
-    public readonly IRepository<Detector> DetectorRepo = default!;
-    public readonly IDetectorConnection DetectorConnection = default!;
+    public IRepository<Detector> DetectorRepo { get; set; } = default!;
+    public IDetectorConnection DetectorConnection { get; set; }= default!;
 
     public class Req
     {
@@ -40,7 +40,9 @@ public class Stream : Endpoint<Stream.Req>
         }
 
         var stream = await DetectorConnection.RequestStream(detector);
-
-        await SendStreamAsync(stream, null, cancellation: ct);
+        
+        // NOTE(rg): content type is necessary if we want to view the stream directly from the browser; otherwise,
+        // it will be downloaded as a file
+        await SendStreamAsync(stream, null, cancellation: ct, contentType: "multipart/x-mixed-replace; boundary=frame");
     }
 }

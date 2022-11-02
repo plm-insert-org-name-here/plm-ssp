@@ -1,11 +1,13 @@
 using Domain.Common;
 using Domain.Entities;
 using Domain.Interfaces;
+using System.Net.Http;
 
 namespace Domain.Services;
 
-public class DetectorHTTPConnection : IDetectorConnection
+public class DetectorHttpConnection : IDetectorConnection
 {
+    private readonly System.Net.Http.
     // TODO(rg): HTTP client
     // all of these methods involve a HTTP client which must be initialized with the detector's IP address.
     // Detectors call the Identify endpoint on startup, and send their MAC and IP addresses

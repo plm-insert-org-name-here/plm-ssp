@@ -10,6 +10,7 @@ using FastEndpoints.Swagger;
 using Infrastructure;
 using Infrastructure.Database;
 using Infrastructure.Logging;
+using Infrastructure.OpenApi;
 using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +23,7 @@ builder.Services.AddDatabase(builder.Configuration);
 
 builder.Services.AddScoped<ICHNameUniquenessChecker<Site>, SiteNameUniquenessChecker>();
 builder.Services.AddScoped(typeof(ICHNameUniquenessChecker<,>), typeof(CHNameUniquenessChecker<,>));
-builder.Services.AddScoped<IDetectorConnection, DetectorHTTPConnection>();
+builder.Services.AddScoped<IDetectorConnection, DetectorHttpConnection>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();

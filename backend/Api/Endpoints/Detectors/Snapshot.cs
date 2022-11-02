@@ -8,8 +8,8 @@ namespace Api.Endpoints.Detectors;
 
 public class Snapshot : Endpoint<Snapshot.Req>
 {
-    public readonly IRepository<Detector> DetectorRepo = default!;
-    public readonly IDetectorConnection DetectorConnection = default!;
+    public IRepository<Detector> DetectorRepo { get; set; } = default!;
+    public IDetectorConnection DetectorConnection { get; set; }= default!;
 
     public class Req
     {

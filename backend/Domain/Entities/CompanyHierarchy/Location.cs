@@ -12,7 +12,7 @@ public class Location : ICHNodeWithParent<Station>
     public Station Parent { get; set; } = default!;
     public int ParentId { get; set; }
     public Detector? Detector { get; set; }
-    public Task[] Tasks { get; set; } = default!;
+    public List<Task> Tasks { get; set; } = default!;
     
     public byte[]? Snapshot { get; set; }
 

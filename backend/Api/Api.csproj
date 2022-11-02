@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Ardalis.ApiEndpoints" Version="4.0.1" />
       <PackageReference Include="FastEndpoints" Version="5.2.1.5-beta" />
       <PackageReference Include="FastEndpoints.ClientGen" Version="5.2.1.16-beta" />
     </ItemGroup>
