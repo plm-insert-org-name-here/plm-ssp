@@ -51,6 +51,7 @@ public static class Routes
     {
         public const string Command = "detectors/{id}/command";
         public const string Snapshot = "detectors/{id}/snapshot";
+        public const string Stream = "detectors/{id}/stream";
         
         public const string GetAll = "detectors";
         public const string GetAllAttachable = "detectors/attachable";
