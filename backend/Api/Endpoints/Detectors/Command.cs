@@ -8,8 +8,8 @@ namespace Api.Endpoints.Detectors;
 
 public class Command : Endpoint<Command.Req, EmptyResponse>
 {
-    public IRepository<Detector> DetectorRepo;
-    public IDetectorConnection DetectorConnection;
+    public readonly IRepository<Detector> DetectorRepo = default!;
+    public readonly IDetectorConnection DetectorConnection = default!;
     
     public class Req
     {

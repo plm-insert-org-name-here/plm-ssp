@@ -6,19 +6,14 @@ using FastEndpoints;
 
 namespace Api.Endpoints.Detectors;
 
-public class Snapshot : Endpoint<Snapshot.Req, Snapshot.Res>
+public class Snapshot : Endpoint<Snapshot.Req>
 {
-    public IRepository<Detector> DetectorRepo;
-    public IDetectorConnection DetectorConnection;
+    public readonly IRepository<Detector> DetectorRepo = default!;
+    public readonly IDetectorConnection DetectorConnection = default!;
 
     public class Req
     {
         public int Id { get; set; }
-    }
-
-    public class Res
-    {
-        public byte[] Snapshot { get; set; } = default!;
     }
 
     public override void Configure()
@@ -52,6 +47,6 @@ public class Snapshot : Endpoint<Snapshot.Req, Snapshot.Res>
 
         var snapshot = await DetectorConnection.RequestSnapshot(detector);
 
-        await SendOkAsync(new Res { Snapshot = snapshot }, ct);
+        await SendBytesAsync(snapshot, cancellation: ct);
     }
 }
