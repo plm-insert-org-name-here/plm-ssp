@@ -1,7 +1,7 @@
 using NSwag;
 using NSwag.CodeGeneration.OperationNameGenerators;
 
-namespace Infrastructure;
+namespace Infrastructure.OpenApi;
 
 public class ShorterOperationNameGenerator : SingleClientFromOperationIdOperationNameGenerator
 {

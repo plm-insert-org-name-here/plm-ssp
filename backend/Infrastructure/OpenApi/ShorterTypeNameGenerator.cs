@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NJsonSchema;
 
-namespace Infrastructure;
+namespace Infrastructure.OpenApi;
 
 public class ShorterTypeNameGenerator : DefaultTypeNameGenerator
 {

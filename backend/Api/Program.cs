@@ -1,5 +1,7 @@
 global using FluentValidation;
+using System.Text.Json.Serialization;
 using Api;
+using Application.Services;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Services;
@@ -9,6 +11,8 @@ using FastEndpoints.Swagger;
 using Infrastructure;
 using Infrastructure.Database;
 using Infrastructure.Logging;
+using Infrastructure.OpenApi;
+using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,12 +24,16 @@ builder.Services.AddDatabase(builder.Configuration);
 
 builder.Services.AddScoped<ICHNameUniquenessChecker<Site>, SiteNameUniquenessChecker>();
 builder.Services.AddScoped(typeof(ICHNameUniquenessChecker<,>), typeof(CHNameUniquenessChecker<,>));
+builder.Services.AddScoped<IDetectorConnection, DetectorHttpConnection>();
 
+builder.Services.AddHttpClient();
 
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();
 builder.Services.AddSwaggerDoc(s =>
 {
+    s.SerializerSettings.Converters.Add(new StringEnumConverter());
+    s.GenerateEnumMappingDescription = true;
     s.DocumentName = "Version 1";
 });
 
@@ -73,6 +81,7 @@ app.UseMiddleware<ApiExceptionMiddleware>();
 
 app.UseFastEndpoints(options =>
 {
+    options.Serializer.Options.Converters.Add(new JsonStringEnumConverter());
     options.Endpoints.Configurator = o =>
     {
         o.DontAutoTag();

@@ -8,6 +8,7 @@ public class Task : IBaseEntity
     public int Id { get; set; }
     public string Name { get; set; } = default!;
     public TaskType Type { get; set; } = default!;
+    public TaskState State { get; set; }
     public Location? Location { get; set; } = default!;
     public int? LocationId { get; set; }
     public List<TaskInstance> Instances { get; set; } = default!;

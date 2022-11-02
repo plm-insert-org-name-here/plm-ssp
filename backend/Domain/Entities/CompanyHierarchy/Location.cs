@@ -1,6 +1,7 @@
 using Domain.Common;
 using Domain.Interfaces;
 using FluentResults;
+using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Domain.Entities.CompanyHierarchy;
 
@@ -11,10 +12,9 @@ public class Location : ICHNodeWithParent<Station>
     public Station Parent { get; set; } = default!;
     public int ParentId { get; set; }
     public Detector? Detector { get; set; }
+    public List<Task> Tasks { get; set; } = default!;
     
     public byte[]? Snapshot { get; set; }
-    
-    public Job? Job { get; set; }
 
     private Location() {}
 
