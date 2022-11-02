@@ -50,6 +50,7 @@ public static class Routes
     public static class Detectors
     {
         public const string Command = "detectors/{id}/command";
+        public const string Snapshot = "detectors/{id}/snapshot";
         
         public const string GetAll = "detectors";
         public const string GetAllAttachable = "detectors/attachable";
