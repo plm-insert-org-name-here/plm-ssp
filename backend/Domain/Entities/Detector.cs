@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.NetworkInformation;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
@@ -14,6 +15,7 @@ public class Detector : IBaseEntity
 
     public Location? Location { get; set; }
     public int? LocationId { get; set; }
+    public IPAddress IpAddress { get; set; }
 
     private Detector() { }
     public List<HeartBeatLog> HearthBeatLogs { get; set; } = default!;
@@ -27,11 +29,12 @@ public class Detector : IBaseEntity
         public int Uptime { get; set; }
     }
 
-    public Detector(string newName, PhysicalAddress newMacAddress, int newLocationId)
+    public Detector(string newName, PhysicalAddress newMacAddress, int newLocationId, IPAddress newAddress)
     {
         Name = newName;
         MacAddress = newMacAddress;
         LocationId = newLocationId;
         HearthBeatLogs = new List<HeartBeatLog>();
+        IpAddress = newAddress;
     }
 }

@@ -41,7 +41,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         
         if (detector is null)
         {
-            var newDetector = new Detector(req.MacAddress, phisicalMacAddress, req.LocationId);
+            var newDetector = new Detector(req.MacAddress, phisicalMacAddress, req.LocationId, HttpContext.Connection.RemoteIpAddress);
             await DetectorRepo.AddAsync(newDetector, ct);
             var result = location.AttachDetector(newDetector);
             await LocationRepo.SaveChangesAsync(ct);
