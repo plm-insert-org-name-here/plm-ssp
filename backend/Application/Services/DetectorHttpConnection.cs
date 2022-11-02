@@ -1,17 +1,20 @@
 using Domain.Common;
 using Domain.Entities;
 using Domain.Interfaces;
-using System.Net.Http;
 
-namespace Domain.Services;
+namespace Application.Services;
 
 public class DetectorHttpConnection : IDetectorConnection
 {
-    private readonly System.Net.Http.
-    // TODO(rg): HTTP client
     // all of these methods involve a HTTP client which must be initialized with the detector's IP address.
     // Detectors call the Identify endpoint on startup, and send their MAC and IP addresses
-    
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public DetectorHttpConnection(IHttpClientFactory httpClientFactory)
+    {
+        _httpClientFactory = httpClientFactory;
+    }
+
     public Task SendCommand(Detector detector, DetectorCommand command)
     {
         throw new NotImplementedException();
@@ -22,8 +25,9 @@ public class DetectorHttpConnection : IDetectorConnection
         throw new NotImplementedException();
     }
 
-    public Task<Stream> RequestStream(Detector detector)
+    public async Task<Stream> RequestStream(Detector detector)
     {
-        throw new NotImplementedException();
+        var client = _httpClientFactory.CreateClient();
+        return await client.GetStreamAsync("http://127.0.0.1:3000/stream");
     }
 }

@@ -1,6 +1,7 @@
 global using FluentValidation;
 using System.Text.Json.Serialization;
 using Api;
+using Application.Services;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Services;
@@ -24,6 +25,8 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddScoped<ICHNameUniquenessChecker<Site>, SiteNameUniquenessChecker>();
 builder.Services.AddScoped(typeof(ICHNameUniquenessChecker<,>), typeof(CHNameUniquenessChecker<,>));
 builder.Services.AddScoped<IDetectorConnection, DetectorHttpConnection>();
+
+builder.Services.AddHttpClient();
 
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();
