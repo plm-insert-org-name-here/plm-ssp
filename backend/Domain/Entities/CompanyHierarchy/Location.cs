@@ -27,7 +27,7 @@ public class Location : ICHNodeWithParent<Station>
     {
         if (nameUniquenessChecker.IsDuplicate(Parent, newName, this).GetAwaiter().GetResult())
         {
-            return Result.Fail("Duplicate name");
+            return Result.Fail("Duplicate name!");
         }
 
         Name = newName;
@@ -40,10 +40,34 @@ public class Location : ICHNodeWithParent<Station>
         if (Detector is null)
         {
             Detector = newDetector;
-            return Result.Fail("Location already have a detector attached to it");
+            return Result.Ok();
         }
         else
         {
+            if (Detector.State == DetectorState.Off)
+            {
+                Detector = newDetector;
+                return Result.Ok();
+            }
+            return Result.Fail("Location already have a detector attached to it!");
+            
+        }
+    }
+
+    public Result DetachDetector()
+    {
+        if (Detector is null)
+        {
+            return Result.Fail("Location already does not have a detector attached to it!");
+        }
+        else
+        {
+            if (Detector.State == DetectorState.Streaming)
+            {
+                return Result.Fail("An other detector currently running on this location!");
+            }
+
+            Detector = null;
             return Result.Ok();
         }
     }

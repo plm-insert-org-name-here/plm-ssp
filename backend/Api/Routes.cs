@@ -58,14 +58,19 @@ public static class Routes
         public const string GetById = "detectors/{id}";
         public const string Update = "detectors/{id}";
         public const string Delete = "detectors/{id}";
-        public const string Attach = "detectors/{id}/attach";
-        public const string Detach = "detectors/{id}/detach";
+
+        public const string SendCommand = "detectors/{id}/command";
+        public const string Attach = "detectors/{LocationId}/attach/{DetectorId}";
+        public const string Detach = "detectors/{LocationId}/detach";
+
         public const string Controller = "/" + "detectors/controller";
         public const string DetectorHub = "/" + "detector_hub";
 
         public const string StreamGroupPrefix = "Stream-";
         
         public const string Identify = "detectors/{LocationId}/identify";
+        public const string HeartBeat = "detectors/{MacAddress}/heartbeat";
+        
     }
 
     public static class Jobs
@@ -85,6 +90,8 @@ public static class Routes
         public const string Update = "tasks/{id}";
         public const string Delete = "tasks/{id}";
         public const string AbandonInstance = "tasks/{id}/abandon";
+        public const string EventPost = "tasks/{TaskId}/events";
+        public const string GetObjectsAndEvents = "tasks/{TaskId}/objects_and_steps";
     }
 
     public static class Events

@@ -14,7 +14,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
     public IRepository<Location> LocationRepo { get; set; } = default!;
     public class Req
     {
-        public int Locationid { get; set; }
+        public int LocationId { get; set; }
         public string  MacAddress { get; set; } = default!;
     }
 
@@ -28,9 +28,9 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
         var phisicalMacAddress = PhysicalAddress.Parse(req.MacAddress);
-        Console.WriteLine("test");
+
         var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(phisicalMacAddress), ct);
-        var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(req.Locationid), ct);
+        var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(req.LocationId), ct);
 
         if (location is null)
         {
@@ -41,7 +41,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         
         if (detector is null)
         {
-            var newDetector = new Detector(req.MacAddress, phisicalMacAddress, req.Locationid);
+            var newDetector = new Detector(req.MacAddress, phisicalMacAddress, req.LocationId);
             await DetectorRepo.AddAsync(newDetector, ct);
             var result = location.AttachDetector(newDetector);
             await LocationRepo.SaveChangesAsync(ct);
@@ -50,7 +50,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
             return;
         }
         
-        detector.LocationId = req.Locationid;
+        detector.LocationId = req.LocationId;
         var result2 = location.AttachDetector(detector);
         await DetectorRepo.SaveChangesAsync(ct);
         await LocationRepo.SaveChangesAsync(ct);
