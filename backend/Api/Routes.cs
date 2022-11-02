@@ -63,6 +63,7 @@ public static class Routes
         public const string StreamGroupPrefix = "Stream-";
         
         public const string Identify = "detectors/{LocationId}/identify";
+        public const string HeartBeat = "detectors/{MacAddress}/heartbeat";
     }
 
     public static class Jobs

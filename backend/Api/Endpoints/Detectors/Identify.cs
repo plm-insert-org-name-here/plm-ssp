@@ -28,7 +28,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
         var phisicalMacAddress = PhysicalAddress.Parse(req.MacAddress);
-        Console.WriteLine("test");
+
         var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(phisicalMacAddress), ct);
         var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(req.Locationid), ct);
 
