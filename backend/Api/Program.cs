@@ -4,7 +4,9 @@ using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Services;
 using FastEndpoints;
+using FastEndpoints.ClientGen;
 using FastEndpoints.Swagger;
+using Infrastructure;
 using Infrastructure.Database;
 using Infrastructure.Logging;
 
@@ -22,7 +24,11 @@ builder.Services.AddScoped(typeof(ICHNameUniquenessChecker<,>), typeof(CHNameUni
 
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();
-builder.Services.AddSwaggerDoc();
+builder.Services.AddSwaggerDoc(s =>
+{
+    s.DocumentName = "Version 1";
+});
+
 builder.Services.AddSignalR();
 builder.Services.AddCors();
 
@@ -38,6 +44,14 @@ if (app.Environment.IsDevelopment())
         c.ConfigureDefaults();
     });
 }
+
+app.MapTypeScriptClientEndpoint("/ts-client", "Version 1", s =>
+{
+    s.ClassName = "ApiClient";
+    s.TypeScriptGeneratorSettings.Namespace = "ApiClient";
+    s.TypeScriptGeneratorSettings.TypeNameGenerator = new ShorterTypeNameGenerator();
+    s.OperationNameGenerator = new ShorterOperationNameGenerator();
+});
 
 app.UseCors(options =>
 {
