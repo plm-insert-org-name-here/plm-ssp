@@ -85,6 +85,7 @@ public static class Routes
         public const string Delete = "tasks/{id}";
         public const string AbandonInstance = "tasks/{id}/abandon";
         public const string EventPost = "tasks/{TaskId}/events";
+        public const string GetObjectsAndEvents = "tasks/{TaskId}/objects_and_steps";
     }
 
     public static class Events
