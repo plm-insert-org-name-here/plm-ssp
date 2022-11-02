@@ -33,4 +33,17 @@ public class Location : ICHNodeWithParent<Station>
 
         return Result.Ok();
     }
+
+    public Result AttachDetector(Detector newDetector)
+    {
+        if (Detector is null)
+        {
+            Detector = newDetector;
+            return Result.Fail("Location already have a detector attached to it");
+        }
+        else
+        {
+            return Result.Ok();
+        }
+    }
 }

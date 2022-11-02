@@ -15,4 +15,11 @@ public class Detector : IBaseEntity
     public int? LocationId { get; set; }
 
     private Detector() { }
+
+    public Detector(string newName, PhysicalAddress newMacAddress, int newLocationId)
+    {
+        Name = newName;
+        MacAddress = newMacAddress;
+        LocationId = newLocationId;
+    }
 }

@@ -61,6 +61,8 @@ public static class Routes
         public const string DetectorHub = "/" + "detector_hub";
 
         public const string StreamGroupPrefix = "Stream-";
+        
+        public const string Identify = "detectors/{LocationId}/identify";
     }
 
     public static class Jobs
