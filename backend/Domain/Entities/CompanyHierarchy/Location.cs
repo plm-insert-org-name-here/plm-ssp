@@ -54,7 +54,7 @@ public class Location : ICHNodeWithParent<Station>
         }
     }
 
-    public Result DetachDetector(Detector oldDetector)
+    public Result DetachDetector()
     {
         if (Detector is null)
         {
@@ -66,7 +66,8 @@ public class Location : ICHNodeWithParent<Station>
             {
                 return Result.Fail("An other detector currently running on this location!");
             }
-            Detector = default!;
+
+            Detector = null;
             return Result.Ok();
         }
     }

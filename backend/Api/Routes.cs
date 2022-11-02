@@ -64,6 +64,7 @@ public static class Routes
         
         public const string Identify = "detectors/{LocationId}/identify";
         public const string HeartBeat = "detectors/{MacAddress}/heartbeat";
+        
     }
 
     public static class Jobs
@@ -83,6 +84,7 @@ public static class Routes
         public const string Update = "tasks/{id}";
         public const string Delete = "tasks/{id}";
         public const string AbandonInstance = "tasks/{id}/abandon";
+        public const string EventPost = "tasks/{TaskId}/events";
     }
 
     public static class Events

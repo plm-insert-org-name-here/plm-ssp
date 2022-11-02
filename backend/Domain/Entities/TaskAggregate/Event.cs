@@ -8,8 +8,7 @@ public class Event : IBaseEntity
     public DateTime Timestamp { get; set; }
 
     public EventResult Result { get; set; } = default!;
-    public string? FailureReason { get; set; }
-    
+
     public Step Step { get; set; } = default!;
     public int StepId { get; set; }
     
@@ -17,4 +16,15 @@ public class Event : IBaseEntity
     public int TaskInstanceId { get; set; }
 
     private Event() { }
+
+    public static Event Create(DateTime newTimeStamp, EventResult newResult, int newStepId, int newTaskInstanceId)
+    {
+        return new Event()
+        {
+            Timestamp = newTimeStamp,
+            Result = newResult,
+            StepId = newStepId,
+            TaskInstanceId = newTaskInstanceId
+        };
+    }
 }
