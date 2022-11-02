@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.NetworkInformation;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
@@ -9,6 +10,7 @@ public class Detector : IBaseEntity
     public int Id { get; set; }
     public string Name { get; set; } = default!;
     public PhysicalAddress MacAddress { get; set; } = default!;
+    public IPAddress? IpAddress { get; set; }
     public DetectorState State { get; set; }
 
     public Location? Location { get; set; }
