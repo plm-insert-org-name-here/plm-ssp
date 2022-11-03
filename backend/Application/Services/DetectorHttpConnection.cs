@@ -53,4 +53,3 @@ public class DetectorHttpConnection : IDetectorConnection
         return stream;
     }
 }
-// test
