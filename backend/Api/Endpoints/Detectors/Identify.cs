@@ -1,5 +1,4 @@
 using System.Net.NetworkInformation;
-using Api.Endpoints.Lines;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;

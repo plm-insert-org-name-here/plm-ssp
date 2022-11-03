@@ -9,6 +9,8 @@
     <ItemGroup>
       <PackageReference Include="FastEndpoints" Version="5.2.1.5-beta" />
       <PackageReference Include="FastEndpoints.ClientGen" Version="5.2.1.16-beta" />
+      <PackageReference Include="OneOf" Version="3.0.223" />
+      <PackageReference Include="OneOf.SourceGenerator" Version="3.0.223" />
     </ItemGroup>
 
     <ItemGroup>

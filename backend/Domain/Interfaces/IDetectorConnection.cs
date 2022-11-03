@@ -1,5 +1,6 @@
-using Domain.Common;
+using Domain.Common.DetectorCommand;
 using Domain.Entities;
+using FluentResults;
 
 namespace Domain.Interfaces;
 
@@ -7,10 +8,10 @@ namespace Domain.Interfaces;
 // (e.g. HTTP implementation needs Detector.IPAddress)
 public interface IDetectorConnection
 {
-    public Task SendCommand(Detector detector, DetectorCommand command);
+    public Task<Result> SendCommand(Detector detector, DetectorCommand command);
     
     // TODO(rg): wrap byte[] into a more descriptive object (e.g. Image / Frame / Snapshot)
-    public Task<byte[]> RequestSnapshot(Detector detector);
+    public Task<Result<byte[]>> RequestSnapshot(Detector detector);
     
-    public Task<Stream> RequestStream(Detector detector);
+    public Task<Result<Stream>> RequestStream(Detector detector);
 }

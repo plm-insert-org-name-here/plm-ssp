@@ -1,8 +1,11 @@
+using System.Data;
 using System.Net;
+using System.Text.Json;
 using Application.Interfaces;
-using Domain.Common;
+using Domain.Common.DetectorCommand;
 using Domain.Entities;
 using Domain.Interfaces;
+using FluentResults;
 
 namespace Application.Services;
 
@@ -19,37 +22,66 @@ public class DetectorHttpConnection : IDetectorConnection
         _detectorStreams = detectorStreams;
     }
 
-    public Task SendCommand(Detector detector, DetectorCommand command)
+    public async Task<Result> SendCommand(Detector detector, DetectorCommand command)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<byte[]> RequestSnapshot(Detector detector)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<Stream> RequestStream(Detector detector)
-    {
-        // TODO(rg): temporary IP address to localhost; remove this when 
-        // detector registration is implemented
-        var add = IPAddress.Parse("127.0.0.1");
-        detector.IpAddress = add;
-        
-        // TODO(rg): check IpAddress in caller
-        var existingStream = _detectorStreams.GetStream(detector.IpAddress!);
-
-        if (existingStream is not null)
+        try
         {
-            // TODO(rg): 1st stream request works, but subsequent requests will fail;
-            // find out why
-            return existingStream;
+            var client = _httpClientFactory.CreateClient();
+            var json = JsonSerializer.Serialize(command);
+
+            var response = await client.PostAsync("http://127.0.0.1:3000/command", new StringContent(json));
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(ex.Message);
         }
 
-        var client = _httpClientFactory.CreateClient();
-        var stream = await client.GetStreamAsync($"http://{add}:3000/stream");
-            
-        _detectorStreams.AddStream(detector.IpAddress!, stream);
-        return stream;
+        return Result.Ok();
+    }
+
+    public async Task<Result<byte[]>> RequestSnapshot(Detector detector)
+    {
+        try
+        {
+            var client = _httpClientFactory.CreateClient();
+            var snapshot = await client.GetByteArrayAsync("http://127.0.0.1:3000/snapshot");
+
+            return snapshot;
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(ex.Message);
+        }
+    }
+
+    public async Task<Result<Stream>> RequestStream(Detector detector)
+    {
+        try
+        {
+            // TODO(rg): temporary IP address to localhost; remove this when 
+            // detector registration is implemented
+            var add = IPAddress.Parse("127.0.0.1");
+            detector.IpAddress = add;
+
+            // TODO(rg): check IpAddress in caller
+            var existingStream = _detectorStreams.GetStream(detector.IpAddress!);
+
+            if (existingStream is not null)
+            {
+                // TODO(rg): 1st stream request works, but subsequent requests will fail;
+                // find out why
+                return existingStream;
+            }
+
+            var client = _httpClientFactory.CreateClient();
+            var stream = await client.GetStreamAsync($"http://{add}:3000/stream");
+
+            _detectorStreams.AddStream(detector.IpAddress!, stream);
+            return stream;
+        } 
+        catch (Exception ex)
+        {
+            return Result.Fail(ex.Message);
+        }
     }
 }

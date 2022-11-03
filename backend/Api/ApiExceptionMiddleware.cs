@@ -42,11 +42,17 @@ public class ApiExceptionMiddleware
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
+            var errors = ex.Failures?.Select(e => e.ErrorMessage).ToArray();
+            if (errors is null || !errors.Any())
+            {
+                errors = new[] { ex.Message };
+            }
+
             var res = new ApiExceptionResponse
             {
                 StatusCode = context.Response.StatusCode,
                 Description = "One or more validation errors occurred.",
-                Errors = ex.Failures?.Select(e => e.ErrorMessage)
+                Errors = errors
             };
 
             await context.Response.WriteAsJsonAsync(res);
