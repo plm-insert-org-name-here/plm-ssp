@@ -10,8 +10,19 @@ public class TaskInstance : IBaseEntity
     
     public Task Task { get; set; } = default!;
     public int TaskId { get; set; }
+    public List<int> RemainingStepIds { get; set; }
 
     private TaskInstance()
     {
+    }
+    
+    public bool IsEnded(int StepId)
+    {
+        RemainingStepIds.Remove(StepId);
+        if (!RemainingStepIds.Any())
+        {
+            return true;
+        }
+        return false;
     }
 }

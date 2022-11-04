@@ -11,7 +11,6 @@ namespace Api.Endpoints.Tasks;
 
 public class Update : Endpoint<Update.Req, EmptyResponse>
 {
-    public IRepository<Location> LocationRepo { get; set; } = default!;
     public IRepository<Job> JobRepo { get; set; } = default!;
 
     public IRepository<Object> ObjectRepo { get; set; } = default!;
@@ -20,7 +19,6 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
     {
         public int Id { get; set; }
         public int ParentJobId {get; set; }
-        public int LocationId { get; set; }
         public IEnumerable<NewObjectReq> NewObjects { get; set; } = default!;
         public IEnumerable<ModObjectReq> ModifiedObjects { get; set; } = default!;
         public List<int> DeletedObjects { get; set; } = default!;
@@ -63,16 +61,6 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             task.Type = req.NewType;
         }
 
-        //need to check the object names
-        
-        var location = await LocationRepo.GetByIdAsync(req.LocationId, ct);
-
-        if (location is null)
-        {
-            await SendNotFoundAsync(ct);
-            return;
-        }
-        
         //check if steps' object belongs to this task
         var modified = req.ModifiedSteps.Select(s => task.IsObjectBelongsTo(s.ObjectId));
         var created = req.NewSteps.Select(s => task.IsObjectBelongsTo(s.ObjectId));
@@ -86,9 +74,7 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             await SendNotFoundAsync(ct);
             return;
         }
-        
-        task.Location = location;
-        
+
         //delete
         task.Objects.RemoveAll(o => req.DeletedObjects.Contains(o.Id));
         task.Steps.RemoveAll(s => req.DeletedSteps.Contains(s.Id));

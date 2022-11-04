@@ -20,7 +20,7 @@ public class GetInstance : Endpoint<GetInstance.Req, GetInstance.Res>
 
         public record ResTaskInstance(int Id, TaskInstanceFinalState? FinalState, IEnumerable<ResEvent> Events, int TaskId);
 
-        public record ResEvent(int Id, DateTime TimeStamp, string? FailureReason, int StepId, int TaskInstanceId);
+        public record ResEvent(int Id, DateTime TimeStamp, bool EventResultSuccess, string FailureReason, int StepId, int TaskInstanceId);
 
     }
 
@@ -42,7 +42,7 @@ public class GetInstance : Endpoint<GetInstance.Req, GetInstance.Res>
         }
 
         var resEvents = instance.Events.Select(e =>
-            new Res.ResEvent(e.Id, e.Timestamp, e.FailureReason, e.StepId, e.TaskInstanceId));
+            new Res.ResEvent(e.Id, e.Timestamp, e.Result.Success,  e.Result.FailureReason, e.StepId, e.TaskInstanceId));
         
         var res = new Res();
         res.Instance = new Res.ResTaskInstance(instance.Id, instance.FinalState, resEvents, instance.TaskId);
