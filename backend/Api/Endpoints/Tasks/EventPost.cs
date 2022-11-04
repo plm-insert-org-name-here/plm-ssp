@@ -39,14 +39,15 @@ public class EventPost: Endpoint<EventPost.Req, EmptyResponse>
         var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(task.LocationId), ct);
         if (!Equals(HttpContext.Connection.RemoteIpAddress, location.Detector.IpAddress))
         {
-            await SendStringAsync("remote ip address is not equal with the detector's ip!");
+            //"remote ip address is not equal with the detector's ip!"
+            await SendStringAsync(HttpContext.Connection.RemoteIpAddress.ToString());
             return;
         }
 
         var instance = task.Instances.FirstOrDefault(i => i.TaskId == task.Id);
-        if (instance is null || instance.FinalState == null)
+        if (instance is null || instance.FinalState != null)
         {
-            await SendNotFoundAsync(ct);
+            await SendStringAsync(instance.Id.ToString());
             return;
         }
 
@@ -60,7 +61,7 @@ public class EventPost: Endpoint<EventPost.Req, EmptyResponse>
 
         if (req.EventResult)
         {
-            if (!instance.RemainingStepIds.Contains(req.StepId))
+            if (!instance.Remaining.Contains(req.StepId))
             {
                 ThrowError("invalid stepid");
                 return;

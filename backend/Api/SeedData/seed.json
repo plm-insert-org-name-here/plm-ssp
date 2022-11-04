@@ -125,5 +125,30 @@
       "id": 2,
       "name": "Job 2"
     }
+  ],
+  "Tasks": [
+    {
+      "id": 1,
+      "name": "task1",
+      "locationId": 1
+    }
+  ],"Objects": [
+  {
+    "id": 1,
+    "name": "object1"
+  }
+],
+  "Steps": [
+    {
+      "id": 1,
+      "orderNum": 1,
+      "objectId": 1
+    }
+  ],
+  "TaskInstances": [
+    {
+      "id": 1,
+      "taskId": 1
+    }
   ]
 }

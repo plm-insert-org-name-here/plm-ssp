@@ -1,7 +1,9 @@
+using System.Linq;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Entities.TaskAggregate;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Database;
 
@@ -35,5 +37,9 @@ public class Context : DbContext
             .WithOne(d => d.Location)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
+        
+        modelBuilder.Entity<TaskInstance>().Property(x => x.Remaining).HasConversion(new ValueConverter<int[], string>(
+            i => string.Join(",", i),
+            s => string.IsNullOrWhiteSpace(s) ? new int[0] : s.Split(new[] { ',' }).Select(v => int.Parse(v)).ToArray()));
     }
 }

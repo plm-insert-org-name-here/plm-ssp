@@ -10,7 +10,7 @@ public class TaskInstance : IBaseEntity
     
     public Task Task { get; set; } = default!;
     public int TaskId { get; set; }
-    public List<int> RemainingStepIds { get; set; }
+    public int[] Remaining { get; set; }
 
     private TaskInstance()
     {
@@ -18,8 +18,12 @@ public class TaskInstance : IBaseEntity
     
     public bool IsEnded(int StepId)
     {
-        RemainingStepIds.Remove(StepId);
-        if (!RemainingStepIds.Any())
+        if (Remaining is null)
+        {
+            return true;
+        }
+        Remaining.ToList().Remove(StepId);
+        if (!Remaining.Any())
         {
             return true;
         }
