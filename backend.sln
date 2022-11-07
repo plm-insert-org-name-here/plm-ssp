@@ -1,14 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{5258AE3F-2671-4747-A46A-BC31F7CFEB3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "src\Infrastructure\Infrastructure.csproj", "{5258AE3F-2671-4747-A46A-BC31F7CFEB3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{FD406D2A-1D51-44B4-BE9B-4CFF9A7EFB32}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "src\Domain\Domain.csproj", "{FD406D2A-1D51-44B4-BE9B-4CFF9A7EFB32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{A6AB7EFC-5708-422C-987F-75D82BC4AF58}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "src\Api\Api.csproj", "{A6AB7EFC-5708-422C-987F-75D82BC4AF58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{FA1DBDBF-E7C6-46F4-AB31-C89463D05E44}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "src\Application\Application.csproj", "{FA1DBDBF-E7C6-46F4-AB31-C89463D05E44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiIntegrationTests", "ApiIntegrationTests\ApiIntegrationTests.csproj", "{4FE07D7D-B04E-4173-BE67-315E7554D101}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiIntegrationTests", "tests\ApiIntegrationTests\ApiIntegrationTests.csproj", "{4FE07D7D-B04E-4173-BE67-315E7554D101}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A4253F8B-9BDC-4F31-9518-6C0911FBC6DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C7A309D6-8354-4059-A3E5-F5D6DFBBC34F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +40,12 @@ Global
 		{4FE07D7D-B04E-4173-BE67-315E7554D101}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FE07D7D-B04E-4173-BE67-315E7554D101}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FE07D7D-B04E-4173-BE67-315E7554D101}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5258AE3F-2671-4747-A46A-BC31F7CFEB3B} = {A4253F8B-9BDC-4F31-9518-6C0911FBC6DE}
+		{A6AB7EFC-5708-422C-987F-75D82BC4AF58} = {A4253F8B-9BDC-4F31-9518-6C0911FBC6DE}
+		{FA1DBDBF-E7C6-46F4-AB31-C89463D05E44} = {A4253F8B-9BDC-4F31-9518-6C0911FBC6DE}
+		{FD406D2A-1D51-44B4-BE9B-4CFF9A7EFB32} = {A4253F8B-9BDC-4F31-9518-6C0911FBC6DE}
+		{4FE07D7D-B04E-4173-BE67-315E7554D101} = {C7A309D6-8354-4059-A3E5-F5D6DFBBC34F}
 	EndGlobalSection
 EndGlobal

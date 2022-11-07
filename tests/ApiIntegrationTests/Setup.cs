@@ -16,7 +16,7 @@ public class Setup
         {
             // This makes it so the app settings files are read from the integration tests' project,
             // instead of the Api project
-            builder.UseSolutionRelativeContentRoot("ApiIntegrationTests");
+            builder.UseSolutionRelativeContentRoot("tests/ApiIntegrationTests");
         });
 
         Services = Application.Services;
