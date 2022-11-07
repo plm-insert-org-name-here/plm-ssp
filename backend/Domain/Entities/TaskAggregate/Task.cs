@@ -9,8 +9,8 @@ public class Task : IBaseEntity
     public string Name { get; set; } = default!;
     public TaskType Type { get; set; } = default!;
     public TaskState State { get; set; }
-    public Location? Location { get; set; } = default!;
-    public int? LocationId { get; set; }
+    public Location Location { get; set; } = default!;
+    public int LocationId { get; set; }
     public List<TaskInstance> Instances { get; set; } = default!;
 
     public List<Object> Objects { get; set; } = default!;
@@ -18,11 +18,12 @@ public class Task : IBaseEntity
     
     private Task() {}
 
-    public Task(string name, List<Object> objects, List<Step> steps)
+    public Task(string name, List<Object> objects, List<Step> steps, int locationId)
     {
         Name = name;
         Objects = objects;
         Steps = steps;
+        LocationId = locationId;
     }
 
     public bool IsObjectBelongsTo(int id)

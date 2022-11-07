@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 
 using Domain.Entities.TaskAggregate;
@@ -13,10 +14,12 @@ namespace Api.Endpoints.Tasks;
 public class Create: Endpoint<Create.Req, Create.Res>
 {
     public IRepository<Job> JobRepo { get; set; } = default!;
+    public IRepository<Location> LocationRepo { get; set; }
     public class Req
     {
         public int ParentJobId { get; set; }
         public string Name { get; set; } = default!;
+        public int LocationId { get; set; }
     }
 
     public class Res
@@ -47,7 +50,15 @@ public class Create: Endpoint<Create.Req, Create.Res>
             return;
         }
 
-        var task = new Task(name: req.Name, objects: new List<Object>(), steps: new List<Step>());
+        var location = await LocationRepo.GetByIdAsync(req.LocationId, ct);
+
+        if (location is null || location.Snapshot is null)
+        {
+            await SendNotFoundAsync(ct);
+            return;
+        }
+
+        var task = new Task(name: req.Name, objects: new List<Object>(), steps: new List<Step>(), req.LocationId);
 
         job.Tasks.Add(task);
 

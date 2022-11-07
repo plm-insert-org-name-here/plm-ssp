@@ -6,7 +6,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Api.Endpoints.Jobs;
 
-public class GetById: Endpoint<GetById.Req, GetById.Res>
+public class GetById : Endpoint<GetById.Req, GetById.Res>
 {
     public IRepository<Job> JobRepo { get; set; } = default!;
 

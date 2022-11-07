@@ -1,4 +1,5 @@
 using Domain.Common;
+using Domain.Entities.CompanyHierarchy;
 using Domain.Entities.TaskAggregate;
 using Domain.Interfaces;
 using Domain.Specifications;
@@ -10,6 +11,7 @@ namespace Api.Endpoints.Tasks;
 public class EventPost: Endpoint<EventPost.Req, EmptyResponse>
 {
     public IRepository<Task> TaskRepo { get; set; } = default!;
+    public IRepository<Location> LocationRepo { get; set; } = default!;
     public class Req
     {
         public int TaskId { get; set; }
@@ -34,10 +36,18 @@ public class EventPost: Endpoint<EventPost.Req, EmptyResponse>
             return;
         }
 
-        var instance = task.Instances.FirstOrDefault(i => i.TaskId == task.Id);
-        if (instance is null)
+        var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(task.LocationId), ct);
+        if (!Equals(HttpContext.Connection.RemoteIpAddress, location.Detector.IpAddress))
         {
-            await SendNotFoundAsync(ct);
+            //"remote ip address is not equal with the detector's ip!"
+            await SendStringAsync(HttpContext.Connection.RemoteIpAddress.ToString());
+            return;
+        }
+
+        var instance = task.Instances.FirstOrDefault(i => i.TaskId == task.Id);
+        if (instance is null || instance.FinalState != null)
+        {
+            await SendStringAsync(instance.Id.ToString());
             return;
         }
 
@@ -48,6 +58,19 @@ public class EventPost: Endpoint<EventPost.Req, EmptyResponse>
         };
         
         Event newEvent = Event.Create(DateTime.Now, eventResult, req.StepId, instance.Id);
+
+        if (req.EventResult)
+        {
+            if (!instance.Remaining.Contains(req.StepId))
+            {
+                ThrowError("invalid stepid");
+                return;
+            }
+            if (instance.IsEnded(req.StepId))
+            {
+                instance.FinalState = TaskInstanceFinalState.Completed;
+            }
+        }
         
         instance.Events.Add(newEvent);
         await TaskRepo.SaveChangesAsync(ct);

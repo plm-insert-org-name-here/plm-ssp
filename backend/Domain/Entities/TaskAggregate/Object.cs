@@ -6,7 +6,7 @@ public class Object : IBaseEntity
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;
-    public ObjectCoordinates Coordinates { get; set; } = default!;
+    public ObjectCoordinates? Coordinates { get; set; } = default!;
 
     private Object()
     {
