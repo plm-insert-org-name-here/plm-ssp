@@ -2,6 +2,7 @@ using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Detectors;
 
@@ -12,7 +13,7 @@ public class Detach: Endpoint<Detach.Req, EmptyResponse>
     {
         public int LocationId { get; set; }
     }
-    
+
     public override void Configure()
     {
         Post(Api.Routes.Detectors.Detach);
@@ -28,11 +29,12 @@ public class Detach: Endpoint<Detach.Req, EmptyResponse>
             await SendNotFoundAsync(ct);
             return;
         }
-        
+
         var result = location.DetachDetector();
+        result.Unwrap();
+
         await LocationRepo.SaveChangesAsync(ct);
-        
-        await SendStringAsync(result.ToString());
-        return;
+
+        await SendNoContentAsync(ct);
     }
 }

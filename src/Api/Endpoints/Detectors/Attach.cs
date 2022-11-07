@@ -3,6 +3,7 @@ using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Detectors;
 
@@ -10,12 +11,12 @@ public class Attach: Endpoint<Attach.Req, EmptyResponse>
 {
     public IRepository<Location> LocationRepo { get; set; } = default!;
     public IRepository<Detector> DetectorRepo { get; set; } = default!;
-    public class Req 
+    public class Req
     {
         public int LocationId { get; set; }
         public int DetectorId { get; set; }
     }
-    
+
     public override void Configure()
     {
         Post(Api.Routes.Detectors.Attach);
@@ -33,11 +34,12 @@ public class Attach: Endpoint<Attach.Req, EmptyResponse>
             await SendNotFoundAsync(ct);
             return;
         }
-        
+
         var result = location.AttachDetector(detector);
+        result.Unwrap();
+
         await LocationRepo.SaveChangesAsync(ct);
-        
-        await SendStringAsync(result.ToString());
-        return;
+
+        await SendNoContentAsync(ct);
     }
 }

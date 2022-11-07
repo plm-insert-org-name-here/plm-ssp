@@ -43,9 +43,12 @@ public class GetInstance : Endpoint<GetInstance.Req, GetInstance.Res>
 
         var resEvents = instance.Events.Select(e =>
             new Res.ResEvent(e.Id, e.Timestamp, e.Result.Success,  e.Result.FailureReason, e.StepId, e.TaskInstanceId));
-        
-        var res = new Res();
-        res.Instance = new Res.ResTaskInstance(instance.Id, instance.FinalState, resEvents, instance.TaskId);
+
+        var res = new Res
+        {
+            Instance = new Res.ResTaskInstance(instance.Id, instance.FinalState, resEvents, instance.TaskId)
+        };
+
         await SendOkAsync(res, ct);
     }
 }

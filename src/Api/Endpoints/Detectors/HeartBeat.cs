@@ -16,7 +16,7 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
         public int FreeStoragePercentage { get; set; }
         public int Uptime { get; set; }
     }
-    
+
     public override void Configure()
     {
         Post(Api.Routes.Detectors.HeartBeat);
@@ -33,13 +33,13 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
             return;
         }
 
-        Detector.HeartBeatLog newLog = new Detector.HeartBeatLog
+        var newLog = new Detector.HeartBeatLog
         {
             Temperature = req.Temperature,
             FreeStoragePercentage = req.FreeStoragePercentage,
             Uptime = req.Uptime
         };
-        
+
         detector.HearthBeatLogs.Add(newLog);
         await DetectorRepo.SaveChangesAsync(ct);
         await SendOkAsync(ct);

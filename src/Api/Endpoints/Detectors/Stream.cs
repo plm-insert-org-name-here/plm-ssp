@@ -42,8 +42,7 @@ public class Stream : Endpoint<Stream.Req>
 
         var result = await DetectorConnection.RequestStream(detector);
         var stream = result.Unwrap();
-        
-        
+
         // NOTE(rg): content type is necessary if we want to view the stream directly from the browser; otherwise,
         // it will be downloaded as a file
         await SendStreamAsync(stream, null, cancellation: ct, contentType: "multipart/x-mixed-replace; boundary=frame");

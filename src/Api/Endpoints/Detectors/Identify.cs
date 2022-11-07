@@ -4,6 +4,8 @@ using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure;
+using FormatException = System.FormatException;
 
 namespace Api.Endpoints.Detectors;
 
@@ -26,35 +28,44 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var phisicalMacAddress = PhysicalAddress.Parse(req.MacAddress);
+        var physicalMacAddress = PhysicalAddress.None;
 
-        var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(phisicalMacAddress), ct);
+        try
+        {
+            physicalMacAddress = PhysicalAddress.Parse(req.MacAddress);
+        }
+        catch (FormatException ex)
+        {
+            ThrowError(ex.Message);
+        }
+
+        var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(physicalMacAddress), ct);
         var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(req.LocationId), ct);
 
         if (location is null)
         {
-            //TODO
-            await SendNotFoundAsync(ct);
+            ThrowError("Location not found");
             return;
         }
-        
+
         if (detector is null)
         {
-            var newDetector = new Detector(req.MacAddress, phisicalMacAddress, req.LocationId, HttpContext.Connection.RemoteIpAddress);
+            var newDetector = new Detector(req.MacAddress, physicalMacAddress, req.LocationId, HttpContext.Connection.RemoteIpAddress!);
             await DetectorRepo.AddAsync(newDetector, ct);
-            var result = location.AttachDetector(newDetector);
+            location.AttachDetector(newDetector).Unwrap();
+
             await LocationRepo.SaveChangesAsync(ct);
-            
-            await SendStringAsync(result.ToString());
+
+            await SendNoContentAsync(ct);
             return;
         }
-        
+
         detector.LocationId = req.LocationId;
-        var result2 = location.AttachDetector(detector);
+        location.AttachDetector(detector).Unwrap();
+
         await DetectorRepo.SaveChangesAsync(ct);
         await LocationRepo.SaveChangesAsync(ct);
-        
-        await SendStringAsync(result2.ToString());
-        return;
+
+        await SendNoContentAsync(ct);
     }
 }

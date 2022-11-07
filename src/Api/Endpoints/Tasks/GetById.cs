@@ -1,3 +1,4 @@
+using Domain.Common;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
@@ -16,15 +17,15 @@ public class GetById: Endpoint<GetById.Req, GetById.Res>
     {
         public int Id { get; set; }
         public string Name { get; set; } = default!;
-        public TaskStatus Status { get; set; } = default!;
-        public bool? Ordered { get; set; }
+        public TaskState State { get; set; }
 
     }
-    
+
     private static Res MapOut(Domain.Entities.TaskAggregate.Task t) => new()
     {
         Id = t.Id,
-        Name = t.Name
+        Name = t.Name,
+        State = t.State
     };
 
     public override void Configure()
@@ -33,7 +34,7 @@ public class GetById: Endpoint<GetById.Req, GetById.Res>
         AllowAnonymous();
         Options(x => x.WithTags("Tasks"));
     }
-    
+
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
         var task = await TaskRepo.FirstOrDefaultAsync(new TaskWithChildrenSpec(req.Id), ct);

@@ -6,9 +6,9 @@ using Domain.Specifications;
 using FastEndpoints;
 using Task = Domain.Entities.TaskAggregate.Task;
 
-namespace Api.Endpoints.Tasks;
+namespace Api.Endpoints.Events;
 
-public class EventPost: Endpoint<EventPost.Req, EmptyResponse>
+public class Create: Endpoint<Create.Req, EmptyResponse>
 {
     public IRepository<Task> TaskRepo { get; set; } = default!;
     public IRepository<Location> LocationRepo { get; set; } = default!;
@@ -22,9 +22,9 @@ public class EventPost: Endpoint<EventPost.Req, EmptyResponse>
 
     public override void Configure()
     {
-        Post(Api.Routes.Tasks.EventPost);
+        Post(Api.Routes.Events.Create);
         AllowAnonymous();
-        Options(x => x.WithTags("Tasks"));
+        Options(x => x.WithTags("Events"));
     }
 
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
@@ -37,45 +37,56 @@ public class EventPost: Endpoint<EventPost.Req, EmptyResponse>
         }
 
         var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(task.LocationId), ct);
+        if (location is null)
+        {
+            ThrowError("Location does not exist");
+            return;
+        }
+
+        if (location.Detector is null)
+        {
+            ThrowError("Location does not have a Detector attached to it");
+            return;
+        }
+
         if (!Equals(HttpContext.Connection.RemoteIpAddress, location.Detector.IpAddress))
         {
-            //"remote ip address is not equal with the detector's ip!"
-            await SendStringAsync(HttpContext.Connection.RemoteIpAddress.ToString());
+            ThrowError("Remote IP address is not equal with the detector's IP");
             return;
         }
 
         var instance = task.Instances.FirstOrDefault(i => i.TaskId == task.Id);
         if (instance is null || instance.FinalState != null)
         {
-            await SendStringAsync(instance.Id.ToString());
+            ThrowError("Task instance does not exist, or it's finished");
             return;
         }
 
-        var eventResult = new EventResult()
+        var eventResult = new EventResult
         {
             Success = req.EventResult,
             FailureReason = req.FailureReason
         };
-        
-        Event newEvent = Event.Create(DateTime.Now, eventResult, req.StepId, instance.Id);
+
+        var newEvent = Event.Create(DateTime.Now, eventResult, req.StepId, instance.Id);
 
         if (req.EventResult)
         {
             if (!instance.Remaining.Contains(req.StepId))
             {
-                ThrowError("invalid stepid");
+                ThrowError("invalid step Id");
                 return;
             }
+
             if (instance.IsEnded(req.StepId))
             {
                 instance.FinalState = TaskInstanceFinalState.Completed;
             }
         }
-        
+
         instance.Events.Add(newEvent);
         await TaskRepo.SaveChangesAsync(ct);
-        
-        await SendOkAsync(ct);
-        return;
+
+        await SendNoContentAsync(ct);
     }
 }

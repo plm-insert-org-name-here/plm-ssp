@@ -25,15 +25,15 @@ public class GetObjectsAndSteps : Endpoint<GetObjectsAndSteps.Req, GetObjectsAnd
             TemplateState ExpectedSubsequentState, int ObjectId);
     }
 
-    public Res MapOut(Task task)
+    private static Res MapOut(Task task)
     {
-        return new Res()
+        return new Res
         {
             Objects = task.Objects.Select(o => new Res.ResObject(o.Id, o.Name, o.Coordinates)),
             Steps = task.Steps.Select(s => new Res.ResStep(s.Id, s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId))
         };
     }
-    
+
     public override void Configure()
     {
         Get(Api.Routes.Tasks.GetObjectsAndEvents);
