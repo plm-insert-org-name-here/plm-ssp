@@ -16,7 +16,6 @@ public class Detector : IBaseEntity
 
     public Location? Location { get; set; }
     public int? LocationId { get; set; }
-    public IPAddress IpAddress { get; set; }
 
     private Detector() { }
     public List<HeartBeatLog> HearthBeatLogs { get; set; } = default!;
