@@ -18,6 +18,13 @@ public class Location : ICHNodeWithParent<Station>
 
     private Location() {}
 
+    private Location(int id, string name, int parentId)
+    {
+        Id = id;
+        Name = name;
+        ParentId = parentId;
+    }
+
     public Location(string name)
     {
         Name = name;

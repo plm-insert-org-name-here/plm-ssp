@@ -12,6 +12,12 @@ public class OPU : ICHNodeWithParent<Site>, ICHNodeWithChildren<Line>
     public int ParentId { get; set; }
 
     private OPU() {}
+    private OPU(int id, string name, int parentId)
+    {
+        Id = id;
+        Name = name;
+        ParentId = parentId;
+    }
 
     public OPU(string name)
     {

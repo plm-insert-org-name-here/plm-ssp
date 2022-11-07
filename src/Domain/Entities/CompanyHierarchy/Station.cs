@@ -14,6 +14,13 @@ public class Station : ICHNode<Line, Location>
 
     private Station() {}
 
+    private Station(int id, string name, int parentId)
+    {
+        Id = id;
+        Name = name;
+        ParentId = parentId;
+    }
+
     public Station(string name)
     {
         Name = name;
