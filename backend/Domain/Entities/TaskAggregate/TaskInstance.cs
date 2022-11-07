@@ -18,11 +18,10 @@ public class TaskInstance : IBaseEntity
     
     public bool IsEnded(int StepId)
     {
-        if (Remaining is null)
-        {
-            return true;
-        }
-        Remaining.ToList().Remove(StepId);
+        var list = Remaining.ToList();
+        list.Remove(StepId);
+        Remaining = list.ToArray();
+        
         if (!Remaining.Any())
         {
             return true;
