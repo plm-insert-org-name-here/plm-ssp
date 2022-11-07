@@ -1,29 +1,31 @@
 using Domain.Common;
+using Domain.Common.DetectorCommand;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Detectors;
 
 public class Command : Endpoint<Command.Req, EmptyResponse>
 {
-    public IRepository<Detector> DetectorRepo { get; set; }= default!;
-    public IDetectorConnection DetectorConnection { get; set; }= default!;
-    
+    public IRepository<Detector> DetectorRepo { get; set; } = default!;
+    public IDetectorConnection DetectorConnection { get; set; } = default!;
+
     public class Req
     {
         public int Id { get; set; }
-        public DetectorCommand Command { get; set; }
+        public DetectorCommand Command { get; set; } = default!;
     }
-    
+
     public override void Configure()
     {
         Post(Api.Routes.Detectors.Command);
         AllowAnonymous();
         Options(x => x.WithTags("Detectors"));
     }
-    
+
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
         var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorWithLocationAndTasks(req.Id), ct);
@@ -40,10 +42,11 @@ public class Command : Endpoint<Command.Req, EmptyResponse>
             return;
         }
 
-        if (detector.Location is null && req.Command is
-            DetectorCommand.StartDetection or
-            DetectorCommand.PauseDetection or
-            DetectorCommand.StopDetection)
+        if (detector.Location is null &&
+            (req.Command.IsStartDetection ||
+             req.Command.IsPauseDetection ||
+             req.Command.IsResumeDetection ||
+             req.Command.IsStopDetection))
         {
             ThrowError("Detection commands can't be sent to detached detectors");
             return;
@@ -56,20 +59,24 @@ public class Command : Endpoint<Command.Req, EmptyResponse>
 
             if (ongoingTask is null)
             {
-                if (req.Command is DetectorCommand.PauseDetection or DetectorCommand.StopDetection)
-                    ThrowError("Inactive tasks can't be paused or stopped");
+                if (req.Command.IsPauseDetection || req.Command.IsStopDetection || req.Command.IsResumeDetection)
+                    ThrowError("Inactive tasks can't be stopped, resumed or paused");
             }
-            else
+            else if (ongoingTask.State is TaskState.Paused)
             {
-                if (ongoingTask.State is TaskState.Inactive && req.Command is DetectorCommand.PauseDetection)
-                    ThrowError("Paused tasks can't be paused");
-                else if (ongoingTask.State is TaskState.Active && req.Command is DetectorCommand.StartDetection)
-                    ThrowError("Active tasks can't be started");
+                if (req.Command.IsPauseDetection || req.Command.IsStartDetection)
+                    ThrowError("Paused tasks can't be started or paused");
+            }
+            else if (ongoingTask.State is TaskState.Active)
+            {
+                if (req.Command.IsStartDetection || req.Command.IsResumeDetection)
+                    ThrowError("Active tasks can't be started or resumed");
             }
         }
-        
-        await DetectorConnection.SendCommand(detector, req.Command);
-        
+
+        var result = await DetectorConnection.SendCommand(detector, req.Command);
+        result.Unwrap();
+
         await SendNoContentAsync(ct);
     }
 }

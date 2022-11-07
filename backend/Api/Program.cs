@@ -1,6 +1,8 @@
 global using FluentValidation;
 using System.Text.Json.Serialization;
 using Api;
+using Api.Endpoints.Detectors;
+using Api.RequestBinders;
 using Application.Interfaces;
 using Application.Services;
 using Domain.Entities.CompanyHierarchy;
@@ -29,7 +31,11 @@ builder.Services.AddSingleton<IDetectorStreamCollection, DetectorStreamCollectio
 
 builder.Services.AddHttpClient();
 builder.Services.AddAuthorization();
+
+// TODO(rg): into extension method
+builder.Services.AddSingleton(typeof(IRequestBinder<Command.Req>), typeof(CommandReqBinder));
 builder.Services.AddFastEndpoints();
+
 builder.Services.AddSwaggerDoc(s =>
 {
     s.SerializerSettings.Converters.Add(new StringEnumConverter());

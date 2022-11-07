@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Detectors;
 
@@ -45,7 +46,11 @@ public class Snapshot : Endpoint<Snapshot.Req>
             return;
         }
 
-        var snapshot = await DetectorConnection.RequestSnapshot(detector);
+        var result = await DetectorConnection.RequestSnapshot(detector);
+        var snapshot = result.Unwrap();
+
+        detector.Location.Snapshot = snapshot;
+        await DetectorRepo.SaveChangesAsync(ct);
 
         await SendBytesAsync(snapshot, cancellation: ct);
     }

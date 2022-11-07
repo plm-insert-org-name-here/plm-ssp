@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Detectors;
 
@@ -39,7 +40,9 @@ public class Stream : Endpoint<Stream.Req>
             return;
         }
 
-        var stream = await DetectorConnection.RequestStream(detector);
+        var result = await DetectorConnection.RequestStream(detector);
+        var stream = result.Unwrap();
+        
         
         // NOTE(rg): content type is necessary if we want to view the stream directly from the browser; otherwise,
         // it will be downloaded as a file
