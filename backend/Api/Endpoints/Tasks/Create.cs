@@ -29,8 +29,12 @@ public class Create: Endpoint<Create.Req, Create.Res>
     {
         Id = task.Id,
         Name = task.Name
-        //test github action
     };
+
+    private void Test()
+    {
+        Console.WriteLine("Hello World");
+    }
     
     public override void Configure()
     {
