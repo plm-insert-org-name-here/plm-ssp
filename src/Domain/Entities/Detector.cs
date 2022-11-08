@@ -2,23 +2,22 @@ using System.Net;
 using System.Net.NetworkInformation;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
 public class Detector : IBaseEntity
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = default!;
-    public PhysicalAddress MacAddress { get; set; } = default!;
-    public IPAddress? IpAddress { get; set; }
-    public DetectorState State { get; set; }
+    public int Id { get; private set; }
+    public string Name { get; private set; } = default!;
+    public PhysicalAddress MacAddress { get; private set; } = default!;
+    public IPAddress IpAddress { get; private set; } = default!;
+    public DetectorState State { get; private set; }
+    public List<HeartBeatLog> HeartBeatLogs { get; private set; } = default!;
 
-    public Location? Location { get; set; }
-    public int? LocationId { get; set; }
-
-    private Detector() { }
-    public List<HeartBeatLog> HearthBeatLogs { get; set; } = default!;
+    public Location? Location { get; private set; }
+    public int? LocationId { get; private set; }
 
     [Owned]
     public class HeartBeatLog
@@ -29,12 +28,18 @@ public class Detector : IBaseEntity
         public int Uptime { get; set; }
     }
 
-    public Detector(string newName, PhysicalAddress newMacAddress, int newLocationId, IPAddress newAddress)
+    private Detector() { }
+
+    public static Result<Detector> Create(string newName, PhysicalAddress newMacAddress, IPAddress newAddress, Location location)
     {
-        Name = newName;
-        MacAddress = newMacAddress;
-        LocationId = newLocationId;
-        HearthBeatLogs = new List<HeartBeatLog>();
-        IpAddress = newAddress;
+        var detector = new Detector
+        {
+            Name = newName,
+            MacAddress = newMacAddress,
+            IpAddress = newAddress,
+            HeartBeatLogs = new List<HeartBeatLog>()
+        };
+
+        return location.AttachDetector(detector).ToResult(detector);
     }
 }

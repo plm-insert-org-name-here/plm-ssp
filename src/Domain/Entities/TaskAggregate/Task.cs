@@ -1,5 +1,6 @@
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
+using FluentResults;
 
 namespace Domain.Entities.TaskAggregate;
 
@@ -39,6 +40,56 @@ public class Task : IBaseEntity
         Objects = objects;
         Steps = steps;
         LocationId = locationId;
+    }
+
+    public void CreateInstance()
+    {
+        var instance = new TaskInstance(this);
+
+        Instances.Add(instance);
+    }
+
+    public Result StopCurrentInstance()
+    {
+        var currentInstance = Instances.FirstOrDefault(i => i.FinalState is null);
+        if (currentInstance is null)
+            return Result.Fail("Task does not have a running instance");
+
+        if (State is not (TaskState.Active or TaskState.Paused))
+            return Result.Fail("Task is Inactive, therefore it cannot be stopped");
+
+        currentInstance.FinalState = TaskInstanceFinalState.Abandoned;
+        State = TaskState.Inactive;
+
+        return Result.Ok();
+    }
+
+    public Result PauseCurrentInstance()
+    {
+        var currentInstance = Instances.FirstOrDefault(i => i.FinalState is null);
+        if (currentInstance is null)
+            return Result.Fail("Task does not have a running instance");
+
+        if (State is not TaskState.Active)
+            return Result.Fail("Task is not Active, therefore it cannot be paused");
+
+        State = TaskState.Paused;
+
+        return Result.Ok();
+    }
+
+    public Result ResumeCurrentInstance()
+    {
+        var currentInstance = Instances.FirstOrDefault(i => i.FinalState is null);
+        if (currentInstance is null)
+            return Result.Fail("Task does not have a running instance");
+
+        if (State is not TaskState.Paused)
+            return Result.Fail("Task is not Paused, therefore it cannot be resumed");
+
+        State = TaskState.Active;
+
+        return Result.Ok();
     }
 
     public bool IsObjectBelongsTo(int id)

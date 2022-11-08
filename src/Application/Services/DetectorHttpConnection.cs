@@ -16,6 +16,10 @@ public class DetectorHttpConnection : IDetectorConnection
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IDetectorStreamCollection _detectorStreams;
 
+
+    public const string Scheme = "http";
+    public const int Port = 3000;
+
     public DetectorHttpConnection(IHttpClientFactory httpClientFactory, IDetectorStreamCollection detectorStreams)
     {
         _httpClientFactory = httpClientFactory;
@@ -29,7 +33,7 @@ public class DetectorHttpConnection : IDetectorConnection
             var client = _httpClientFactory.CreateClient();
             var json = JsonSerializer.Serialize(command);
 
-            var response = await client.PostAsync("http://127.0.0.1:3000/command", new StringContent(json));
+            var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/command", new StringContent(json));
         }
         catch (Exception ex)
         {
@@ -44,7 +48,7 @@ public class DetectorHttpConnection : IDetectorConnection
         try
         {
             var client = _httpClientFactory.CreateClient();
-            var snapshot = await client.GetByteArrayAsync("http://127.0.0.1:3000/snapshot");
+            var snapshot = await client.GetByteArrayAsync($"{Scheme}://{detector.IpAddress}:{Port}/snapshot");
 
             return snapshot;
         }
@@ -54,17 +58,12 @@ public class DetectorHttpConnection : IDetectorConnection
         }
     }
 
+
     public async Task<Result<Stream>> RequestStream(Detector detector)
     {
         try
         {
-            // TODO(rg): temporary IP address to localhost; remove this when 
-            // detector registration is implemented
-            var add = IPAddress.Parse("127.0.0.1");
-            detector.IpAddress = add;
-
-            // TODO(rg): check IpAddress in caller
-            var existingStream = _detectorStreams.GetStream(detector.IpAddress!);
+            var existingStream = _detectorStreams.GetStream(detector.IpAddress);
 
             if (existingStream is not null)
             {
@@ -74,11 +73,11 @@ public class DetectorHttpConnection : IDetectorConnection
             }
 
             var client = _httpClientFactory.CreateClient();
-            var stream = await client.GetStreamAsync($"http://{add}:3000/stream");
+            var stream = await client.GetStreamAsync($"{Scheme}://{detector.IpAddress}:{Port}/stream");
+            _detectorStreams.AddStream(detector.IpAddress, stream);
 
-            _detectorStreams.AddStream(detector.IpAddress!, stream);
             return stream;
-        } 
+        }
         catch (Exception ex)
         {
             return Result.Fail(ex.Message);

@@ -16,6 +16,12 @@ public class TaskInstance : IBaseEntity
     {
     }
 
+    public TaskInstance(Task task)
+    {
+        Events = new List<Event>();
+        Remaining = task.Steps.Select(s => s.Id).ToArray();
+    }
+
     public bool IsEnded(int stepId)
     {
         var list = Remaining.ToList();

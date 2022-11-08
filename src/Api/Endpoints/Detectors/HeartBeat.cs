@@ -40,7 +40,7 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
             Uptime = req.Uptime
         };
 
-        detector.HearthBeatLogs.Add(newLog);
+        detector.HeartBeatLogs.Add(newLog);
         await DetectorRepo.SaveChangesAsync(ct);
         await SendOkAsync(ct);
     }

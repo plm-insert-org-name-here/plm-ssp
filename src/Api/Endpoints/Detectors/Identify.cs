@@ -16,7 +16,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
     public class Req
     {
         public int LocationId { get; set; }
-        public string  MacAddress { get; set; } = default!;
+        public string MacAddress { get; set; } = default!;
     }
 
     public override void Configure()
@@ -39,6 +39,9 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
             ThrowError(ex.Message);
         }
 
+        // Endpoint is always called through TCP, so the IP address is never null
+        var remoteIpAddress = HttpContext.Connection.RemoteIpAddress!;
+
         var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(physicalMacAddress), ct);
         var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(req.LocationId), ct);
 
@@ -50,18 +53,13 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
 
         if (detector is null)
         {
-            var newDetector = new Detector(req.MacAddress, physicalMacAddress, req.LocationId, HttpContext.Connection.RemoteIpAddress!);
+            var newDetector = Detector.Create(req.MacAddress, physicalMacAddress, remoteIpAddress, location).Unwrap();
             await DetectorRepo.AddAsync(newDetector, ct);
-            location.AttachDetector(newDetector).Unwrap();
-
-            await LocationRepo.SaveChangesAsync(ct);
-
-            await SendNoContentAsync(ct);
-            return;
         }
-
-        detector.LocationId = req.LocationId;
-        location.AttachDetector(detector).Unwrap();
+        else
+        {
+            location.AttachDetector(detector).Unwrap();
+        }
 
         await DetectorRepo.SaveChangesAsync(ct);
         await LocationRepo.SaveChangesAsync(ct);
