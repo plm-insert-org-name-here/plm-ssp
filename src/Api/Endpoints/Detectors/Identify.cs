@@ -13,10 +13,15 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
 {
     public IRepository<Detector> DetectorRepo { get; set; } = default!;
     public IRepository<Location> LocationRepo { get; set; } = default!;
+
+    // TODO(rg): save calibration coords to database
     public class Req
     {
         public int LocationId { get; set; }
         public string MacAddress { get; set; } = default!;
+        public List<CalibrationCoordsReq> Coordinates { get; set; } = default!;
+
+        public record CalibrationCoordsReq(int X, int Y);
     }
 
     public override void Configure()

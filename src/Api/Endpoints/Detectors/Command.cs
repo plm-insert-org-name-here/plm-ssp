@@ -2,7 +2,6 @@ using Domain.Common.DetectorCommand;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Services;
-using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure;
 

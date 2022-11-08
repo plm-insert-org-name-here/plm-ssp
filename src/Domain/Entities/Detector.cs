@@ -23,7 +23,7 @@ public class Detector : IBaseEntity
     public class HeartBeatLog
     {
         public int Id { get; set; }
-        public string Temperature { get; set; } = default!;
+        public int Temperature { get; set; }
         public int FreeStoragePercentage { get; set; }
         public int Uptime { get; set; }
     }
