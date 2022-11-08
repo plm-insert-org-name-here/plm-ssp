@@ -1,3 +1,4 @@
+using System.Text;
 using Domain.Common;
 
 namespace Domain.Entities.TaskAggregate;
@@ -9,12 +10,24 @@ public class Step : IBaseEntity
     public TemplateState ExpectedInitialState { get; set; }
     public TemplateState ExpectedSubsequentState { get; set; }
 
+    public Object Object { get; set; } = default!;
+    public int ObjectId { get; set; }
+
+    public int TaskId { get; set; }
+
     private Step()
     {
     }
 
-    public Object Object { get; set; } = default!;
-    public int ObjectId { get; set; }
+    private Step(int id, int? orderNum, TemplateState init, TemplateState subs, int objectId, int taskId)
+    {
+        Id = id;
+        OrderNum = orderNum;
+        ExpectedInitialState = init;
+        ExpectedSubsequentState = subs;
+        ObjectId = objectId;
+        TaskId = taskId;
+    }
 
     public static Step Create(int newOrderNum, TemplateState newExpectedInitialState, TemplateState newExpectedSubsequentState, int newObjectId)
     {

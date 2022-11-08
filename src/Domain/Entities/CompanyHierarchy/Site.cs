@@ -11,6 +11,12 @@ public class Site : ICHNodeWithChildren<OPU>
 
     private Site() {}
 
+    private Site(int id, string name)
+    {
+        Id = id;
+        Name = name;
+    }
+
     private Site(string name)
     {
         Name = name;

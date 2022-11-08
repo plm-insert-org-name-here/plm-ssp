@@ -13,6 +13,12 @@ public class Line : ICHNode<OPU, Station>
     public int ParentId { get; set; }
 
     private Line() {}
+    private Line(int id, string name, int parentId)
+    {
+        Id = id;
+        Name = name;
+        ParentId = parentId;
+    }
 
     public Line(string name)
     {
