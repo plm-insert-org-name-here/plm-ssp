@@ -6,11 +6,18 @@ name: .NET
 on: push
 
 jobs:
-  build:
+  test:
+    env:
+      DB_DATABASE: plm_ssp_testing
+      DB_USER: plm
+      DB_PASSWORD: plm
 
     runs-on: ubuntu-latest
 
     steps:
+    - name: Setup MySQL
+      run: |
+        sudo /etc/init.d/mysql start
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -20,3 +27,5 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test -v n
