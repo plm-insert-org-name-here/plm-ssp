@@ -7,10 +7,6 @@ on: push
 
 jobs:
   test:
-    env:
-      DB_DATABASE: plm_ssp_testing
-      DB_USER: plm
-      DB_PASSWORD: plm
 
     runs-on: ubuntu-latest
 
@@ -29,3 +25,5 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test -v n
+      env:
+        Database__ConnectionString: "server=localhost;user=root;password=root;database=plm_ssp_testing"
