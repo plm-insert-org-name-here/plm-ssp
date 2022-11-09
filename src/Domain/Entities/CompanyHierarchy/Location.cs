@@ -18,11 +18,12 @@ public class Location : ICHNodeWithParent<Station>
 
     private Location() {}
 
-    private Location(int id, string name, int parentId)
+    private Location(int id, string name, int parentId, bool snapshot)
     {
         Id = id;
         Name = name;
         ParentId = parentId;
+        Snapshot = snapshot ? new byte[] { (byte) 2, (byte) 3 } : null ;
     }
 
     public Location(string name)
