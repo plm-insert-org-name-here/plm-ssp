@@ -30,6 +30,17 @@ public class Detector : IBaseEntity
 
     private Detector() { }
 
+    private Detector(int id, string name, string macAddressString, string ipAddressString, DetectorState state, int locationId)
+    {
+        Id = id;
+        Name = name;
+        MacAddress = PhysicalAddress.Parse(macAddressString);
+        IpAddress = IPAddress.Parse(ipAddressString);
+        State = state;
+        HeartBeatLogs = new List<HeartBeatLog>();
+        LocationId = locationId;
+    }
+
     public static Result<Detector> Create(string newName, PhysicalAddress newMacAddress, IPAddress newAddress, Location location)
     {
         var detector = new Detector

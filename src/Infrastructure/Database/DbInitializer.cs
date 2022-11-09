@@ -31,7 +31,7 @@ public static class DbInitializer
         {
             logger.Debug("Loading seed data");
             // new SeedLoader(context, env, logger).Load(config);
-            new DevSeedData(context).Load();
+            new CodeSeedLoader(context).Load();
         }
 
         logger.Debug("Database initialization finished");

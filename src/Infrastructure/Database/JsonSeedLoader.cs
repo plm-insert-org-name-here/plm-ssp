@@ -14,7 +14,7 @@ using Serilog;
 
 namespace Infrastructure.Database;
 
-public class SeedLoader
+public class JsonSeedLoader
 {
     private Context Context { get; }
     private IHostEnvironment Env { get; }
@@ -30,7 +30,7 @@ public class SeedLoader
         .Select(p => (p.Name, p.PropertyType))
         .ToDictionary(p => p.Item1, p => p.Item2);
 
-    public SeedLoader(Context context, IHostEnvironment env, ILogger logger)
+    public JsonSeedLoader(Context context, IHostEnvironment env, ILogger logger)
     {
         Context = context;
         Env = env;
