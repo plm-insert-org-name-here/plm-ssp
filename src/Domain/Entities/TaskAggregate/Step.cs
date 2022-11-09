@@ -1,5 +1,6 @@
 using System.Text;
 using Domain.Common;
+using FluentResults;
 
 namespace Domain.Entities.TaskAggregate;
 
@@ -29,14 +30,14 @@ public class Step : IBaseEntity
         TaskId = taskId;
     }
 
-    public static Step Create(int newOrderNum, TemplateState newExpectedInitialState, TemplateState newExpectedSubsequentState, int newObjectId)
+    public static Step Create(int orderNum, TemplateState exInitState, TemplateState exSubsState, Object obj)
     {
-        return new Step()
+        return new Step
         {
-            OrderNum = newOrderNum,
-            ExpectedInitialState = newExpectedInitialState,
-            ExpectedSubsequentState = newExpectedSubsequentState,
-            ObjectId = newObjectId
+            OrderNum = orderNum,
+            ExpectedInitialState = exInitState,
+            ExpectedSubsequentState = exSubsState,
+            Object = obj
         };
     }
 }
