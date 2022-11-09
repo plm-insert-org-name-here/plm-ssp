@@ -12,7 +12,7 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
     public class Req
     {
         public string MacAddress { get; set; } = default!;
-        public string Temperature { get; set; } = default!;
+        public int Temperature { get; set; }
         public int FreeStoragePercentage { get; set; }
         public int Uptime { get; set; }
     }
@@ -40,7 +40,7 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
             Uptime = req.Uptime
         };
 
-        detector.HearthBeatLogs.Add(newLog);
+        detector.HeartBeatLogs.Add(newLog);
         await DetectorRepo.SaveChangesAsync(ct);
         await SendOkAsync(ct);
     }

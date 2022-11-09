@@ -33,7 +33,7 @@ public class GetInstance : Endpoint<GetInstance.Req, GetInstance.Res>
 
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
-        var instance = await InstanceRepo.FirstOrDefaultAsync(new ActiveTaskInstanceWithEvents(req.TaskId), ct);
+        var instance = await InstanceRepo.FirstOrDefaultAsync(new ActiveTaskInstanceWithEventsSpec(req.TaskId), ct);
 
         if (instance is null)
         {

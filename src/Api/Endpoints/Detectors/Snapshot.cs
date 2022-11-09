@@ -26,7 +26,7 @@ public class Snapshot : Endpoint<Snapshot.Req>
     
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorWithLocationAndTasks(req.Id), ct);
+        var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorWithLocationAndTasksSpec(req.Id), ct);
 
         if (detector is null)
         {

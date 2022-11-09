@@ -10,7 +10,7 @@ using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Infrastructure.Database;
 
-public class DevSeedData
+public class CodeSeedLoader
 {
     private readonly Context _context;
 
@@ -50,7 +50,11 @@ public class DevSeedData
         typeof(Job).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
             new[] {typeof(int), typeof(string)})!;
 
-    public DevSeedData(Context context)
+    private static readonly ConstructorInfo DetectorConstructor =
+        typeof(Detector).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
+            new[] {typeof(int), typeof(string), typeof(string), typeof(string), typeof(DetectorState), typeof(int)})!;
+
+    public CodeSeedLoader(Context context)
     {
         _context = context;
     }
@@ -60,27 +64,39 @@ public class DevSeedData
         var sites = new List<Site>
         {
             (Site)SiteConstructor.Invoke(new object?[] { 1, "Site 1" }),
+            (Site)SiteConstructor.Invoke(new object?[] { 2, "Site 2" })
         };
 
         var opus = new List<OPU>
         {
-            (OPU)OpuConstructor.Invoke(new object?[] { 1, "OPU 1", 1 })
+            (OPU)OpuConstructor.Invoke(new object?[] { 1, "OPU 1-1", 1 }),
+            (OPU)OpuConstructor.Invoke(new object?[] { 2, "OPU 1-2", 1 }),
+            (OPU)OpuConstructor.Invoke(new object?[] { 3, "OPU 2-1", 2 }),
+            (OPU)OpuConstructor.Invoke(new object?[] { 4, "OPU 2-2", 2 })
         };
 
         var lines = new List<Line>
         {
-            (Line)LineConstructor.Invoke(new object?[] { 1, "Line 1", 1 })
+            (Line)LineConstructor.Invoke(new object?[] { 1, "Line 1-1", 1 }),
+            (Line)LineConstructor.Invoke(new object?[] { 2, "Line 1-2", 1 }),
+            (Line)LineConstructor.Invoke(new object?[] { 3, "Line 2-1", 2 }),
+            (Line)LineConstructor.Invoke(new object?[] { 4, "Line 2-2", 2 })
         };
 
         var stations = new List<Station>
         {
-            (Station)StationConstructor.Invoke(new object?[] { 1, "Station 1", 1 })
+            (Station)StationConstructor.Invoke(new object?[] { 1, "Station 1-1", 1 }),
+            (Station)StationConstructor.Invoke(new object?[] { 2, "Station 1-2", 1 }),
+            (Station)StationConstructor.Invoke(new object?[] { 3, "Station 2-1", 2 }),
+            (Station)StationConstructor.Invoke(new object?[] { 4, "Station 2-2", 2 })
         };
 
         var locations = new List<Location>
         {
             (Location)LocationConstructor.Invoke(new object?[] { 1, "Location 1", 1, true }),
-            (Location)LocationConstructor.Invoke(new object?[] { 2, "Location 2", 1, false })
+            (Location)LocationConstructor.Invoke(new object?[] { 2, "Location 2", 1, false }),
+            (Location)LocationConstructor.Invoke(new object?[] { 3, "Location 3", 2, true }),
+            (Location)LocationConstructor.Invoke(new object?[] { 4, "Location 4", 2, false })
         };
 
         var objects = new List<Object>
@@ -128,6 +144,14 @@ public class DevSeedData
             (Job)JobConstructor.Invoke(new object?[] { 1, "Job 1" })
         };
 
+        var detectors = new List<Detector>
+        {
+            (Detector)DetectorConstructor.Invoke(new object?[]
+                { 1, "Detector 1", "11:22:33:44:55:66", "127.0.0.1", DetectorState.Off, 1}),
+            (Detector)DetectorConstructor.Invoke(new object?[]
+                { 2, "Detector 2", "12:34:56:78:90:AB", "127.0.0.1", DetectorState.Off, 2})
+        };
+
         _context.Sites.AddRange(sites);
         _context.OPUs.AddRange(opus);
         _context.Lines.AddRange(lines);
@@ -138,6 +162,7 @@ public class DevSeedData
         _context.Tasks.AddRange(tasks);
         _context.Objects.AddRange(objects);
         _context.Steps.AddRange(steps);
+        _context.Detectors.AddRange(detectors);
 
         _context.SaveChanges();
     }

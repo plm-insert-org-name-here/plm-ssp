@@ -2,7 +2,7 @@ using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
 
-namespace Domain.Services;
+namespace Application.Services;
 
 public class CHNameUniquenessChecker<TParent, T> : ICHNameUniquenessChecker<TParent, T>
     where TParent: class, ICHNodeWithChildren<T>

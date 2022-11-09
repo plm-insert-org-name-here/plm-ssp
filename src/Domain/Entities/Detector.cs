@@ -2,39 +2,55 @@ using System.Net;
 using System.Net.NetworkInformation;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities;
 
 public class Detector : IBaseEntity
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = default!;
-    public PhysicalAddress MacAddress { get; set; } = default!;
-    public IPAddress? IpAddress { get; set; }
-    public DetectorState State { get; set; }
+    public int Id { get; private set; }
+    public string Name { get; private set; } = default!;
+    public PhysicalAddress MacAddress { get; private set; } = default!;
+    public IPAddress IpAddress { get; private set; } = default!;
+    public DetectorState State { get; private set; }
+    public List<HeartBeatLog> HeartBeatLogs { get; private set; } = default!;
 
-    public Location? Location { get; set; }
-    public int? LocationId { get; set; }
-
-    private Detector() { }
-    public List<HeartBeatLog> HearthBeatLogs { get; set; } = default!;
+    public Location? Location { get; private set; }
+    public int? LocationId { get; private set; }
 
     [Owned]
     public class HeartBeatLog
     {
         public int Id { get; set; }
-        public string Temperature { get; set; } = default!;
+        public int Temperature { get; set; }
         public int FreeStoragePercentage { get; set; }
         public int Uptime { get; set; }
     }
 
-    public Detector(string newName, PhysicalAddress newMacAddress, int newLocationId, IPAddress newAddress)
+    private Detector() { }
+
+    private Detector(int id, string name, string macAddressString, string ipAddressString, DetectorState state, int locationId)
     {
-        Name = newName;
-        MacAddress = newMacAddress;
-        LocationId = newLocationId;
-        HearthBeatLogs = new List<HeartBeatLog>();
-        IpAddress = newAddress;
+        Id = id;
+        Name = name;
+        MacAddress = PhysicalAddress.Parse(macAddressString);
+        IpAddress = IPAddress.Parse(ipAddressString);
+        State = state;
+        HeartBeatLogs = new List<HeartBeatLog>();
+        LocationId = locationId;
+    }
+
+    public static Result<Detector> Create(string newName, PhysicalAddress newMacAddress, IPAddress newAddress, Location location)
+    {
+        var detector = new Detector
+        {
+            Name = newName,
+            MacAddress = newMacAddress,
+            IpAddress = newAddress,
+            HeartBeatLogs = new List<HeartBeatLog>()
+        };
+
+        return location.AttachDetector(detector).ToResult(detector);
     }
 }

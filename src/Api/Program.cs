@@ -7,7 +7,6 @@ using Application.Interfaces;
 using Application.Services;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
-using Domain.Services;
 using FastEndpoints;
 using FastEndpoints.ClientGen;
 using FastEndpoints.Swagger;

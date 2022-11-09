@@ -2,7 +2,7 @@ using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
 
-namespace Domain.Services;
+namespace Application.Services;
 
 public class SiteNameUniquenessChecker : ICHNameUniquenessChecker<Site>
 {
