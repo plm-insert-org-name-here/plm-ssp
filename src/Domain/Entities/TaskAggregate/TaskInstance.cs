@@ -15,7 +15,7 @@ public class TaskInstance : IBaseEntity
     private TaskInstance()
     {
     }
-
+    
     public bool IsEnded(int stepId)
     {
         var list = Remaining.ToList();

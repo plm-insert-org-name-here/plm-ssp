@@ -29,14 +29,15 @@ public class Step : IBaseEntity
         TaskId = taskId;
     }
 
-    public static Step Create(int newOrderNum, TemplateState newExpectedInitialState, TemplateState newExpectedSubsequentState, int newObjectId)
+    public static Step Create(int newOrderNum, TemplateState newExpectedInitialState, TemplateState newExpectedSubsequentState, int newObjectId, int newTaskId)
     {
-        return new Step()
+        return new Step
         {
             OrderNum = newOrderNum,
             ExpectedInitialState = newExpectedInitialState,
             ExpectedSubsequentState = newExpectedSubsequentState,
-            ObjectId = newObjectId
+            ObjectId = newObjectId,
+            TaskId = newTaskId
         };
     }
 }

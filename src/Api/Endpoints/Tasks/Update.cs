@@ -6,14 +6,15 @@ using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
 using Object = Domain.Entities.TaskAggregate.Object;
+using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Api.Endpoints.Tasks;
 
-public class Update : Endpoint<Update.Req, EmptyResponse>
+public class Update : Endpoint<Update.Req, Update.Res>
 {
     public IRepository<Job> JobRepo { get; set; } = default!;
 
-    public IRepository<Object> ObjectRepo { get; set; } = default!;
+    public IRepository<Task> TaskRepo { get; set; } = default!;
 
     public class Req
     {
@@ -35,6 +36,21 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         public TaskType NewType { get; set; }
     }
 
+    public class Res
+    {
+        public ResTask Task { get; set; } = default!;
+        public List<NewStepRes> Steps { get; set; } = default!;
+
+        public record NewStepRes(int? OrderNum, TemplateState ExpectedInitialState, TemplateState ExpectedSubsequentState, int ObjectId);
+        public record ResTask(int Id, int ParentJobId, string Name, TaskType Type, int NumObjects, int NumSteps);
+    }
+
+    public Res MapOut(Task task, List<Step> steps) => new()
+    {
+        Task = new Res.ResTask(task.Id, task.JobId, task.Name, task.Type, task.Objects.Count, task.Steps.Count),
+        Steps = steps.Select(s => new Res.NewStepRes(s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId)).ToList()
+    };
+
     public override void Configure()
     {
         Put(Api.Routes.Tasks.Update);
@@ -51,8 +67,8 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             return;
         }
 
-        var task = job.Tasks.FirstOrDefault(t => t.Id == req.Id);
-        if (task is null)
+        var task = await TaskRepo.FirstOrDefaultAsync(new TaskWithChildrenSpec(req.Id), ct);
+        if (task is null || task.JobId != job.Id)
         {
             await SendNotFoundAsync(ct);
             return;
@@ -69,7 +85,13 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         // TODO: steps should refer to objects by their names and not by ID, because on object creation, their ID is unknown until the DB roundtrip
 
         // check if steps' object belongs to this task
-        if (req.ModifiedSteps.All(s => task.IsObjectBelongsTo(s.ObjectId)) && req.NewSteps.All(s => task.IsObjectBelongsTo(s.ObjectId)))
+        if (!req.NewSteps.Any() && !req.NewSteps.All(s => task.IsObjectBelongsTo(s.ObjectId)))
+        {
+            ThrowError("Some Objects do not belong to this Task");
+            return;
+        }
+        
+        if (!req.ModifiedSteps.Any() && !req.ModifiedSteps.All(s => task.IsObjectBelongsTo(s.ObjectId)))
         {
             ThrowError("Some Objects do not belong to this Task");
             return;
@@ -80,14 +102,16 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         task.Steps.RemoveAll(s => req.DeletedSteps.Contains(s.Id));
 
         // TODO: modify
-        task.Objects = task.Objects.Where(o => req.ModifiedObjects.Select(m => m.Id).Contains(o.Id)).ToList();
-        task.Steps = task.Steps.Where(s => req.ModifiedSteps.Select(m => m.Id).Contains(s.Id)).ToList();
+        // task.Objects = task.Objects.Where(o => req.ModifiedObjects.Select(m => m.Id).Contains(o.Id)).ToList();
+        // task.Steps = task.Steps.Where(s => req.ModifiedSteps.Select(m => m.Id).Contains(s.Id)).ToList();
 
         //add
         task.Objects.AddRange(req.NewObjects.Select(o => Object.Create(o.Name, o.Coordinates)));
-        task.Steps.AddRange(req.NewSteps.Select(s => Step.Create(s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId)));
-
+        task.Steps.AddRange(req.NewSteps.Select(s => Step.Create(s.OrderNum, s.ExpectedInitialState, s.ExpectedSubsequentState, s.ObjectId, req.Id)));
+        
         await JobRepo.SaveChangesAsync(ct);
-        await SendNoContentAsync(ct);
+        
+        var res = MapOut(task, task.Steps);
+        await SendOkAsync(res, ct);
     }
 }

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
 
@@ -20,7 +21,7 @@ public class Task : IBaseEntity
 
     private Task() {}
 
-    private Task(int id, string name, TaskType type, int locationId, int jobId)
+    private Task(int id, string name, TaskType type, int locationId, int jobId, TaskState taskState)
     {
         Id = id;
         Name = name;
@@ -31,6 +32,7 @@ public class Task : IBaseEntity
         Instances = new List<TaskInstance>();
         Objects = new List<Object>();
         Steps = new List<Step>();
+        State = taskState;
     }
 
     public Task(string name, List<Object> objects, List<Step> steps, int locationId)
@@ -43,6 +45,6 @@ public class Task : IBaseEntity
 
     public bool IsObjectBelongsTo(int id)
     {
-        return Objects.Select(o => o.Id).Contains(id);
+        return Objects.Any() && Objects.Select(o => o.Id).Contains(id);
     }
 }
