@@ -2,7 +2,6 @@ using System.Net;
 using Api;
 using FastEndpoints;
 using Xunit;
-using Xunit.Priority;
 using Endpoint = Api.Endpoints.Tasks.Create;
 
 namespace ApiIntegrationTests.Tasks;
@@ -11,7 +10,7 @@ namespace ApiIntegrationTests.Tasks;
 public class Create : IClassFixture<Setup>
 {
     private readonly HttpClient _client;
-    
+
     public Create(Setup setup)
     {
         _client = setup.Client;
@@ -26,19 +25,19 @@ public class Create : IClassFixture<Setup>
             ParentJobId = 1,
             LocationId = 1
         };
-    
+
         var (response, result) = await _client.POSTAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req);
-    
+
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-    
+
         Assert.NotNull(result);
         Assert.Equal(3, result.Id);
-        Assert.Equal("New Task", result.Name); 
+        Assert.Equal("New Task", result.Name);
     }
-    
+
     [Fact]
-    public async Task BadrequestForNoSnapshot()
+    public async Task BadRequestForNoSnapshot()
     {
         Endpoint.Req req = new()
         {
@@ -46,15 +45,13 @@ public class Create : IClassFixture<Setup>
             ParentJobId = 1,
             LocationId = 2
         };
-    
+
         var (response, result) = await _client.POSTAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req);
-    
+
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        // var exceptionResponse = await response.Content.ReadFromJsonAsync<ApiExceptionResponse>();
-        // Assert.Equal("One or more domain errors occurred.", exceptionResponse?.Description);
     }
-    
+
     [Fact]
     public async Task CantCreateWithInvalidParentId()
     {
@@ -70,7 +67,7 @@ public class Create : IClassFixture<Setup>
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
-    
+
     [Fact]
     public async Task CantCreateWithInvalidLocationId()
     {
@@ -86,7 +83,7 @@ public class Create : IClassFixture<Setup>
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
-    
+
     // [Fact]
     // public async Task CantCreateWithDuplicateNameWithinParent()
     // {
