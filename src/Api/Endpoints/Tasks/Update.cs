@@ -12,7 +12,6 @@ namespace Api.Endpoints.Tasks;
 public class Update : Endpoint<Update.Req, EmptyResponse>
 {
     public IRepository<Job> JobRepo { get; set; } = default!;
-    public IRepository<Object> ObjectRepo { get; set; } = default!;
 
     public class Req
     {
@@ -82,7 +81,7 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         }
 
         var task = job.Tasks.FirstOrDefault(t => t.Id == req.Id);
-        if (task is null)
+        if (task is null || task.JobId != job.Id)
         {
             await SendNotFoundAsync(ct);
             return;
