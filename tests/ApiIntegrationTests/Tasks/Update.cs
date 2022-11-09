@@ -63,11 +63,11 @@ public class Update : IClassFixture<Setup>
             ParentJobId = 1,
             NewObjects = new List<Endpoint.Req.NewObjectReq>
             {
-                new("newTestObjectName",
-                    new ObjectCoordinates {X = 10, Y = 10, Width = 100, Height = 100}),
                 new("newTestObjectName2",
-                    new ObjectCoordinates { X = 20, Y = 20, Width = 200, Height = 200}),
+                    new ObjectCoordinates {X = 10, Y = 10, Width = 100, Height = 100}),
                 new("newTestObjectName3",
+                    new ObjectCoordinates { X = 20, Y = 20, Width = 200, Height = 200}),
+                new("newTestObjectName4",
                     new ObjectCoordinates { X = 30, Y = 30, Width = 300, Height = 300})
             }
         };
