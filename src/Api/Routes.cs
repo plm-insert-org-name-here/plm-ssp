@@ -49,11 +49,12 @@ public static class Routes
 
     public static class Detectors
     {
+        public const string List = "detectors";
+
         public const string Command = "detectors/{id}/command";
         public const string Snapshot = "detectors/{id}/snapshot";
         public const string Stream = "detectors/{id}/stream";
 
-        public const string GetAll = "detectors";
         public const string GetAllAttachable = "detectors/attachable";
         public const string GetById = "detectors/{id}";
         public const string Update = "detectors/{id}";
