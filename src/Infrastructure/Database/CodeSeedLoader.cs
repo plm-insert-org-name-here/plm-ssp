@@ -54,6 +54,10 @@ public class CodeSeedLoader
         typeof(Detector).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
             new[] {typeof(int), typeof(string), typeof(string), typeof(string), typeof(DetectorState), typeof(int)})!;
 
+    private static readonly ConstructorInfo TaskInstanceConstructor =
+        typeof(TaskInstance).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
+            new[] {typeof(int), typeof(int), typeof(TaskInstanceFinalState?)})!;
+    
     public CodeSeedLoader(Context context)
     {
         _context = context;
@@ -152,6 +156,16 @@ public class CodeSeedLoader
                 { 2, "Detector 2", "12:34:56:78:90:AB", "127.0.0.1", DetectorState.Off, 2})
         };
 
+        var instances = new List<TaskInstance>
+        {
+            (TaskInstance)TaskInstanceConstructor.Invoke(new object?[]
+                { 1, 1, TaskInstanceFinalState.Completed }),
+            (TaskInstance)TaskInstanceConstructor.Invoke(new object?[]
+                { 2, 1, null }),
+            (TaskInstance)TaskInstanceConstructor.Invoke(new object?[]
+                { 3, 2, TaskInstanceFinalState.Completed })
+        };
+
         _context.Sites.AddRange(sites);
         _context.OPUs.AddRange(opus);
         _context.Lines.AddRange(lines);
@@ -163,6 +177,8 @@ public class CodeSeedLoader
         _context.Objects.AddRange(objects);
         _context.Steps.AddRange(steps);
         _context.Detectors.AddRange(detectors);
+        
+        _context.TaskInstances.AddRange(instances);
 
         _context.SaveChanges();
     }

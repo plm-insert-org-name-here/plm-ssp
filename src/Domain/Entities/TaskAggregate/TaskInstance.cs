@@ -10,10 +10,13 @@ public class TaskInstance : IBaseEntity
 
     public Task Task { get; set; } = default!;
     public int TaskId { get; set; }
-    public int[] Remaining { get; set; } = default!;
+    public int[]? Remaining { get; set; } = default!;
 
-    private TaskInstance()
+    private TaskInstance(int id, int taskId, TaskInstanceFinalState? finalState)
     {
+        Id = id;
+        FinalState = finalState;
+        TaskId = taskId;
     }
 
     public TaskInstance(Task task)
