@@ -53,4 +53,13 @@ public class Detector : IBaseEntity
 
         return location.AttachDetector(detector).ToResult(detector);
     }
+
+    public Result SendRecalibrate(List<CalibrationCoordinates>? coords)
+    {
+        if (coords is null)
+        {
+            Result.Fail("This detector has no original coordinates!");
+        }
+        return Result.Ok();
+    }
 }

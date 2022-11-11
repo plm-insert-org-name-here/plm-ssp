@@ -13,6 +13,7 @@ public class Location : ICHNodeWithParent<Station>
     public int ParentId { get; set; }
     public Detector? Detector { get; set; }
     public List<Task> Tasks { get; set; } = default!;
+    public List<CalibrationCoordinates>? OriginalCoordinates { get; set; } = default!;
 
     public byte[]? Snapshot { get; set; }
 
@@ -74,5 +75,18 @@ public class Location : ICHNodeWithParent<Station>
 
         Detector = null;
         return Result.Ok();
+    }
+
+    public List<CalibrationCoordinates> SetNewCoordinates(List<CalibrationCoordinates> coords)
+    {
+        if (OriginalCoordinates is not null)
+        {
+            var old = OriginalCoordinates;
+            OriginalCoordinates = coords;
+            return old;
+        }
+        OriginalCoordinates = coords;
+        return new List<CalibrationCoordinates>();
+
     }
 }

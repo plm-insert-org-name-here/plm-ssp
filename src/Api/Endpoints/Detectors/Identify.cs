@@ -1,4 +1,5 @@
 using System.Net.NetworkInformation;
+using Domain.Common;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
@@ -60,10 +61,18 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         {
             var newDetector = Detector.Create(req.MacAddress, physicalMacAddress, remoteIpAddress, location).Unwrap();
             await DetectorRepo.AddAsync(newDetector, ct);
+            detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(physicalMacAddress), ct);
         }
         else
         {
             location.AttachDetector(detector).Unwrap();
+        }
+
+        var originalCoords =
+            location.SetNewCoordinates(req.Coordinates.Select(c => new CalibrationCoordinates(c.X, c.Y)).ToList());
+        if (!originalCoords.Any())
+        {
+            detector?.SendRecalibrate(originalCoords);
         }
 
         await DetectorRepo.SaveChangesAsync(ct);
