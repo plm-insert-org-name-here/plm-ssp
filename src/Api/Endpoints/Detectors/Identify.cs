@@ -72,7 +72,13 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
             location.SetNewCoordinates(req.Coordinates.Select(c => new CalibrationCoordinates(c.X, c.Y)).ToList());
         if (!originalCoords.Any())
         {
-            detector?.SendRecalibrate(originalCoords);
+            if (originalCoords.All(c => c.IsValid()))
+            {
+                var result = detector?.SendRecalibrate(originalCoords);
+                result?.Unwrap();
+            }
+            ThrowError("some of the coordinates are not valid!");
+            return;
         }
 
         await DetectorRepo.SaveChangesAsync(ct);

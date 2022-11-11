@@ -10,8 +10,7 @@ public class CalibrationCoordinates
         X = x;
         Y = y;
     }
-
-    // TODO(rg): read constants from config?
+    
     public bool IsValid()
     {
         if (X is < 0 or > 640) return false;
