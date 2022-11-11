@@ -6,9 +6,14 @@ using FastEndpoints;
 
 namespace Api.Endpoints.Detectors;
 
-public class List : EndpointWithoutRequest<IEnumerable<List.Res>>
+public class GetById : Endpoint<GetById.Req, GetById.Res>
 {
     public IRepository<Detector> DetectorRepo { get; set; } = default!;
+
+    public class Req
+    {
+        public int Id { get; set; }
+    }
 
     public class Res
     {
@@ -41,15 +46,21 @@ public class List : EndpointWithoutRequest<IEnumerable<List.Res>>
 
     public override void Configure()
     {
-        Get(Api.Routes.Detectors.List);
+        Get(Api.Routes.Detectors.GetById);
         AllowAnonymous();
         Options(x => x.WithTags("Detectors"));
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var detectors = await DetectorRepo.ListAsync(new DetectorsWithLocationSpec(), ct);
+        var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByIdWithLocationSpec(req.Id), ct);
 
-        await SendOkAsync(detectors.Select(MapOut), ct);
+        if (detector is null)
+        {
+            await SendNotFoundAsync(ct);
+            return;
+        }
+
+        await SendOkAsync(MapOut(detector), ct);
     }
 }
