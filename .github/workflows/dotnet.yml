@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test -v n
+      run: dotnet test -v n --logger "trx;LogFileName=test-results.trx"
       env:
         Database__ConnectionString: "server=localhost;user=root;password=root;database=plm_ssp_testing"
     - name: Test Report
