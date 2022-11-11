@@ -1,5 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Domain.Common;
 
+[Owned]
 public class CalibrationCoordinates
 {
     public int X { get; set; }
