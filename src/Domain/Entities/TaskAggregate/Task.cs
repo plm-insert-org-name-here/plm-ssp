@@ -111,7 +111,7 @@ public class Task : IBaseEntity
         return Result.Ok();
     }
 
-    public Result AddEventToCurrentInstance(int stepId, EventResult eventResult)
+    public Result AddEventToCurrentInstance(int stepId, EventResult eventResult, Detector detector)
     {
         if (State is not TaskState.Active)
             return Result.Fail("Task is not active");
@@ -127,7 +127,11 @@ public class Task : IBaseEntity
         if (addEventResult.IsFailed) return addEventResult;
 
         if (currentInstance.IsEnded())
+        {
             State = TaskState.Inactive;
+            detector.RemoveFromState(DetectorState.Monitoring);
+            detector.AddToState(DetectorState.Standby);
+        }
 
         return Result.Ok();
     }

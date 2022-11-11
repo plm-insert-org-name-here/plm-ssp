@@ -58,7 +58,7 @@ public class Create: Endpoint<Create.Req, EmptyResponse>
 
         var eventResult = EventResult.Create(req.Success, req.FailureReason).Unwrap();
 
-        task.AddEventToCurrentInstance(req.StepId, eventResult).Unwrap();
+        task.AddEventToCurrentInstance(req.StepId, eventResult, location.Detector).Unwrap();
 
         await TaskRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);
