@@ -2,6 +2,7 @@ using System.Data;
 using System.Net;
 using System.Text.Json;
 using Application.Interfaces;
+using Domain.Common;
 using Domain.Common.DetectorCommand;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -82,5 +83,22 @@ public class DetectorHttpConnection : IDetectorConnection
         {
             return Result.Fail(ex.Message);
         }
+    }
+
+    public async Task<Result> SendCalibrationData(Detector detector, List<CalibrationCoordinates> coordinates)
+    {
+        try
+        {
+            var client = _httpClientFactory.CreateClient();
+            var json = JsonSerializer.Serialize(coordinates);
+
+            var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/recalibrate", new StringContent(json));
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(ex.Message);
+        }
+
+        return Result.Ok();
     }
 }

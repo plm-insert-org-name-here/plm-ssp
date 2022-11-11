@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,12 +55,16 @@ public class Detector : IBaseEntity
         return location.AttachDetector(detector).ToResult(detector);
     }
 
-    public Result SendRecalibrate(List<CalibrationCoordinates>? coords)
+    public Result SendRecalibrate(List<CalibrationCoordinates>? coords, IDetectorConnection detectorConnection)
     {
         if (coords is null)
         {
             Result.Fail("This detector has no original coordinates!");
         }
+    
+        var result = detectorConnection.SendCalibrationData(this, coords);
+        
+        //küldeni kell rpi-nek egy requestet, paraméterei: original coordinates, tálca coordinates
         return Result.Ok();
     }
 }

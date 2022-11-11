@@ -14,6 +14,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
 {
     public IRepository<Detector> DetectorRepo { get; set; } = default!;
     public IRepository<Location> LocationRepo { get; set; } = default!;
+    public IDetectorConnection DetectorConnection { get; set; } = default!;
 
     // TODO(rg): save calibration coords to database
     public class Req
@@ -74,7 +75,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         {
             if (originalCoords.All(c => c.IsValid()))
             {
-                var result = detector?.SendRecalibrate(originalCoords);
+                var result = detector?.SendRecalibrate(originalCoords, DetectorConnection);
                 result?.Unwrap();
             }
             ThrowError("some of the coordinates are not valid!");

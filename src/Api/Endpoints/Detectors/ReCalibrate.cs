@@ -9,6 +9,7 @@ namespace Api.Endpoints.Detectors;
 public class ReCalibrate : Endpoint<ReCalibrate.Req, EmptyResponse>
 {
     public IRepository<Location> LocationRepo { get; set; } = default!;
+    public IDetectorConnection DetectorConnection { get; set; } = default!;
     public class Req
     {
         public int LocationId { get; set; }
@@ -37,7 +38,7 @@ public class ReCalibrate : Endpoint<ReCalibrate.Req, EmptyResponse>
             return;
         }
         
-        var result = location.Detector.SendRecalibrate(location.OriginalCoordinates);
+        var result = location.Detector.SendRecalibrate(location.OriginalCoordinates, DetectorConnection);
         result.Unwrap();
         
         await SendNoContentAsync(ct);
