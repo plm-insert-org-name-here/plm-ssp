@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
