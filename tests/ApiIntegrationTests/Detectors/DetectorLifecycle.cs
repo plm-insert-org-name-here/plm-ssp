@@ -15,6 +15,7 @@ using IdentifyEP = Api.Endpoints.Detectors.Identify;
 using CommandEP = Api.Endpoints.Detectors.Command;
 using EventEP = Api.Endpoints.Events.Create;
 using TaskEP = Api.Endpoints.Tasks.GetById;
+using DetectorEP = Api.Endpoints.Detectors.GetById;
 
 [Collection("Sequential")]
 [TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]
@@ -37,7 +38,18 @@ public class DetectorLifecycle : IClassFixture<Setup>
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
-    // TODO(rg): more descriptive name
+    private async Task DetectorStateIsCorrect(int detectorId, DetectorState expectedState)
+    {
+        DetectorEP.Req req = new() { Id = detectorId };
+
+        var (response, result) = await _client.GETAsync<DetectorEP, DetectorEP.Req, DetectorEP.Res>(req);
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(result);
+        Assert.Equal(expectedState, result.State);
+    }
+
     [Fact, Priority(0)]
     public async Task DetectorCanIdentifyItselfAndPerformSimpleTask()
     {
@@ -53,7 +65,7 @@ public class DetectorLifecycle : IClassFixture<Setup>
         Assert.NotNull(identityResponse);
         Assert.Equal(HttpStatusCode.NoContent, identityResponse.StatusCode);
 
-        // TODO: check device status (standby)
+        await DetectorStateIsCorrect(2, DetectorState.Standby);
 
         CommandEP.Req commandReq = new()
         {
@@ -66,7 +78,7 @@ public class DetectorLifecycle : IClassFixture<Setup>
         Assert.NotNull(commandResponse);
         Assert.Equal(HttpStatusCode.NoContent, commandResponse.StatusCode);
 
-        // TODO: check device status (monitoring)
+        await DetectorStateIsCorrect(2, DetectorState.Monitoring);
 
         await CanSendSuccessEvent(
             new EventEP.Req
@@ -98,8 +110,10 @@ public class DetectorLifecycle : IClassFixture<Setup>
         Assert.Equal(HttpStatusCode.OK, taskResponse.StatusCode);
         Assert.NotNull(taskResult);
         Assert.Equal(TaskState.Inactive, taskResult.State);
+        Assert.NotNull(taskResult.LatestInstance);
+        Assert.Equal(TaskInstanceFinalState.Completed, taskResult.LatestInstance.FinalState);
+        Assert.Equal(3, taskResult.LatestInstance.Events.Count());
 
-        // TODO: check device status(standby)
-        // TODO: check task instance status & events (completed & 3)
+        await DetectorStateIsCorrect(2, DetectorState.Standby);
     }
 }
