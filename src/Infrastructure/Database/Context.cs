@@ -38,7 +38,7 @@ public class Context : DbContext
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
         
-        modelBuilder.Entity<TaskInstance>().Property(x => x.Remaining).HasConversion(new ValueConverter<int[], string>(
+        modelBuilder.Entity<TaskInstance>().Property(x => x.RemainingStepIds).HasConversion(new ValueConverter<int[], string>(
             i => string.Join(",", i),
             s => string.IsNullOrWhiteSpace(s) ? new int[0] : s.Split(new[] { ',' }).Select(v => int.Parse(v)).ToArray()));
     }

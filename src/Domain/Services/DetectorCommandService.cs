@@ -5,6 +5,7 @@ using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FluentResults;
+using Microsoft.Extensions.Logging;
 using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Domain.Services;
@@ -14,17 +15,18 @@ public class DetectorCommandService
     private readonly IDetectorConnection _detectorConnection;
     private readonly IRepository<Location> _locationRepo;
     private readonly IRepository<Task> _taskRepo;
+    private readonly ILogger<DetectorCommandService> _logger;
 
-    public DetectorCommandService(IDetectorConnection detectorConnection, IRepository<Task> taskRepo, IRepository<Location> locationRepo)
+    public DetectorCommandService(IDetectorConnection detectorConnection, IRepository<Task> taskRepo, IRepository<Location> locationRepo, ILogger<DetectorCommandService> logger)
     {
         _detectorConnection = detectorConnection;
         _taskRepo = taskRepo;
         _locationRepo = locationRepo;
+        _logger = logger;
     }
 
     public async Task<Result> HandleCommand(Detector detector, DetectorCommand command, CancellationToken ct)
     {
-
         var location = detector.LocationId.HasValue ?
             await _locationRepo.FirstOrDefaultAsync(new LocationWithTasksSpec(detector.LocationId.Value), ct) :
             null;
@@ -50,14 +52,17 @@ public class DetectorCommandService
                     return Result.Fail("A new instance of a Task cannot be started while another is in progress");
 
                 var taskId = ((DetectorCommand.StartDetection)command).TaskId;
-                var task = await _taskRepo.GetByIdAsync(taskId, ct);
+                var task = await _taskRepo.FirstOrDefaultAsync(new TaskWithChildrenSpec(taskId), ct);
                 if (task is null)
                     return Result.Fail("The specified Task does not exist");
 
-                if (location.Tasks.Contains(task))
+                if (!location.Tasks.Contains(task))
                     return Result.Fail("The Detector cannot start the specified Task, as it does not belong to the Detector's Location");
 
                 task.CreateInstance();
+
+                detector.RemoveFromState(DetectorState.Standby);
+                detector.AddToState(DetectorState.Monitoring);
             }
             else if (command.IsStopDetection)
             {
@@ -66,6 +71,9 @@ public class DetectorCommandService
 
                 var result = ongoingTask.StopCurrentInstance();
                 if (result.IsFailed) return result;
+
+                detector.RemoveFromState(DetectorState.Monitoring);
+                detector.AddToState(DetectorState.Standby);
             }
             else if (command.IsPauseDetection)
             {
@@ -74,6 +82,9 @@ public class DetectorCommandService
 
                 var result = ongoingTask.PauseCurrentInstance();
                 if (result.IsFailed) return result;
+
+                detector.RemoveFromState(DetectorState.Monitoring);
+                detector.AddToState(DetectorState.Standby);
             }
             else if (command.IsResumeDetection)
             {
@@ -82,11 +93,12 @@ public class DetectorCommandService
 
                 var result = ongoingTask.ResumeCurrentInstance();
                 if (result.IsFailed) return result;
+
+                detector.RemoveFromState(DetectorState.Standby);
+                detector.AddToState(DetectorState.Monitoring);
             }
         }
 
-        await _detectorConnection.SendCommand(detector, command);
-
-        return Result.Ok();
+        return await _detectorConnection.SendCommand(detector, command);
     }
 }

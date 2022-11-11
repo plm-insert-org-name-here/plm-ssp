@@ -48,9 +48,25 @@ public class Detector : IBaseEntity
             Name = newName,
             MacAddress = newMacAddress,
             IpAddress = newAddress,
+            State = DetectorState.Standby,
             HeartBeatLogs = new List<HeartBeatLog>()
         };
 
         return location.AttachDetector(detector).ToResult(detector);
+    }
+
+    public void SetState(DetectorState state)
+    {
+        State = state;
+    }
+
+    public void AddToState(DetectorState state)
+    {
+        State |= state;
+    }
+
+    public void RemoveFromState(DetectorState state)
+    {
+        State &= ~state;
     }
 }

@@ -6,7 +6,7 @@ using FastEndpoints;
 
 namespace Api.Endpoints.Tasks;
 
-public class GetInstance : Endpoint<GetInstance.Req, GetInstance.Res>
+public class GetCurrentInstance : Endpoint<GetCurrentInstance.Req, GetCurrentInstance.Res>
 {
     public IRepository<TaskInstance> InstanceRepo { get; set; } = default!;
     public class Req
@@ -33,7 +33,7 @@ public class GetInstance : Endpoint<GetInstance.Req, GetInstance.Res>
 
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
-        var instance = await InstanceRepo.FirstOrDefaultAsync(new ActiveTaskInstanceWithEventsSpec(req.TaskId), ct);
+        var instance = await InstanceRepo.FirstOrDefaultAsync(new CurrentTaskInstanceWithEventsSpec(req.TaskId), ct);
 
         if (instance is null)
         {

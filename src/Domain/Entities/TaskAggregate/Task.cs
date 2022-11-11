@@ -49,6 +49,7 @@ public class Task : IBaseEntity
         var instance = new TaskInstance(this);
 
         Instances.Add(instance);
+        State = TaskState.Active;
     }
 
     public void AddObjects(IEnumerable<Object> objects)
@@ -100,13 +101,33 @@ public class Task : IBaseEntity
         Steps.RemoveAll(s => stepIds.Contains(s.Id));
     }
 
-
     public Result Rename(string newName, Job parentJob)
     {
         if (parentJob.Tasks.Where(t => t.Id != Id).Select(t => t.Name).Contains(newName))
             return Result.Fail("Tasks' names within the same Job must be unique");
 
         Name = newName;
+
+        return Result.Ok();
+    }
+
+    public Result AddEventToCurrentInstance(int stepId, EventResult eventResult)
+    {
+        if (State is not TaskState.Active)
+            return Result.Fail("Task is not active");
+
+        var currentInstance = Instances.FirstOrDefault(i => i.FinalState is null);
+        if (currentInstance is null)
+            return Result.Fail("Task does not have a running instance");
+
+        if (!Steps.Select(s => s.Id).Contains(stepId))
+            return Result.Fail("Task does not contain the referenced Step");
+
+        var addEventResult = currentInstance.AddEvent(new Event(DateTime.Now, eventResult, stepId, currentInstance.Id));
+        if (addEventResult.IsFailed) return addEventResult;
+
+        if (currentInstance.IsEnded())
+            State = TaskState.Inactive;
 
         return Result.Ok();
     }
@@ -120,7 +141,7 @@ public class Task : IBaseEntity
         if (State is not (TaskState.Active or TaskState.Paused))
             return Result.Fail("Task is Inactive, therefore it cannot be stopped");
 
-        currentInstance.FinalState = TaskInstanceFinalState.Abandoned;
+        currentInstance.Abandon();
         State = TaskState.Inactive;
 
         return Result.Ok();

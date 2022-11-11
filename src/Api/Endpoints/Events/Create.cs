@@ -4,6 +4,7 @@ using Domain.Entities.TaskAggregate;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure;
 using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Api.Endpoints.Events;
@@ -16,8 +17,8 @@ public class Create: Endpoint<Create.Req, EmptyResponse>
     {
         public int TaskId { get; set; }
         public int StepId { get; set; }
-        public bool EventResult { get; set; }
-        public string FailureReason { get; set; } = default!;
+        public bool Success { get; set; }
+        public string? FailureReason { get; set; }
     }
 
     public override void Configure()
@@ -29,7 +30,7 @@ public class Create: Endpoint<Create.Req, EmptyResponse>
 
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
-        var task = await TaskRepo.FirstOrDefaultAsync(new TaskWithChildrenSpec(req.TaskId),ct);
+        var task = await TaskRepo.FirstOrDefaultAsync(new TaskWithChildrenSpec(req.TaskId), ct);
         if (task is null)
         {
             await SendNotFoundAsync(ct);
@@ -55,38 +56,11 @@ public class Create: Endpoint<Create.Req, EmptyResponse>
             return;
         }
 
-        var instance = task.Instances.FirstOrDefault(i => i.TaskId == task.Id);
-        if (instance is null || instance.FinalState != null)
-        {
-            ThrowError("Task instance does not exist, or it's finished");
-            return;
-        }
+        var eventResult = EventResult.Create(req.Success, req.FailureReason).Unwrap();
 
-        var eventResult = new EventResult
-        {
-            Success = req.EventResult,
-            FailureReason = req.FailureReason
-        };
+        task.AddEventToCurrentInstance(req.StepId, eventResult).Unwrap();
 
-        var newEvent = Event.Create(DateTime.Now, eventResult, req.StepId, instance.Id);
-
-        if (req.EventResult)
-        {
-            if (!instance.Remaining.Contains(req.StepId))
-            {
-                ThrowError("invalid step Id");
-                return;
-            }
-
-            if (instance.IsEnded(req.StepId))
-            {
-                instance.FinalState = TaskInstanceFinalState.Completed;
-            }
-        }
-
-        instance.Events.Add(newEvent);
         await TaskRepo.SaveChangesAsync(ct);
-
         await SendNoContentAsync(ct);
     }
 }

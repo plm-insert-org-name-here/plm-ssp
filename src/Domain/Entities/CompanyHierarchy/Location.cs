@@ -51,6 +51,9 @@ public class Location : ICHNodeWithParent<Station>
             return Result.Ok();
         }
 
+        if (Detector.Id == newDetector.Id)
+            return Result.Ok();
+
         if (Detector.State == DetectorState.Off)
         {
             Detector = newDetector;

@@ -1,16 +1,17 @@
 using Domain.Common;
+using FluentResults;
 
 namespace Domain.Entities.TaskAggregate;
 
 public class TaskInstance : IBaseEntity
 {
-    public int Id { get; set; }
-    public TaskInstanceFinalState? FinalState { get; set; }
-    public List<Event> Events { get; set; } = default!;
+    public int Id { get; private set; }
+    public TaskInstanceFinalState? FinalState { get; private set; }
+    public List<Event> Events { get; private set; } = default!;
 
-    public Task Task { get; set; } = default!;
-    public int TaskId { get; set; }
-    public int[] Remaining { get; set; } = default!;
+    public Task Task { get; private set; } = default!;
+    public int TaskId { get; private set; }
+    public int[] RemainingStepIds { get; private set; } = default!;
 
     private TaskInstance()
     {
@@ -19,15 +20,38 @@ public class TaskInstance : IBaseEntity
     public TaskInstance(Task task)
     {
         Events = new List<Event>();
-        Remaining = task.Steps.Select(s => s.Id).ToArray();
+        RemainingStepIds = task.Steps.Select(s => s.Id).ToArray();
     }
 
-    public bool IsEnded(int stepId)
+    private void RemoveRemainingStep(int stepId)
     {
-        var list = Remaining.ToList();
+        var list = RemainingStepIds.ToList();
         list.Remove(stepId);
-        Remaining = list.ToArray();
+        RemainingStepIds = list.ToArray();
+    }
 
-        return !Remaining.Any();
+    public Result AddEvent(Event ev)
+    {
+        if (!RemainingStepIds.Contains(ev.StepId))
+            return Result.Fail("Current Task instance does not expect this Step");
+
+        Events.Add(ev);
+
+        RemoveRemainingStep(ev.StepId);
+
+        if (IsEnded())
+            FinalState = TaskInstanceFinalState.Completed;
+
+        return Result.Ok();
+    }
+
+    public void Abandon()
+    {
+        FinalState = TaskInstanceFinalState.Abandoned;
+    }
+
+    public bool IsEnded()
+    {
+        return !RemainingStepIds.Any();
     }
 }
