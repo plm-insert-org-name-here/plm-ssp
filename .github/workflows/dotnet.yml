@@ -24,13 +24,6 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test -v n --logger "trx;logfilename=testResults.trx"
+      run: dotnet test -v n
       env:
         Database__ConnectionString: "server=localhost;user=root;password=root;database=plm_ssp_testing"
-    - name: Test Report
-      uses: dorny/test-reporter@v1
-      if: success() || failure()    # run this step even if previous step failed
-      with:
-        name: xUnit Tests            # Name of the check run which will be created
-        path: testResults.trx   # Path to test results
-        reporter: dotnet-trx
