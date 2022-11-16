@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
@@ -18,6 +19,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         public int Id { get; set; }
         public string Name { get; set; } = default!;
 
+        [JsonPropertyName("opus")]
         public IEnumerable<ResOPU> OPUs { get; set; } = default!;
 
         public record ResOPU(int Id, string Name);
