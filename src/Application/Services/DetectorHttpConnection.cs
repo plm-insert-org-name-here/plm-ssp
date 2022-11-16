@@ -1,9 +1,11 @@
 using System.Data;
 using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 using Application.Interfaces;
 using Domain.Common;
 using Domain.Common.DetectorCommand;
+using Domain.Commonn;
 using Domain.Entities;
 using Domain.Interfaces;
 using FluentResults;
@@ -85,7 +87,7 @@ public class DetectorHttpConnection : IDetectorConnection
         }
     }
 
-    public async Task<Result> SendCalibrationData(Detector detector, List<CalibrationCoordinates> coordinates)
+    public async Task<Result<CalibrationCoordinates>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates, int[]? newTrayPoints)
     {
         try
         {
@@ -93,12 +95,18 @@ public class DetectorHttpConnection : IDetectorConnection
             var json = JsonSerializer.Serialize(coordinates);
 
             var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/recalibrate", new StringContent(json));
+
+            var res = await response.Content.ReadFromJsonAsync<CalibrationCoordinates>();
+
+            if (res is null)
+            {
+                return Result.Fail("invalid response content");
+            }
+            return Result.Ok(res);
         }
         catch (Exception ex)
         {
             return Result.Fail(ex.Message);
         }
-
-        return Result.Ok();
     }
 }

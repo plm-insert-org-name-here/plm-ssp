@@ -1,3 +1,5 @@
+// using System.Net.NetworkInformation;
+
 using System.Net.NetworkInformation;
 using Domain.Common;
 using Domain.Entities;
@@ -21,9 +23,8 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
     {
         public int LocationId { get; set; }
         public string MacAddress { get; set; } = default!;
-        public List<CalibrationCoordsReq> Coordinates { get; set; } = default!;
-
-        public record CalibrationCoordsReq(int X, int Y);
+        public int[] QrCoordinates { get; set; } = default!;
+        public int[] TrayCoordinates { get; set; } = default!;
     }
 
     public override void Configure()
@@ -70,17 +71,13 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         }
 
         var originalCoords =
-            location.SetNewCoordinates(req.Coordinates.Select(c => new CalibrationCoordinates(c.X, c.Y)).ToList());
-        if (!originalCoords.Any())
-        {
-            if (originalCoords.All(c => c.IsValid()))
-            {
-                var result = detector?.SendRecalibrate(originalCoords, DetectorConnection);
-                result?.Unwrap();
-            }
-            ThrowError("some of the coordinates are not valid!");
-            return;
-        }
+            location.SetNewCoordinates(req.QrCoordinates, req.TrayCoordinates);
+        originalCoords.Unwrap();
+        
+        var result = await detector?.SendRecalibrate(originalCoords.Value, DetectorConnection);
+        result?.Unwrap();
+        
+        
 
         await DetectorRepo.SaveChangesAsync(ct);
         await LocationRepo.SaveChangesAsync(ct);

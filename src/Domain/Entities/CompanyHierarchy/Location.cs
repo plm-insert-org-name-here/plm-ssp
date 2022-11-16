@@ -1,6 +1,8 @@
 using Domain.Common;
+using Domain.Commonn;
 using Domain.Interfaces;
 using FluentResults;
+using static FluentResults.Result;
 using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Domain.Entities.CompanyHierarchy;
@@ -13,7 +15,7 @@ public class Location : ICHNodeWithParent<Station>
     public int ParentId { get; set; }
     public Detector? Detector { get; set; }
     public List<Task> Tasks { get; set; } = default!;
-    public List<CalibrationCoordinates>? OriginalCoordinates { get; set; } = default!;
+    public CalibrationCoordinates? Coordinates { get; set; } = default!;
 
     public byte[]? Snapshot { get; set; }
 
@@ -36,12 +38,12 @@ public class Location : ICHNodeWithParent<Station>
     {
         if (nameUniquenessChecker.IsDuplicate(Parent, newName, this).GetAwaiter().GetResult())
         {
-            return Result.Fail("Duplicate name!");
+            return Fail("Duplicate name!");
         }
 
         Name = newName;
 
-        return Result.Ok();
+        return Ok();
     }
 
     public Result AttachDetector(Detector newDetector)
@@ -49,44 +51,49 @@ public class Location : ICHNodeWithParent<Station>
         if (Detector is null)
         {
             Detector = newDetector;
-            return Result.Ok();
+            return Ok();
         }
 
         if (Detector.State == DetectorState.Off)
         {
             Detector = newDetector;
-            return Result.Ok();
+            return Ok();
         }
 
-        return Result.Fail("Location already have a detector attached to it!");
+        return Fail("Location already have a detector attached to it!");
     }
 
     public Result DetachDetector()
     {
         if (Detector is null)
         {
-            return Result.Fail("Location already does not have a detector attached to it!");
+            return Fail("Location already does not have a detector attached to it!");
         }
 
         if (Detector.State == DetectorState.Streaming)
         {
-            return Result.Fail("An other detector currently running on this location!");
+            return Fail("An other detector currently running on this location!");
         }
 
         Detector = null;
-        return Result.Ok();
+        return Ok();
     }
 
-    public List<CalibrationCoordinates> SetNewCoordinates(List<CalibrationCoordinates> coords)
+    public Result<CalibrationCoordinates> SetNewCoordinates( int[]? newTray, int[]? newQr=null)
     {
-        if (OriginalCoordinates is not null)
+        if (Coordinates is not null)
         {
-            var old = OriginalCoordinates;
-            OriginalCoordinates = coords;
-            return old;
+            var old = Coordinates;
+            Coordinates.Qr = newQr ?? Coordinates.Qr;
+            Coordinates.Tray = newTray ?? Coordinates.Tray;
+            return Ok(old);
         }
-        OriginalCoordinates = coords;
-        return new List<CalibrationCoordinates>();
+        Coordinates = new CalibrationCoordinates()
+        {
+            Qr = newQr,
+            Tray = newTray
+        };
+        return  Fail("no old coordinates");
 
     }
 }

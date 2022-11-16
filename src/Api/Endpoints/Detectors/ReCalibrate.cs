@@ -1,3 +1,4 @@
+using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
@@ -13,6 +14,7 @@ public class ReCalibrate : Endpoint<ReCalibrate.Req, EmptyResponse>
     public class Req
     {
         public int LocationId { get; set; }
+        public int[] NewTrayCoordinates { get; set; }
     }
     
     public override void Configure()
@@ -37,8 +39,11 @@ public class ReCalibrate : Endpoint<ReCalibrate.Req, EmptyResponse>
             ThrowError("This location has no active detector!");
             return;
         }
+
+        var old = location.SetNewCoordinates(newTray: req.NewTrayCoordinates);
+        old.Unwrap();
         
-        var result = location.Detector.SendRecalibrate(location.OriginalCoordinates, DetectorConnection);
+        var result = await location.Detector.SendRecalibrate(old.Value, DetectorConnection, req.NewTrayCoordinates);
         result.Unwrap();
         
         await SendNoContentAsync(ct);

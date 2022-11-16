@@ -1,5 +1,6 @@
 using Domain.Common;
 using Domain.Common.DetectorCommand;
+using Domain.Commonn;
 using Domain.Entities;
 using FluentResults;
 
@@ -16,5 +17,6 @@ public interface IDetectorConnection
     
     public Task<Result<Stream>> RequestStream(Detector detector);
 
-    public Task<Result> SendCalibrationData(Detector detector, List<CalibrationCoordinates> coordinates);
+    public Task<Result<CalibrationCoordinates>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates,
+        int[]? newTrayPoints);
 }

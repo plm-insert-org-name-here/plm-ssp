@@ -1,24 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Common;
+namespace Domain.Commonn;
 
-[Owned]
 public class CalibrationCoordinates
 {
-    public int X { get; set; }
-    public int Y { get; set; }
+    public int Id { get; set; }
+    public int[] Qr { get; set; }
+    public int[] Tray { get; set; }
 
-    public CalibrationCoordinates(int x, int y)
+    public CalibrationCoordinates()
     {
-        X = x;
-        Y = y;
+        
     }
-    
-    public bool IsValid()
+    public CalibrationCoordinates(int[] x, int[] y)
     {
-        if (X is < 0 or > 640) return false;
-        if (Y is < 0 or > 480) return false;
-
-        return true;
+        Qr = x;
+        Tray = y;
     }
 }
