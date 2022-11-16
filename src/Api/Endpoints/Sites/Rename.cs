@@ -21,6 +21,12 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
         Put(Api.Routes.Sites.Update);
         AllowAnonymous();
         Options(x => x.WithTags("Sites"));
+        Description(x => x
+                .Accepts<Req>("application/json")
+                .Produces(204)
+                .ProducesProblemFE()
+                .Produces(404),
+            clearDefaults: true);
     }
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
@@ -38,5 +44,4 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
         await SiteRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);
     }
-
 }

@@ -27,6 +27,12 @@ public class Rename : Endpoint<Rename.Req, EmptyResponse>
         Put(Api.Routes.Stations.Update);
         AllowAnonymous();
         Options(x => x.WithTags("Stations"));
+        Description(x => x
+                .Accepts<Req>("application/json")
+                .Produces(204)
+                .ProducesProblemFE()
+                .Produces(404),
+            clearDefaults: true);
     }
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
