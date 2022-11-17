@@ -14,6 +14,7 @@ using Infrastructure.Database;
 using Infrastructure.Logging;
 using Infrastructure.OpenApi;
 using Newtonsoft.Json.Converters;
+using NSwag.Generation.Processors.Collections;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseLogging();
@@ -53,13 +54,6 @@ if (app.Environment.IsDevelopment())
     app.UseOpenApi();
     app.UseSwaggerUi3(c => { c.ConfigureDefaults(); });
 }
-app.MapTypeScriptClientEndpoint("/ts-client", "Version 1", s =>
-{
-    s.ClassName = "ApiClient";
-    s.TypeScriptGeneratorSettings.Namespace = "ApiClient";
-    s.TypeScriptGeneratorSettings.TypeNameGenerator = new ShorterTypeNameGenerator();
-    s.OperationNameGenerator = new ShorterOperationNameGenerator();
-});
 app.UseCors(options =>
 {
     options.AllowAnyMethod();

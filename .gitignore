@@ -1,2 +1,4 @@
 .idea/
 backend.sln.DotSettings.user
+bin/*.jar
+bin/api_client
