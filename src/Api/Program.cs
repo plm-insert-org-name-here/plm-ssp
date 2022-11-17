@@ -41,7 +41,7 @@ builder.Services.AddSwaggerDoc(s =>
     s.TypeNameGenerator = new ShorterTypeNameGenerator();
     s.SerializerSettings.Converters.Add(new StringEnumConverter());
     s.GenerateEnumMappingDescription = true;
-    s.DocumentName = "Version 1";
+    s.DocumentName = "v1";
 });
 builder.Services.AddSignalR();
 builder.Services.AddCors();
