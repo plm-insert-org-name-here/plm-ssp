@@ -88,5 +88,19 @@ public class Location : ICHNodeWithParent<Station>
 
         return Fail("this location has no coordinates yet!");
     }
+
+    public async Task<Result> SendRecalibrate(IDetectorConnection DetectorConnection, int[]? newTrayCoordinates=null)
+    {
+        if (Detector is null || Detector.State == DetectorState.Off)
+        {
+            return Fail("This location has no active detector!");
+        }
+
+        var result = await Detector.SendRecalibrate(Coordinates, DetectorConnection, newTrayCoordinates);
+
+        Coordinates = result.Value;
+
+        return Ok();
+    }
     
 }

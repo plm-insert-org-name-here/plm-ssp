@@ -1,7 +1,6 @@
 // using System.Net.NetworkInformation;
 
 using System.Net.NetworkInformation;
-using Domain.Common;
 using Domain.Commonn;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
@@ -82,11 +81,8 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         else
         {
             //send to the RPI and get back the current coordinates
-            var result = await detector.SendRecalibrate(originalCoords.Value, DetectorConnection);
+            var result = await location.SendRecalibrate(DetectorConnection);
             result.Unwrap();
-        
-            //set the coordinates with the new ones
-            location.Coordinates = result.Value;
         }
 
         await DetectorRepo.SaveChangesAsync(ct);

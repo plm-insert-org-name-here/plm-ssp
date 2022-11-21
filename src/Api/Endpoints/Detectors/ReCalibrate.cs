@@ -40,17 +40,9 @@ public class ReCalibrate : Endpoint<ReCalibrate.Req, EmptyResponse>
             return;
         }
 
-        //get the old coordinates for the difference calculation
-        var old = location.GetCoordinates();
-        old.Unwrap();
-        
-        //send to the RPI and get back the current coordinates
-        var result = await location.Detector.SendRecalibrate(old.Value, DetectorConnection, req.NewTrayCoordinates);
+        var result = await location.SendRecalibrate(DetectorConnection, req.NewTrayCoordinates);
         result.Unwrap();
 
-        //set the coordinates with the new ones
-        location.Coordinates = result.Value;
-        
         await SendNoContentAsync(ct);
     }
 }
