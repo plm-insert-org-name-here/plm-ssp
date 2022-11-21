@@ -1,3 +1,4 @@
+using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
@@ -13,6 +14,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
     {
         public int Id { get; set; }
     }
+
     public class Res
     {
         public int Id { get; set; }
@@ -20,15 +22,23 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
         public IEnumerable<LocationRes> Locations { get; set; } = default!;
 
-        public record LocationRes(int Id, string Name);
+        public record LocationRes(int Id, string Name, DetectorRes? Detector);
+
+        public record DetectorRes(int Id, string Name, string MacAddress, DetectorState State);
     }
 
-    private static Res MapOut(Station s) => new()
-    {
-        Id = s.Id,
-        Name = s.Name,
-        Locations = s.Children.Select(o => new Res.LocationRes(o.Id, o.Name))
-    };
+    private static Res MapOut(Station s) =>
+        new()
+        {
+            Id = s.Id,
+            Name = s.Name,
+            Locations = s.Children.Select(l =>
+                new Res.LocationRes(l.Id, l.Name,
+                    l.Detector is null
+                        ? null
+                        : new Res.DetectorRes(l.Detector.Id, l.Detector.Name, l.Detector.MacAddress.ToString(),
+                            l.Detector.State)))
+        };
 
     public override void Configure()
     {
@@ -39,7 +49,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var station = await StationRepo.FirstOrDefaultAsync(new CHNodeWithChildrenSpec<Station, Location>(req.Id), ct);
+        var station = await StationRepo.FirstOrDefaultAsync(new StationWithLocationsAndDetectorsSpec(req.Id), ct);
 
         if (station is null)
         {
@@ -50,5 +60,4 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         var res = MapOut(station);
         await SendOkAsync(res, ct);
     }
-
 }
