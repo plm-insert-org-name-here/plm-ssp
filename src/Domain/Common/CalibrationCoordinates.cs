@@ -6,7 +6,7 @@ public class CalibrationCoordinates
 {
     public int Id { get; set; }
     public int[] Qr { get; set; }
-    public int[] Tray { get; set; }
+    public int[]? Tray { get; set; }
 
     public CalibrationCoordinates()
     {

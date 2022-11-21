@@ -2,6 +2,7 @@
 
 using System.Net.NetworkInformation;
 using Domain.Common;
+using Domain.Commonn;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
@@ -24,7 +25,6 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         public int LocationId { get; set; }
         public string MacAddress { get; set; } = default!;
         public int[] QrCoordinates { get; set; } = default!;
-        public int[] TrayCoordinates { get; set; } = default!;
     }
 
     public override void Configure()
@@ -72,14 +72,22 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
 
         //get the old coordinates for the difference calculation
         var originalCoords = location.GetCoordinates();
-        originalCoords.Unwrap();
+        if (originalCoords.IsFailed)
+        {
+            location.Coordinates = new CalibrationCoordinates()
+            {
+                Qr = req.QrCoordinates
+            };
+        }
+        else
+        {
+            //send to the RPI and get back the current coordinates
+            var result = await detector.SendRecalibrate(originalCoords.Value, DetectorConnection);
+            result.Unwrap();
         
-        //send to the RPI and get back the current coordinates
-        var result = await detector.SendRecalibrate(originalCoords.Value, DetectorConnection);
-        result.Unwrap();
-        
-        //set the coordinates with the new ones
-        location.Coordinates = result.Value;
+            //set the coordinates with the new ones
+            location.Coordinates = result.Value;
+        }
 
         await DetectorRepo.SaveChangesAsync(ct);
         await LocationRepo.SaveChangesAsync(ct);
