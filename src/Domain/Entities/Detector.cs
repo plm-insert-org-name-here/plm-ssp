@@ -56,7 +56,7 @@ public class Detector : IBaseEntity
         return location.AttachDetector(detector).ToResult(detector);
     }
 
-    public async Task<Result> SendRecalibrate(CalibrationCoordinates? coords, IDetectorConnection detectorConnection, int[]? newTrayPoints=null)
+    public async Task<Result<CalibrationCoordinates>> SendRecalibrate(CalibrationCoordinates? coords, IDetectorConnection detectorConnection, int[]? newTrayPoints=null)
     {
         if (coords is null)
         {
@@ -64,8 +64,9 @@ public class Detector : IBaseEntity
         }
 
         var result = await detectorConnection.SendCalibrationData(this, coords, newTrayPoints);
+        //we working with a location's detector so the location will always be something
         Location.Coordinates = result.Value;
 
-        return Result.Ok();
+        return Result.Ok(result.Value);
     }
 }

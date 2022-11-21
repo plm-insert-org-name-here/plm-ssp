@@ -70,14 +70,16 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
             location.AttachDetector(detector).Unwrap();
         }
 
-        var originalCoords =
-            location.SetNewCoordinates(req.QrCoordinates, req.TrayCoordinates);
+        //get the old coordinates for the difference calculation
+        var originalCoords = location.GetCoordinates();
         originalCoords.Unwrap();
         
-        var result = await detector?.SendRecalibrate(originalCoords.Value, DetectorConnection);
-        result?.Unwrap();
+        //send to the RPI and get back the current coordinates
+        var result = await detector.SendRecalibrate(originalCoords.Value, DetectorConnection);
+        result.Unwrap();
         
-        
+        //set the coordinates with the new ones
+        location.Coordinates = result.Value;
 
         await DetectorRepo.SaveChangesAsync(ct);
         await LocationRepo.SaveChangesAsync(ct);

@@ -79,21 +79,14 @@ public class Location : ICHNodeWithParent<Station>
         return Ok();
     }
 
-    public Result<CalibrationCoordinates> SetNewCoordinates( int[]? newTray, int[]? newQr=null)
+    public Result<CalibrationCoordinates> GetCoordinates()
     {
         if (Coordinates is not null)
         {
-            var old = Coordinates;
-            Coordinates.Qr = newQr ?? Coordinates.Qr;
-            Coordinates.Tray = newTray ?? Coordinates.Tray;
-            return Ok(old);
+            return Ok(Coordinates);
         }
-        Coordinates = new CalibrationCoordinates()
-        {
-            Qr = newQr,
-            Tray = newTray
-        };
-        return  Fail("no old coordinates");
 
+        return Fail("this location has no coordinates yet!");
     }
+    
 }

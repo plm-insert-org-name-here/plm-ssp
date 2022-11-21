@@ -19,4 +19,8 @@ public interface IDetectorConnection
 
     public Task<Result<CalibrationCoordinates>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates,
         int[]? newTrayPoints);
+
+    public Task<Result<byte[]>> RequestCalibrationPreview(Detector detector, CalibrationCoordinates coordinates,
+        int[]? newTrayPoints);
+
 }

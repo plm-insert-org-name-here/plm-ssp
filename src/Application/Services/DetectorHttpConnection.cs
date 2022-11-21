@@ -87,12 +87,15 @@ public class DetectorHttpConnection : IDetectorConnection
         }
     }
 
+    public record CalibrationMessageData(int Id, int[] Qr, int[] Tray, int[]? newTray);
     public async Task<Result<CalibrationCoordinates>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates, int[]? newTrayPoints)
     {
+        var data = new CalibrationMessageData(coordinates.Id, coordinates.Qr, coordinates.Tray, newTrayPoints);
+
         try
         {
             var client = _httpClientFactory.CreateClient();
-            var json = JsonSerializer.Serialize(coordinates);
+            var json = JsonSerializer.Serialize(data);
 
             var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/recalibrate", new StringContent(json));
 
@@ -102,6 +105,27 @@ public class DetectorHttpConnection : IDetectorConnection
             {
                 return Result.Fail("invalid response content");
             }
+            return Result.Ok(res);
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(ex.Message);
+        }
+    }
+    
+    public async Task<Result<byte[]>> RequestCalibrationPreview(Detector detector, CalibrationCoordinates coordinates, int[]? newTrayPoints )
+    {
+        var data = new CalibrationMessageData(coordinates.Id, coordinates.Qr, coordinates.Tray, newTrayPoints);
+
+        try
+        {
+            var client = _httpClientFactory.CreateClient();
+            var json = JsonSerializer.Serialize(data);
+            
+            var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/snapshot", new StringContent(json));
+
+            var res = await response.Content.ReadFromJsonAsync<byte[]>();
+            
             return Result.Ok(res);
         }
         catch (Exception ex)
