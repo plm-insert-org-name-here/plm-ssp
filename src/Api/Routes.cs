@@ -100,4 +100,13 @@ public static class Routes
         public const string GetAll = "events";
         public const string GetByTemplateId = "events/{id}";
     }
+    
+    public static class Users
+    {
+        public const string Create = "users/register";
+        public const string Delete = "users/{id}";
+        public const string Update = "users/{id}";
+        public const string SignIn = "users={id}";
+        public const string SetRole = "users/{id}/setrole/{role}";
+    }
 }
