@@ -20,7 +20,7 @@ public class GetCurrentInstance : Endpoint<GetCurrentInstance.Req, GetCurrentIns
 
         public record ResTaskInstance(int Id, TaskInstanceFinalState? FinalState, IEnumerable<ResEvent> Events, int TaskId);
 
-        public record ResEvent(int Id, DateTime TimeStamp, bool EventResultSuccess, string FailureReason, int StepId, int TaskInstanceId);
+        public record ResEvent(int Id, DateTime TimeStamp, bool EventResultSuccess, string? FailureReason, int StepId, int TaskInstanceId);
 
     }
 
