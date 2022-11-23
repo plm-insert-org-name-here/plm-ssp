@@ -32,9 +32,10 @@ public class Registrate : Endpoint<Registrate.Req, EmptyResponse>
 
             await UserRepo.SaveChangesAsync(ct);
         }
-        catch
+        catch(Exception exception)
         {
-            ThrowError("Could not register the user");
+            ThrowError((exception.Message));
+            // ThrowError("Could not register the user");
         }
 
         await SendOkAsync(ct);

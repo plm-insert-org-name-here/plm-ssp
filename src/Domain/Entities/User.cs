@@ -2,21 +2,19 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Domain.Common;
-using Domain.Interfaces;
-using Domain.Specifications;
 using FluentResults;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Domain.Entities;
 using System.Security.Cryptography; 
 
-public class User
+public class User : IBaseEntity
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;
     public byte[] PasswordHash { get; set; } = default!;
     public byte[] PasswordSalt { get; set; } = default!;
-    public UserRole Role { get; set; } = default!;
+    public UserRole Role { get; set; }
 
     public User(string newName, string newPassword, UserRole newRole)
     {

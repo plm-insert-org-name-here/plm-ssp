@@ -1,20 +1,24 @@
-global using FluentValidation;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using System.Text.Json.Serialization;
 using Api;
 using Api.Endpoints.Detectors;
 using Api.RequestBinders;
 using Application.Interfaces;
 using Application.Services;
+using Domain.Common;
+using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using FastEndpoints;
-using FastEndpoints.ClientGen;
 using FastEndpoints.Swagger;
 using Infrastructure.Database;
 using Infrastructure.Logging;
 using Infrastructure.OpenApi;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
-using NSwag.Generation.Processors.Collections;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseLogging();
@@ -46,6 +50,50 @@ builder.Services.AddSwaggerDoc(s =>
 builder.Services.AddSignalR();
 builder.Services.AddCors();
 
+var jwtOptions = new JwtOptions();
+builder.Configuration.GetSection(JwtOptions.ConfigurationEntryName).Bind(jwtOptions);
+
+builder.Services.AddIdentityCore<User>(opt =>
+{
+    opt.Password.RequiredLength = 8;
+    opt.Password.RequireDigit = false;
+    opt.Password.RequireLowercase = false;
+    opt.Password.RequireUppercase = false;
+    opt.Password.RequireNonAlphanumeric = false;
+})
+    .AddRoles<ApplicationRole>()
+    //nemtom erre mi az új solution, edit: ig ez
+    .AddEntityFrameworkStores<Context>();
+
+JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
+var tokenValidationParameters = new TokenValidationParameters
+{
+    ValidIssuer = jwtOptions.ValidIssuer,
+    ValidAudience = jwtOptions.ValidAudience,
+    NameClaimType = JwtRegisteredClaimNames.Sub,
+    RoleClaimType = jwtOptions.RoleClaimName,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret))
+};
+
+builder.Services.AddAuthentication(opt =>
+    {
+        // TODO(rg): not all of these are needed
+        //ez a todo örökké itt lesz
+        opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, "DefaultScheme", opt =>
+    {
+        opt.TokenValidationParameters = tokenValidationParameters;
+    });
+
+builder.Services.Configure<DefaultUserOptions>(builder.Configuration.GetSection(DefaultUserOptions.ConfigurationEntryName));
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.ConfigurationEntryName));
+builder.Services.AddSingleton<IOptions<TokenValidationParameters>>(new OptionsWrapper<TokenValidationParameters>(tokenValidationParameters));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -66,6 +114,7 @@ app.UseCors(options =>
 });
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseWebSockets();
 app.UseMiddleware<ApiExceptionMiddleware>();
