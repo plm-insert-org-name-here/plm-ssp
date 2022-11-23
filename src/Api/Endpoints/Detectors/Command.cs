@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Domain.Common.DetectorCommand;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -23,6 +24,10 @@ public class Command : Endpoint<Command.Req, EmptyResponse>
         Post(Api.Routes.Detectors.Command);
         AllowAnonymous();
         Options(x => x.WithTags("Detectors"));
+        Summary(x => x.ExampleRequest = new Dictionary<string, object>
+        {
+            { "Command", new DetectorCommand.StartDetection(2) }
+        });
     }
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
