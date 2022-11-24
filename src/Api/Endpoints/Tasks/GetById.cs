@@ -27,8 +27,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         public record ResInstance(int Id, TaskInstanceFinalState? FinalState, IEnumerable<ResEvent> Events);
 
         // TODO(rg): might need to extend with steps and objects
-        public record ResEvent(DateTime Timestamp, ResEventResult Result);
-        public record ResEventResult(bool Success, string? FailureReason);
+        public record ResEvent(DateTime Timestamp, bool Success, string? FailureReason);
 
     }
 
@@ -43,7 +42,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
         if (ti is not null)
         {
-            var events = ti.Events.Select(e => new Res.ResEvent(e.Timestamp, new Res.ResEventResult(e.Result.Success, e.Result.FailureReason)));
+            var events = ti.Events.Select(e => new Res.ResEvent(e.Timestamp, e.Result.Success, e.Result.FailureReason));
             var resInstance = new Res.ResInstance(ti.Id, ti.FinalState, events);
 
             res.LatestInstance = resInstance;
