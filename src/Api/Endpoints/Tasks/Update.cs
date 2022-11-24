@@ -62,7 +62,7 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             NewObjects = new[]
             {
                 new Req.NewObjectReq("Object 4",
-                    new ObjectCoordinates() { X = 100, Y = 100, Width = 100, Height = 100 })
+                    new ObjectCoordinates { X = 100, Y = 100, Width = 100, Height = 100 })
             },
             NewSteps = new[] { new Req.NewStepReq(4, TemplateState.Present, TemplateState.Missing, "Object 4") }
         });
