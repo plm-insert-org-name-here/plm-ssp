@@ -7,6 +7,6 @@ public sealed class GetUserByNameSpec : Specification<User>, ISingleResultSpecif
 {
     public GetUserByNameSpec(string name)
     {
-        Query.Where(u => u.Name == name);
+        Query.Where(u => u.UserName == name);
     }
 }

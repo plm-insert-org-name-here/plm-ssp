@@ -3,18 +3,24 @@ using System.Security.Claims;
 using System.Text;
 using Domain.Common;
 using FluentResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Domain.Entities;
 using System.Security.Cryptography; 
 
-public class User : IBaseEntity
+public class User : IdentityUser<int>
 {
     public int Id { get; set; }
-    public string Name { get; set; } = default!;
+    public string UserName { get; set; } = default!;
     public byte[] PasswordHash { get; set; } = default!;
     public byte[] PasswordSalt { get; set; } = default!;
     public UserRole Role { get; set; }
+
+    public User()
+    {
+        
+    }
 
     public User(string newName, string newPassword, UserRole newRole)
     {
@@ -32,7 +38,7 @@ public class User : IBaseEntity
         var hash = ConcatTwoHashes(bytePassword, byteSalt);
         
         
-        Name = newName;
+        UserName = newName;
         PasswordSalt = byteSalt;
         //hash again the combination
         PasswordHash = algorithm.ComputeHash(hash);
@@ -48,7 +54,7 @@ public class User : IBaseEntity
         //concatenate the two hashed values
         var hash = ConcatTwoHashes(bytePassword, PasswordSalt);
 
-        if (PasswordHash != algorithm.ComputeHash(hash))
+        if (!PasswordHash.SequenceEqual(algorithm.ComputeHash(hash)))
         {
             return Result.Fail("invalid password");
         }
@@ -59,18 +65,26 @@ public class User : IBaseEntity
 
     private string generateJwtToken(User user)
     {
-        // generate token that is valid for 7 days
-        var tokenHandler = new JwtSecurityTokenHandler();
-        //TODO: secret
-        var key = Encoding.ASCII.GetBytes("_appSettings.Secret");
-        var tokenDescriptor = new SecurityTokenDescriptor
+        List<Claim> claims = new List<Claim>()
         {
-            Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),
-            Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            new Claim(ClaimTypes.Name, user.UserName)
         };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+
+        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("StrONGKAutHENTICATIONKEy"));
+
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+        var token = new JwtSecurityToken(
+            issuer: "https://localhost:5001",
+            audience:"http://localhost:3000",
+            claims: claims,
+            expires: DateTime.Now.AddDays(1),
+            signingCredentials: creds
+        );
+
+        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return jwt;
     }
 
     private byte[] ConcatTwoHashes(byte[] hash1, byte[] hash2)
