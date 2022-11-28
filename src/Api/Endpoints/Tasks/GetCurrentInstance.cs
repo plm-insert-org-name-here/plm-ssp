@@ -6,7 +6,7 @@ using FastEndpoints;
 
 namespace Api.Endpoints.Tasks;
 
-public class GetInstance : Endpoint<GetInstance.Req, GetInstance.Res>
+public class GetCurrentInstance : Endpoint<GetCurrentInstance.Req, GetCurrentInstance.Res>
 {
     public IRepository<TaskInstance> InstanceRepo { get; set; } = default!;
     public class Req
@@ -20,7 +20,7 @@ public class GetInstance : Endpoint<GetInstance.Req, GetInstance.Res>
 
         public record ResTaskInstance(int Id, TaskInstanceFinalState? FinalState, IEnumerable<ResEvent> Events, int TaskId);
 
-        public record ResEvent(int Id, DateTime TimeStamp, bool EventResultSuccess, string FailureReason, int StepId, int TaskInstanceId);
+        public record ResEvent(int Id, DateTime TimeStamp, bool EventResultSuccess, string? FailureReason, int StepId, int TaskInstanceId);
 
     }
 
@@ -33,7 +33,7 @@ public class GetInstance : Endpoint<GetInstance.Req, GetInstance.Res>
 
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
-        var instance = await InstanceRepo.FirstOrDefaultAsync(new ActiveTaskInstanceWithEventsSpec(req.TaskId), ct);
+        var instance = await InstanceRepo.FirstOrDefaultAsync(new CurrentTaskInstanceWithEventsSpec(req.TaskId), ct);
 
         if (instance is null)
         {

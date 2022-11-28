@@ -2,14 +2,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json.Serialization;
 using Api;
-using Api.Endpoints.Detectors;
-using Api.RequestBinders;
 using Application.Interfaces;
 using Application.Services;
 using Domain.Common;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
+using Domain.Services;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Infrastructure.Database;
@@ -19,6 +18,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
+using NJsonSchema;
+using NJsonSchema.Generation.TypeMappers;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseLogging();
@@ -32,16 +33,20 @@ builder.Services.AddScoped(typeof(ICHNameUniquenessChecker<,>), typeof(CHNameUni
 // TODO(rg): into extension method
 builder.Services.AddScoped<IDetectorConnection, DetectorHttpConnection>();
 builder.Services.AddSingleton<IDetectorStreamCollection, DetectorStreamCollection>();
+builder.Services.AddScoped<DetectorCommandService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddAuthorization();
 
-// TODO(rg): into extension method
-builder.Services.AddSingleton(typeof(IRequestBinder<Command.Req>), typeof(CommandReqBinder));
 builder.Services.AddFastEndpoints();
 
 builder.Services.AddSwaggerDoc(s =>
 {
+    // NOTE(rg): DetectorState is a "bitfield" enum which is serialized into a comma-separated string
+    // if multiple fields are set. As far as I can tell, the generated typescript-fetch API client
+    // does not handle bitfields at all, and generates a regular DetectorState enum no matter what. Making it serialize
+    // into a regular string and then "manually" converting into a DetectorState array feels more correct to me
+    s.TypeMappers = new[] { new PrimitiveTypeMapper(typeof(DetectorState), x => x.Type = JsonObjectType.String) };
     s.TypeNameGenerator = new ShorterTypeNameGenerator();
     s.SerializerSettings.Converters.Add(new StringEnumConverter());
     s.GenerateEnumMappingDescription = true;
