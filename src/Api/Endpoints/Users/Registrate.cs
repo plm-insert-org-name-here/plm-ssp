@@ -24,7 +24,7 @@ public class Registrate : Endpoint<Registrate.Req, EmptyResponse>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var role = req.Role == 0 ? UserRole.Operator : UserRole.SuperUser;
+        var role = req.Role == 0 ? UserRole.SuperUser : UserRole.Operator;
         try
         {
             var user = new User(req.Name, req.Password, role);

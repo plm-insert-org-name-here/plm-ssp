@@ -107,6 +107,6 @@ public static class Routes
         public const string Delete = "users/{id}";
         public const string Update = "users/{id}";
         public const string SignIn = "user";
-        public const string SetRole = "users/{id}/setrole/{role}";
+        public const string SetRole = "users/{id}/setrole";
     }
 }
