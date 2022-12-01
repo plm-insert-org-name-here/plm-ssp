@@ -17,6 +17,15 @@ public class Event : IBaseEntity
 
     private Event() { }
 
+    private Event(int id, DateTime timestamp, bool success, string? failureReason, int stepId, int taskInstanceId)
+    {
+        Id = id;
+        Timestamp = timestamp;
+        Result = EventResult.Create(success, failureReason).Value;
+        StepId = stepId;
+        TaskInstanceId = taskInstanceId;
+    }
+
     public Event(DateTime timestamp, EventResult eventResult, int stepId, int taskInstanceId)
     {
         Timestamp = timestamp;

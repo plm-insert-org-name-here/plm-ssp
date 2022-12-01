@@ -17,6 +17,14 @@ public class TaskInstance : IBaseEntity
     {
     }
 
+    private TaskInstance(int id, TaskInstanceFinalState? finalState, int taskId, int[] remainingStepIds)
+    {
+        Id = id;
+        FinalState = finalState;
+        TaskId = taskId;
+        RemainingStepIds = remainingStepIds;
+    }
+
     public TaskInstance(Task task)
     {
         Events = new List<Event>();

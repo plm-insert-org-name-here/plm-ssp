@@ -27,7 +27,6 @@ public class Task : IBaseEntity
         Id = id;
         Name = name;
         Type = type;
-        State = TaskState.Inactive;
         LocationId = locationId;
         JobId = jobId;
         Instances = new List<TaskInstance>();
