@@ -33,6 +33,10 @@ public class DetectorHttpConnection : IDetectorConnection
             var json = JsonSerializer.Serialize(command);
 
             var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/command", new StringContent(json));
+            if (!response.IsSuccessStatusCode)
+            {
+                return Result.Fail($"Response failed with status code {response.StatusCode}: {response.ReasonPhrase}");
+            }
         }
         catch (Exception ex)
         {
