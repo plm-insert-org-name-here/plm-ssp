@@ -1,3 +1,4 @@
+using Domain.Common;
 using Domain.Common.DetectorCommand;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -18,6 +19,16 @@ public class MockedDetectorConnection : IDetectorConnection
     }
 
     public Task<Result<Stream>> RequestStream(Detector detector)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<CalibrationCoordinates>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates, int[]? newTrayPoints)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<byte[]>> RequestCalibrationPreview(Detector detector, CalibrationCoordinates coordinates, int[]? newTrayPoints)
     {
         throw new NotImplementedException();
     }
