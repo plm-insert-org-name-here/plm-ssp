@@ -79,16 +79,6 @@ public class Location : ICHNodeWithParent<Station>
         return Ok();
     }
 
-    public Result<CalibrationCoordinates> GetCoordinates()
-    {
-        if (Coordinates is not null)
-        {
-            return Ok(Coordinates);
-        }
-
-        return Fail("this location has no coordinates yet!");
-    }
-
     public async Task<Result> SendRecalibrate(IDetectorConnection DetectorConnection, int[]? newTrayCoordinates=null)
     {
         if (Detector is null || Detector.State == DetectorState.Off)

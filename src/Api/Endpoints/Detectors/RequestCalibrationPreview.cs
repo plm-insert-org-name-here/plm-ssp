@@ -15,7 +15,7 @@ public class RequestCalibrationPreview : Endpoint<RequestCalibrationPreview.Req>
     public class Req
     {
         public int Id { get; set; }
-        public int[] newTrayPoints { get; set; }
+        public int[] NewTrayPoints { get; set; } = default!;
     }
     
     public override void Configure()
@@ -47,10 +47,15 @@ public class RequestCalibrationPreview : Endpoint<RequestCalibrationPreview.Req>
             return;
         }
         
-        var old = detector.Location.GetCoordinates();
-        old.Unwrap();
+        var old = detector.Location.Coordinates;
+
+        if (old is null)
+        {
+            ThrowError("old is null");
+            return; 
+        }
         
-        var result = await DetectorConnection.RequestCalibrationPreview(detector, old.Value, req.newTrayPoints);
+        var result = await DetectorConnection.RequestCalibrationPreview(detector, old, req.NewTrayPoints);
         var preview = result.Unwrap();
 
         await SendBytesAsync(preview, cancellation: ct);

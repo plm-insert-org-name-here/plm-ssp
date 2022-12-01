@@ -70,8 +70,8 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         }
 
         //get the old coordinates for the difference calculation
-        var originalCoords = location.GetCoordinates();
-        if (originalCoords.IsFailed)
+        var originalCoords = location.Coordinates;
+        if (originalCoords is null)
         {
             location.Coordinates = new CalibrationCoordinates()
             {

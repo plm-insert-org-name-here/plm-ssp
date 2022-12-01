@@ -46,16 +46,27 @@ public class GetInitialCalibrationData : Endpoint<GetInitialCalibrationData.Req>
             return;
         }
 
-        if (!detector.Location.Coordinates.Tray.Any())
+        if (detector.Location.Coordinates is null)
+        {
+            ThrowError("coordinates is null");
+            return;
+        }
+
+        if (detector.Location.Coordinates!.Tray is null)
+        {
+            ThrowError("tray is null");
+            return; 
+        }
+
+        if (!detector.Location.Coordinates!.Tray!.Any())
         {
             ThrowError("Location has no tray coordinates yet!");
             return;
         }
         
-        var old = detector.Location.GetCoordinates();
-        old.Unwrap();
+        var old = detector.Location.Coordinates;
         
-        var result = await DetectorConnection.RequestCalibrationPreview(detector, old.Value, old.Value.Tray);
+        var result = await DetectorConnection.RequestCalibrationPreview(detector, old, old.Tray);
         var preview = result.Unwrap();
         
         await SendBytesAsync(preview, cancellation: ct);
