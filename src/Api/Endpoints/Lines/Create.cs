@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
@@ -19,6 +20,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
     public class Req
     {
         public string Name { get; set; } = default!;
+        [JsonPropertyName("opuId")]
         public int OPUId { get; set; }
     }
 

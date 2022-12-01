@@ -1,7 +1,7 @@
 // using System.Net.NetworkInformation;
 
 using System.Net.NetworkInformation;
-using Domain.Commonn;
+using Domain.Common;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
@@ -66,6 +66,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         }
         else
         {
+            detector.SetState(DetectorState.Standby);
             location.AttachDetector(detector).Unwrap();
         }
 

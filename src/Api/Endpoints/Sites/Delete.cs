@@ -18,6 +18,11 @@ public class Delete : Endpoint<Delete.Req, EmptyResponse>
         Delete(Api.Routes.Sites.Delete);
         AllowAnonymous();
         Options(x => x.WithTags("Sites"));
+        Description(x => x
+                .Accepts<Req>("application/json")
+                .Produces(204)
+                .Produces(404),
+            clearDefaults: true);
     }
 
     public override async Task HandleAsync(Req req, CancellationToken ct)

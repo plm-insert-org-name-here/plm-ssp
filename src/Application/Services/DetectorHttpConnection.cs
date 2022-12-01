@@ -19,7 +19,6 @@ public class DetectorHttpConnection : IDetectorConnection
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IDetectorStreamCollection _detectorStreams;
 
-
     public const string Scheme = "http";
     public const int Port = 3000;
 

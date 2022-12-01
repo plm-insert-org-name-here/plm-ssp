@@ -2,6 +2,7 @@ using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using FastEndpoints;
 using Infrastructure;
+using NSwag.Annotations;
 
 namespace Api.Endpoints.Sites;
 
