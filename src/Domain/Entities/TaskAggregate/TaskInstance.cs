@@ -37,7 +37,8 @@ public class TaskInstance : IBaseEntity
 
         Events.Add(ev);
 
-        RemoveRemainingStep(ev.StepId);
+        if (ev.Result.Success)
+            RemoveRemainingStep(ev.StepId);
 
         if (IsEnded())
             FinalState = TaskInstanceFinalState.Completed;
