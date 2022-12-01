@@ -1,6 +1,7 @@
 using Domain.Common;
 using Domain.Interfaces;
 using FluentResults;
+using static FluentResults.Result;
 using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Domain.Entities.CompanyHierarchy;
@@ -13,6 +14,7 @@ public class Location : ICHNodeWithParent<Station>
     public int ParentId { get; set; }
     public Detector? Detector { get; set; }
     public List<Task> Tasks { get; set; } = default!;
+    public CalibrationCoordinates? Coordinates { get; set; } = default!;
 
     public byte[]? Snapshot { get; set; }
 
@@ -35,12 +37,12 @@ public class Location : ICHNodeWithParent<Station>
     {
         if (nameUniquenessChecker.IsDuplicate(Parent, newName, this).GetAwaiter().GetResult())
         {
-            return Result.Fail("Duplicate name!");
+            return Fail("Duplicate name!");
         }
 
         Name = newName;
 
-        return Result.Ok();
+        return Ok();
     }
 
     public Result AttachDetector(Detector newDetector)
@@ -48,7 +50,7 @@ public class Location : ICHNodeWithParent<Station>
         if (Detector is null)
         {
             Detector = newDetector;
-            return Result.Ok();
+            return Ok();
         }
 
         if (Detector.Id == newDetector.Id)
@@ -57,25 +59,40 @@ public class Location : ICHNodeWithParent<Station>
         if (Detector.State == DetectorState.Off)
         {
             Detector = newDetector;
-            return Result.Ok();
+            return Ok();
         }
 
-        return Result.Fail("Location already have a detector attached to it!");
+        return Fail("Location already have a detector attached to it!");
     }
 
     public Result DetachDetector()
     {
         if (Detector is null)
         {
-            return Result.Fail("Location already does not have a detector attached to it!");
+            return Fail("Location already does not have a detector attached to it!");
         }
 
         if (Detector.State == DetectorState.Streaming)
         {
-            return Result.Fail("An other detector currently running on this location!");
+            return Fail("An other detector currently running on this location!");
         }
 
         Detector = null;
-        return Result.Ok();
+        return Ok();
     }
+
+    public async Task<Result> SendRecalibrate(IDetectorConnection DetectorConnection, int[]? newTrayCoordinates=null)
+    {
+        if (Detector is null || Detector.State == DetectorState.Off)
+        {
+            return Fail("This location has no active detector!");
+        }
+
+        var result = await Detector.SendRecalibrate(Coordinates, DetectorConnection, newTrayCoordinates);
+
+        Coordinates = result.Value;
+
+        return Ok();
+    }
+    
 }

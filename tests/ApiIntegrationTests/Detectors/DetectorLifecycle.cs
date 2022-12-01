@@ -57,7 +57,7 @@ public class DetectorLifecycle : IClassFixture<Setup>
         {
             LocationId = 2,
             MacAddress = "12:34:56:78:90:AB",
-            Coordinates = new List<IdentifyEP.Req.CalibrationCoordsReq>()
+            QrCoordinates = new int[3]
         };
 
         var (identityResponse, _) = await _client.POSTAsync<IdentifyEP, IdentifyEP.Req, EmptyResponse>(identifyReq);

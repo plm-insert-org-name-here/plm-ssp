@@ -63,6 +63,9 @@ public static class Routes
         public const string Identify = "detectors/{LocationId}/identify";
         public const string HeartBeat = "detectors/{MacAddress}/heartbeat";
 
+        public const string ReCalibrate = "detectors/{locationId}/recalibrate";
+        public const string RequestCalibrationPreview = "detectors/{id}/requestcalibrationpreview";
+        public const string GetInitialCalibrationData = "detectors/{id}/getinitialcalibrationdata";
     }
 
     public static class Jobs
