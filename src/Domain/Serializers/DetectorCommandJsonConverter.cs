@@ -73,6 +73,13 @@ public class DetectorCommandJsonConverter : JsonConverter<DetectorCommand>
                 startCommand.TaskId
             );
         }
+        else
+        {
+            writer.WriteString(
+                SerializationUtils.GetJsonPropertyName<DetectorCommand.StartDetection>(c => c.TaskId),
+                "dingdong"
+            );
+        }
 
         writer.WriteEndObject();
     }
