@@ -5,7 +5,6 @@ using System.Text.Json;
 using Application.Interfaces;
 using Domain.Common;
 using Domain.Common.DetectorCommand;
-using Domain.Commonn;
 using Domain.Entities;
 using Domain.Interfaces;
 using FluentResults;

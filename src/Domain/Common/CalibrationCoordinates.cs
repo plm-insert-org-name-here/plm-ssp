@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Commonn;
+namespace Domain.Common;
 
 public class CalibrationCoordinates
 {

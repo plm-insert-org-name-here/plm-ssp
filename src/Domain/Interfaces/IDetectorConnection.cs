@@ -1,6 +1,5 @@
 using Domain.Common;
 using Domain.Common.DetectorCommand;
-using Domain.Commonn;
 using Domain.Entities;
 using FluentResults;
 
