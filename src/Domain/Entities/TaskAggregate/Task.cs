@@ -12,8 +12,11 @@ public class Task : IBaseEntity
     public TaskType Type { get; set; }
     public TaskState State { get; set; }
 
-    public int LocationId { get; set; }
+    public int MaxOrderNum { get; set; }
+
     public int JobId { get; set; }
+    public Job Job { get; set; } = default!;
+    public int LocationId { get; set; }
 
     public Location Location { get; set; } = default!;
     public List<TaskInstance> Instances { get; set; } = default!;
@@ -27,19 +30,22 @@ public class Task : IBaseEntity
         Id = id;
         Name = name;
         Type = type;
+        State = taskState;
+        MaxOrderNum = 0;
         LocationId = locationId;
         JobId = jobId;
         Instances = new List<TaskInstance>();
         Objects = new List<Object>();
         Steps = new List<Step>();
-        State = taskState;
     }
 
-    public Task(string name, List<Object> objects, List<Step> steps, int locationId)
+    public Task(string name, int locationId, TaskType taskType)
     {
         Name = name;
-        Objects = objects;
-        Steps = steps;
+        Type = taskType;
+        State = TaskState.Inactive;
+        Objects = new List<Object>();
+        Steps = new List<Step>();
         LocationId = locationId;
     }
 
@@ -176,10 +182,5 @@ public class Task : IBaseEntity
         State = TaskState.Active;
 
         return Result.Ok();
-    }
-
-    public bool IsObjectBelongsTo(int id)
-    {
-        return Objects.Any() && Objects.Select(o => o.Id).Contains(id);
     }
 }

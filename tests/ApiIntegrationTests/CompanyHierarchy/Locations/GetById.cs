@@ -32,7 +32,25 @@ public class GetById : IClassFixture<Setup>
         
         Assert.NotNull(result);
         Assert.Equal("Location 1", result.Name);
-        Assert.NotNull(result.Detector);
-        Assert.Equal("Detector 1", result.Detector.Name);
+        Assert.True(result.HasSnapshot);
+
+        Assert.NotNull(result.OngoingTask);
+        Assert.Null(result.OngoingTask.TaskInstance);
+
+        req = new Endpoint.Req
+        {
+            Id = 2
+        };
+
+        (response, result) = await _client.GETAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req);
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        Assert.NotNull(result);
+        Assert.Equal("Location 2", result.Name);
+        Assert.False(result.HasSnapshot);
+
+        Assert.Null(result.OngoingTask);
     }
 }

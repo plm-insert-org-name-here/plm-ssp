@@ -1,7 +1,4 @@
 using System.Net;
-using System.Text;
-using System.Text.Json;
-using Api;
 using Domain.Common;
 using Domain.Common.DetectorCommand;
 using FastEndpoints;

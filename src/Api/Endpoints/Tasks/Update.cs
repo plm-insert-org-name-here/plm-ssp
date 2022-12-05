@@ -68,8 +68,6 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         });
     }
 
-    // NOTE(rg): it's safe to update Tasks while they're being ran. Detectors only ask for the Task once, when starting it.
-    // Because of this, we can't mess up the execution of a Task if we update in during the execution.
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
         var job = await JobRepo.FirstOrDefaultAsync(new JobWithSpecificTaskSpec(req.ParentJobId, req.Id), ct);
@@ -86,6 +84,10 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             await SendNotFoundAsync(ct);
             return;
         }
+
+        // TODO(rg): I thought we were allowed to update a Task while a Detector is running it,
+        // but this isn't true, because of how Event submission works... only way around this is to
+        // immediately let the Detector know of the updated Task
 
         if (req.NewName is not null && req.NewName != task.Name)
             task.Rename(req.NewName, job).Unwrap();
@@ -122,7 +124,6 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
                     if (referencedObject is null)
                     {
                         ThrowError("Referenced Object does not exist within the Task");
-
                     }
 
                     return Step.Create(
