@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Domain.Common;
 using Domain.Entities;
@@ -33,7 +34,7 @@ public class CodeSeedLoader
 
     private static readonly ConstructorInfo LocationConstructor =
         typeof(Location).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
-            new[] { typeof(int), typeof(string), typeof(int), typeof(bool) })!;
+            new[] { typeof(int), typeof(string), typeof(int), typeof(bool), typeof(int?) })!;
 
     private static readonly ConstructorInfo ObjectConstructor =
         typeof(Object).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
@@ -43,12 +44,15 @@ public class CodeSeedLoader
         typeof(Step).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
             new[]
             {
-                typeof(int), typeof(int?), typeof(TemplateState), typeof(TemplateState), typeof(int), typeof(int)
+                typeof(int), typeof(int), typeof(TemplateState), typeof(TemplateState), typeof(int), typeof(int)
             })!;
 
     private static readonly ConstructorInfo TaskConstructor =
         typeof(Task).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
-            new[] { typeof(int), typeof(string), typeof(TaskType), typeof(int), typeof(int), typeof(TaskState) })!;
+            new[]
+            {
+                typeof(int), typeof(string), typeof(TaskType), typeof(int), typeof(int), typeof(int?), typeof(int)
+            })!;
 
     private static readonly ConstructorInfo JobConstructor =
         typeof(Job).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
@@ -60,7 +64,7 @@ public class CodeSeedLoader
 
     private static readonly ConstructorInfo TaskInstanceConstructor =
         typeof(TaskInstance).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
-            new[] { typeof(int), typeof(TaskInstanceFinalState?), typeof(int), typeof(int[]) })!;
+            new[] { typeof(int), typeof(TaskInstanceState), typeof(int), typeof(int[]), typeof(int) })!;
 
     private static readonly ConstructorInfo EventConstructor =
         typeof(Event).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
@@ -105,10 +109,10 @@ public class CodeSeedLoader
 
         var locations = new List<Location>
         {
-            (Location)LocationConstructor.Invoke(new object?[] { 1, "Location 1", 1, true }),
-            (Location)LocationConstructor.Invoke(new object?[] { 2, "Location 2", 1, false }),
-            (Location)LocationConstructor.Invoke(new object?[] { 3, "Location 3", 2, true }),
-            (Location)LocationConstructor.Invoke(new object?[] { 4, "Location 4", 2, false })
+            (Location)LocationConstructor.Invoke(new object?[] { 1, "Location 1", 1, true, null }),
+            (Location)LocationConstructor.Invoke(new object?[] { 2, "Location 2", 1, false, null }),
+            (Location)LocationConstructor.Invoke(new object?[] { 3, "Location 3", 2, true, null }),
+            (Location)LocationConstructor.Invoke(new object?[] { 4, "Location 4", 2, false, null })
         };
 
         var objects = new List<Object>
@@ -164,11 +168,11 @@ public class CodeSeedLoader
         var tasks = new List<Task>
         {
             (Task)TaskConstructor.Invoke(new object?[]
-                { 1, "Task 1", TaskType.ItemKit, 1, 1, TaskState.Active }),
+                { 1, "Task 1", TaskType.ItemKit, 1, 1, null, 3 }),
             (Task)TaskConstructor.Invoke(new object?[]
-                { 2, "Task 2", TaskType.ToolKit, 2, 1, TaskState.Inactive }),
+                { 2, "Task 2", TaskType.ToolKit, 2, 1, null, 3 }),
             (Task)TaskConstructor.Invoke(new object?[]
-                { 3, "Task 3", TaskType.ToolKit, 1, 1, TaskState.Active })
+                { 3, "Task 3", TaskType.ToolKit, 1, 1, null, 3 })
         };
 
         var jobs = new List<Job>
@@ -188,15 +192,15 @@ public class CodeSeedLoader
         {
             (TaskInstance)TaskInstanceConstructor.Invoke(new object?[]
             {
-                1, TaskInstanceFinalState.Completed, 3, Array.Empty<int>()
+                1, TaskInstanceState.Completed, 3, Array.Empty<int>(), 0
             }),
             (TaskInstance)TaskInstanceConstructor.Invoke(new object?[]
             {
-                2, TaskInstanceFinalState.Abandoned, 3, new[] { 8, 9, 10, 11, 12 }
+                2, TaskInstanceState.Abandoned, 3, new[] { 8, 9, 10, 11, 12 }, 1
             }),
             (TaskInstance)TaskInstanceConstructor.Invoke(new object?[]
             {
-                3, null, 3, new[] { 11, 12 }
+                3, TaskInstanceState.InProgress, 3, new[] { 11, 12 }, 2
             })
         };
 
@@ -245,6 +249,11 @@ public class CodeSeedLoader
         _context.Detectors.AddRange(detectors);
         _context.TaskInstances.AddRange(taskInstances);
         _context.Events.AddRange(events);
+
+        _context.SaveChanges();
+
+        _context.Locations.First(l => l.Id == 1).OngoingTaskId = 3;
+        _context.Tasks.First(t => t.Id == 3).OngoingInstanceId = 3;
 
         _context.SaveChanges();
     }

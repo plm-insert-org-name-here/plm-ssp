@@ -1,3 +1,5 @@
+using System.Diagnostics.Tracing;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
@@ -7,54 +9,66 @@ namespace Domain.Entities.TaskAggregate;
 
 public class Task : IBaseEntity
 {
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public string Name { get; private set; } = default!;
     public TaskType Type { get; set; }
-    public TaskState State { get; set; }
 
-    public int MaxOrderNum { get; set; }
+    public int MaxOrderNum { get; private set; }
 
-    public int JobId { get; set; }
-    public Job Job { get; set; } = default!;
-    public int LocationId { get; set; }
+    public int JobId { get; private set; }
+    public Job Job { get; private set; } = default!;
+    public int LocationId { get; private set; }
 
-    public Location Location { get; set; } = default!;
-    public List<TaskInstance> Instances { get; set; } = default!;
-    public List<Object> Objects { get; set; } = default!;
-    public List<Step> Steps { get; set; } = default!;
+    public Location Location { get; private set; } = default!;
+    public List<TaskInstance> Instances { get; private set; } = default!;
+    public List<Object> Objects { get; private set; } = default!;
+    public List<Step> Steps { get; private set; } = default!;
+
+    public TaskInstance? OngoingInstance { get; set; }
+    public int? OngoingInstanceId { get; set; }
 
     private Task() {}
 
-    private Task(int id, string name, TaskType type, int locationId, int jobId, TaskState taskState)
+    private Task(int id, string name, TaskType type, int locationId, int jobId, int? ongoingInstanceId, int maxOrderNum)
     {
         Id = id;
         Name = name;
         Type = type;
-        State = taskState;
-        MaxOrderNum = 0;
         LocationId = locationId;
         JobId = jobId;
         Instances = new List<TaskInstance>();
         Objects = new List<Object>();
         Steps = new List<Step>();
+        OngoingInstanceId = ongoingInstanceId;
+        MaxOrderNum = maxOrderNum;
     }
 
     public Task(string name, int locationId, TaskType taskType)
     {
         Name = name;
         Type = taskType;
-        State = TaskState.Inactive;
         Objects = new List<Object>();
         Steps = new List<Step>();
         LocationId = locationId;
+        MaxOrderNum = 0;
     }
 
-    public void CreateInstance()
+    private void UpdateMaxOrderNum()
     {
+        MaxOrderNum = Steps.Select(s => s.OrderNum).Max();
+    }
+
+    public Result CreateInstance()
+    {
+        if (OngoingInstance is not null)
+            return Result.Fail("Cannot create a new Task Instance while there's already an ongoing Instance");
+
         var instance = new TaskInstance(this);
 
+        OngoingInstance = instance;
         Instances.Add(instance);
-        State = TaskState.Active;
+
+        return Result.Ok();
     }
 
     public void AddObjects(IEnumerable<Object> objects)
@@ -65,6 +79,7 @@ public class Task : IBaseEntity
     public void AddSteps(IEnumerable<Step> steps)
     {
         Steps.AddRange(steps);
+        UpdateMaxOrderNum();
     }
 
     public Result ModifyObject(int objectId, string name, ObjectCoordinates coords)
@@ -82,16 +97,16 @@ public class Task : IBaseEntity
         return Result.Ok();
     }
 
-    public Result ModifyStep(int stepId, int orderNum, TemplateState exInitState, TemplateState exSubsState, Object obj)
+    public Result ModifyStep(int stepId, int orderNum, TemplateState init, TemplateState subs, Object obj)
     {
         var step = Steps.FirstOrDefault(s => s.Id == stepId);
         if (step is null)
             return Result.Fail("Step to modify does not exist within the Task");
 
-        step.OrderNum = orderNum;
-        step.ExpectedInitialState = exInitState;
-        step.ExpectedSubsequentState = exSubsState;
-        step.Object = obj;
+        var updateResult = step.Update(orderNum, init, subs, obj);
+        if (updateResult.IsFailed) return updateResult;
+
+        UpdateMaxOrderNum();
 
         return Result.Ok();
     }
@@ -104,7 +119,9 @@ public class Task : IBaseEntity
     public void RemoveSteps(IEnumerable<int> stepIds)
     {
         Steps.RemoveAll(s => stepIds.Contains(s.Id));
+        UpdateMaxOrderNum();
     }
+
 
     public Result Rename(string newName, Job parentJob)
     {
@@ -118,24 +135,21 @@ public class Task : IBaseEntity
 
     public Result AddEventToCurrentInstance(int stepId, EventResult eventResult, Detector detector)
     {
-        if (State is not TaskState.Active)
-            return Result.Fail("Task is not active");
+        if (OngoingInstance is null)
+            return Result.Fail("Task does not have an ongoing instance");
 
-        var currentInstance = Instances.FirstOrDefault(i => i.FinalState is null);
-        if (currentInstance is null)
-            return Result.Fail("Task does not have a running instance");
-
-        if (!Steps.Select(s => s.Id).Contains(stepId))
+        var step = Steps.FirstOrDefault(s => s.Id == stepId);
+        if (step is null)
             return Result.Fail("Task does not contain the referenced Step");
 
-        var addEventResult = currentInstance.AddEvent(new Event(DateTime.Now, eventResult, stepId, currentInstance.Id));
+        var addEventResult = OngoingInstance.AddEvent(Steps, step, eventResult);
         if (addEventResult.IsFailed) return addEventResult;
 
-        if (currentInstance.IsEnded())
+        if (OngoingInstance.State is TaskInstanceState.Completed)
         {
-            State = TaskState.Inactive;
             detector.RemoveFromState(DetectorState.Monitoring);
             detector.AddToState(DetectorState.Standby);
+            OngoingInstance = null;
         }
 
         return Result.Ok();
@@ -143,44 +157,32 @@ public class Task : IBaseEntity
 
     public Result StopCurrentInstance()
     {
-        var currentInstance = Instances.FirstOrDefault(i => i.FinalState is null);
-        if (currentInstance is null)
-            return Result.Fail("Task does not have a running instance");
+        if (OngoingInstance is null)
+            return Result.Fail("Task does not have an ongoing instance");
 
-        if (State is not (TaskState.Active or TaskState.Paused))
-            return Result.Fail("Task is Inactive, therefore it cannot be stopped");
+        var abandonResult = OngoingInstance.Abandon();
+        if (abandonResult.IsFailed) return abandonResult;
 
-        currentInstance.Abandon();
-        State = TaskState.Inactive;
+        OngoingInstance = null;
 
         return Result.Ok();
     }
 
     public Result PauseCurrentInstance()
     {
-        var currentInstance = Instances.FirstOrDefault(i => i.FinalState is null);
-        if (currentInstance is null)
-            return Result.Fail("Task does not have a running instance");
+        if (OngoingInstance is null)
+            return Result.Fail("Task does not have an ongoing instance");
 
-        if (State is not TaskState.Active)
-            return Result.Fail("Task is not Active, therefore it cannot be paused");
-
-        State = TaskState.Paused;
-
-        return Result.Ok();
+        var pauseResult = OngoingInstance.Pause();
+        return pauseResult.IsFailed ? pauseResult : Result.Ok();
     }
 
     public Result ResumeCurrentInstance()
     {
-        var currentInstance = Instances.FirstOrDefault(i => i.FinalState is null);
-        if (currentInstance is null)
-            return Result.Fail("Task does not have a running instance");
+        if (OngoingInstance is null)
+            return Result.Fail("Task does not have an ongoing instance");
 
-        if (State is not TaskState.Paused)
-            return Result.Fail("Task is not Paused, therefore it cannot be resumed");
-
-        State = TaskState.Active;
-
-        return Result.Ok();
+        var resumeResult = OngoingInstance.Resume();
+        return resumeResult.IsFailed ? resumeResult : Result.Ok();
     }
 }

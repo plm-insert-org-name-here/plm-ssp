@@ -4,6 +4,7 @@ using Domain.Entities.TaskAggregate;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using FluentResults;
 using Infrastructure;
 using Object = Domain.Entities.TaskAggregate.Object;
 
@@ -68,6 +69,21 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         });
     }
 
+    // TODO(rg): better wording
+    private static Result VerifyOrderNumContinuity(IEnumerable<Step> steps)
+    {
+        var orderNums = steps.Select(s => s.OrderNum).Distinct().OrderBy(n => n).ToList();
+
+        if (orderNums[0] != 1) return Result.Fail("Lowest Step order num should be 1");
+
+        foreach (var (o1, o2) in orderNums.Zip(orderNums.Skip(1)))
+        {
+            if (o1 + 1 != o2) return Result.Fail("Step order nums should be continuous");
+        }
+
+        return Result.Ok();
+    }
+
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
         var job = await JobRepo.FirstOrDefaultAsync(new JobWithSpecificTaskSpec(req.ParentJobId, req.Id), ct);
@@ -85,9 +101,14 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
             return;
         }
 
-        // TODO(rg): I thought we were allowed to update a Task while a Detector is running it,
+        // NOTE(rg): I thought we were allowed to update a Task while a Detector is running it,
         // but this isn't true, because of how Event submission works... only way around this is to
         // immediately let the Detector know of the updated Task
+        if (task.Location.OngoingTask is not null && task.Location.OngoingTask.Id == task.Id)
+        {
+            ThrowError("Cannot update an ongoing Task");
+            return;
+        }
 
         if (req.NewName is not null && req.NewName != task.Name)
             task.Rename(req.NewName, job).Unwrap();
@@ -140,6 +161,8 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
         {
             task.Type = req.NewType.Value;
         }
+
+        VerifyOrderNumContinuity(task.Steps).Unwrap();
 
         await JobRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);

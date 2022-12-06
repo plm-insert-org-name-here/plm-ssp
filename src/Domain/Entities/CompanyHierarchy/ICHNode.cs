@@ -10,18 +10,18 @@ public interface ICHNode<TParent, TChild>
 public interface ICHNodeWithParent<TParent> : ICHNode
     where TParent : class, ICHNode
 {
-    public TParent Parent { get; set; }
-    public int ParentId { get; set; }
+    public TParent Parent { get; }
+    public int ParentId { get; }
 }
 
 public interface ICHNodeWithChildren<TChild> : ICHNode
     where TChild : class, ICHNode
 {
-    public List<TChild> Children { get; set; }
+    public List<TChild> Children { get; }
 }
 
 public interface ICHNode : IBaseEntity
 {
-    public string Name { get; set; }
+    public string Name { get; }
 
 }

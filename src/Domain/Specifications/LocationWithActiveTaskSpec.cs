@@ -10,14 +10,14 @@ public sealed class LocationWithActiveTaskSpec : Specification<Location>
     {
         Query.Where(l => l.Id == id)
             .Include(l => l.Detector)
-            .Include(l => l.Tasks.Where(t => t.State != TaskState.Inactive))
+            .Include(l => l.OngoingTask)
             .ThenInclude(t => t.Job)
-            .Include(l => l.Tasks.Where(t => t.State != TaskState.Inactive))
+            .Include(l => l.OngoingTask)
             .ThenInclude(t => t.Steps)
-            .Include(l => l.Tasks.Where(t => t.State != TaskState.Inactive))
+            .Include(l => l.OngoingTask)
             .ThenInclude(t => t.Objects)
-            .Include(l => l.Tasks.Where(t => t.State != TaskState.Inactive))
-            .ThenInclude(t => t.Instances.Where(ti => ti.FinalState == null))
+            .Include(l => l.OngoingTask)
+            .ThenInclude(t => t.OngoingInstance)
             .ThenInclude(ti => ti.Events);
     }
 }

@@ -106,10 +106,7 @@ public class DetectorLifecycle : IClassFixture<Setup>
         Assert.NotNull(taskResponse);
         Assert.Equal(HttpStatusCode.OK, taskResponse.StatusCode);
         Assert.NotNull(taskResult);
-        Assert.Equal(TaskState.Inactive, taskResult.State);
-        Assert.NotNull(taskResult.LatestInstance);
-        Assert.Equal(TaskInstanceFinalState.Completed, taskResult.LatestInstance.FinalState);
-        Assert.Equal(3, taskResult.LatestInstance.Events.Count());
+        Assert.Null(taskResult.OngoingInstance);
 
         await DetectorStateIsCorrect(2, DetectorState.Standby);
     }

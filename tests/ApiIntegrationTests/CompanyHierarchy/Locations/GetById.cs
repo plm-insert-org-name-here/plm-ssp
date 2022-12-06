@@ -26,16 +26,16 @@ public class GetById : IClassFixture<Setup>
         };
 
         var (response, result) = await _client.GETAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req);
-        
+
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        
+
         Assert.NotNull(result);
         Assert.Equal("Location 1", result.Name);
         Assert.True(result.HasSnapshot);
 
         Assert.NotNull(result.OngoingTask);
-        Assert.Null(result.OngoingTask.TaskInstance);
+        Assert.NotNull(result.OngoingTask.OngoingInstance);
 
         req = new Endpoint.Req
         {

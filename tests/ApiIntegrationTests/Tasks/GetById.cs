@@ -15,7 +15,7 @@ public class GetById : IClassFixture<Setup>
     {
         _client = setup.Client;
     }
-    
+
     [Fact]
     public async Task CanGetById()
     {
@@ -25,28 +25,28 @@ public class GetById : IClassFixture<Setup>
         };
 
         var (response, result) = await _client.GETAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req);
-        
+
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        
+
         Assert.NotNull(result);
         Assert.Equal(1, result.Id);
         Assert.Equal("Task 1", result.Name);
-        Assert.Equal(TaskState.Active, result.State);
-        
-        Endpoint.Req req2 = new()
+        Assert.Null(result.OngoingInstance);
+
+        Endpoint.Req req3 = new()
         {
-            Id = 2
+            Id = 3
         };
 
-        var (response2, result2) = await _client.GETAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req2);
-        
-        Assert.NotNull(response2);
-        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
-        
-        Assert.NotNull(result2);
-        Assert.Equal(2, result2.Id);
-        Assert.Equal("Task 2", result2.Name);
-        Assert.Equal(TaskState.Inactive, result2.State);
+        var (response3, result3) = await _client.GETAsync<Endpoint, Endpoint.Req, Endpoint.Res>(req3);
+
+        Assert.NotNull(response3);
+        Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+
+        Assert.NotNull(result3);
+        Assert.Equal(3, result3.Id);
+        Assert.Equal("Task 3", result3.Name);
+        Assert.NotNull(result3.OngoingInstance);
     }
 }

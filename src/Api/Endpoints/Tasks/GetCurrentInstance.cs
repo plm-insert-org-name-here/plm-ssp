@@ -18,7 +18,7 @@ public class GetCurrentInstance : Endpoint<GetCurrentInstance.Req, GetCurrentIns
     {
         public ResTaskInstance Instance { get; set; } = default!;
 
-        public record ResTaskInstance(int Id, TaskInstanceFinalState? FinalState, IEnumerable<ResEvent> Events, int TaskId);
+        public record ResTaskInstance(int Id, TaskInstanceState? FinalState, IEnumerable<ResEvent> Events, int TaskId);
 
         public record ResEvent(int Id, DateTime TimeStamp, bool EventResultSuccess, string? FailureReason, int StepId, int TaskInstanceId);
 
@@ -46,7 +46,7 @@ public class GetCurrentInstance : Endpoint<GetCurrentInstance.Req, GetCurrentIns
 
         var res = new Res
         {
-            Instance = new Res.ResTaskInstance(instance.Id, instance.FinalState, resEvents, instance.TaskId)
+            Instance = new Res.ResTaskInstance(instance.Id, instance.State, resEvents, instance.TaskId)
         };
 
         await SendOkAsync(res, ct);

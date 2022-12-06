@@ -43,12 +43,9 @@ public class DetectorCommandService
 
         if (location is not null)
         {
-            var ongoingTask = location.Tasks
-                .FirstOrDefault(t => t.State is TaskState.Active or TaskState.Paused);
-
             if (command.IsStartDetection)
             {
-                if (ongoingTask is not null)
+                if (location.OngoingTask is not null)
                     return Result.Fail("A new instance of a Task cannot be started while another is in progress");
 
                 var taskId = ((DetectorCommand.StartDetection)command).TaskId;
@@ -59,28 +56,33 @@ public class DetectorCommandService
                 if (!location.Tasks.Contains(task))
                     return Result.Fail("The Detector cannot start the specified Task, as it does not belong to the Detector's Location");
 
-                task.CreateInstance();
+                var createResult = task.CreateInstance();
+                if (createResult.IsFailed) return createResult;
+
+                location.OngoingTask = task;
 
                 detector.RemoveFromState(DetectorState.Standby);
                 detector.AddToState(DetectorState.Monitoring);
             }
             else if (command.IsStopDetection)
             {
-                if (ongoingTask is null)
+                if (location.OngoingTask is null)
                     return Result.Fail("The Detector is not running a Task");
 
-                var result = ongoingTask.StopCurrentInstance();
+                var result = location.OngoingTask.StopCurrentInstance();
                 if (result.IsFailed) return result;
+
+                location.OngoingTask = null;
 
                 detector.RemoveFromState(DetectorState.Monitoring);
                 detector.AddToState(DetectorState.Standby);
             }
             else if (command.IsPauseDetection)
             {
-                if (ongoingTask is null)
+                if (location.OngoingTask is null)
                     return Result.Fail("The Detector is not running a Task");
 
-                var result = ongoingTask.PauseCurrentInstance();
+                var result = location.OngoingTask.PauseCurrentInstance();
                 if (result.IsFailed) return result;
 
                 detector.RemoveFromState(DetectorState.Monitoring);
@@ -88,10 +90,10 @@ public class DetectorCommandService
             }
             else if (command.IsResumeDetection)
             {
-                if (ongoingTask is null)
+                if (location.OngoingTask is null)
                     return Result.Fail("The Detector is not running a Task");
 
-                var result = ongoingTask.ResumeCurrentInstance();
+                var result = location.OngoingTask.ResumeCurrentInstance();
                 if (result.IsFailed) return result;
 
                 detector.RemoveFromState(DetectorState.Standby);

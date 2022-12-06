@@ -8,7 +8,7 @@ public sealed class CurrentTaskInstanceWithEventsSpec : Specification<TaskInstan
     public CurrentTaskInstanceWithEventsSpec(int id)
     {
         Query.Where(t => t.TaskId == id)
-            .Where(t => t.FinalState == null)
+            .Where(t => t.State == null)
             .Include(t => t.Events);
     }
 }
