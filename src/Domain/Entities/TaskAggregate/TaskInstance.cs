@@ -58,7 +58,6 @@ public class TaskInstance : IBaseEntity
         if (!RemainingStepIds.Any())
             State = TaskInstanceState.Completed;
 
-        Console.WriteLine($"Next order num after adding Step {thisStep.Id}: {CurrentOrderNum}");
         return Result.Ok();
     }
 
