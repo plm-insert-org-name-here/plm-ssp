@@ -1,10 +1,15 @@
 {
-  "x-generator": "NSwag v13.17.0.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))",
+  "x-generator": "NSwag v13.17.0.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v9.0.0.0))",
   "openapi": "3.0.0",
   "info": {
-    "title": "dotnet-nswag",
+    "title": "Api",
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "https://localhost:9696"
+    }
+  ],
   "paths": {
     "/api/v1/tasks": {
       "post": {
@@ -1310,6 +1315,38 @@
         }
       }
     },
+    "/api/v1/detectors/{id}/getinitialcalibrationdata": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsGetInitialCalibrationData",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              },
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/detectors/{MacAddress}/heartbeat": {
       "post": {
         "tags": [
@@ -1424,6 +1461,97 @@
                     "$ref": "#/components/schemas/DetectorsList_Res"
                   }
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{locationId}/recalibrate": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsReCalibrate",
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "NewTrayCoordinates",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{id}/requestcalibrationpreview": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsRequestCalibrationPreview",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "NewTrayPoints",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              },
+              "application/json": {
+                "schema": {}
               }
             }
           }
@@ -2077,6 +2205,9 @@
             "type": "string",
             "nullable": true
           },
+          "HasSnapshot": {
+            "type": "boolean"
+          },
           "Detector": {
             "nullable": true,
             "oneOf": [
@@ -2345,17 +2476,20 @@
           "Name": {
             "type": "string"
           },
-          "Detector": {
+          "HasSnapshot": {
+            "type": "boolean"
+          },
+          "OngoingTask": {
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/LocationsGetById_Res_DetectorRes"
+                "$ref": "#/components/schemas/LocationsGetById_Res_OngoingTaskRes"
               }
             ]
           }
         }
       },
-      "LocationsGetById_Res_DetectorRes": {
+      "LocationsGetById_Res_OngoingTaskRes": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2366,6 +2500,168 @@
           "Name": {
             "type": "string",
             "nullable": true
+          },
+          "Type": {
+            "$ref": "#/components/schemas/TaskType"
+          },
+          "State": {
+            "$ref": "#/components/schemas/TaskState"
+          },
+          "Job": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationsGetById_Res_OngoingJobRes"
+              }
+            ]
+          },
+          "TaskInstance": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationsGetById_Res_OngoingTaskInstanceRes"
+              }
+            ]
+          },
+          "Steps": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/LocationsGetById_Res_StepRes"
+            }
+          }
+        }
+      },
+      "LocationsGetById_Res_OngoingJobRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "LocationsGetById_Res_OngoingTaskInstanceRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FinalState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TaskInstanceFinalState"
+              }
+            ]
+          },
+          "Events": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/LocationsGetById_Res_EventRes"
+            }
+          }
+        }
+      },
+      "LocationsGetById_Res_EventRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Result": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EventResult"
+              }
+            ]
+          },
+          "Step": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationsGetById_Res_StepRes"
+              }
+            ]
+          }
+        }
+      },
+      "EventResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Success": {
+            "type": "boolean"
+          },
+          "FailureReason": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "LocationsGetById_Res_StepRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "OrderNum": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ExInitState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "ExSubsState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "Object": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationsGetById_Res_ObjectRes"
+              }
+            ]
+          }
+        }
+      },
+      "LocationsGetById_Res_ObjectRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Coords": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ObjectCoordinates"
+              }
+            ]
           }
         }
       },
@@ -2635,6 +2931,10 @@
         "type": "object",
         "additionalProperties": false
       },
+      "DetectorsGetInitialCalibrationData_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
       "DetectorsHeartBeat_Req": {
         "type": "object",
         "additionalProperties": false,
@@ -2660,25 +2960,12 @@
           "MacAddress": {
             "type": "string"
           },
-          "Coordinates": {
+          "QrCoordinates": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DetectorsIdentify_Req_CalibrationCoordsReq"
+              "type": "integer",
+              "format": "int32"
             }
-          }
-        }
-      },
-      "DetectorsIdentify_Req_CalibrationCoordsReq": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "X": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "Y": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },
@@ -2725,6 +3012,14 @@
             "nullable": true
           }
         }
+      },
+      "DetectorsReCalibrate_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DetectorsRequestCalibrationPreview_Req": {
+        "type": "object",
+        "additionalProperties": false
       },
       "DetectorsSnapshot_Req": {
         "type": "object",

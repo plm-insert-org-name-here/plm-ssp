@@ -1,12 +1,13 @@
 using System.Net;
 using Domain.Common;
-using Domain.Entities.TaskAggregate;
 using FastEndpoints;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Priority;
-using Endpoint = Api.Endpoints.Tasks.Update;
-using Object = System.Object;
 using Task = System.Threading.Tasks.Task;
+
+using Endpoint = Api.Endpoints.Tasks.Update;
+using GetByIdEP = Api.Endpoints.Tasks.GetById;
 
 namespace ApiIntegrationTests.Tasks;
 
@@ -14,10 +15,12 @@ namespace ApiIntegrationTests.Tasks;
 [TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]
 public class Update : IClassFixture<Setup>
 {
+    private readonly ITestOutputHelper _testOutputHelper;
     private readonly HttpClient _client;
 
-    public Update(Setup setup)
+    public Update(Setup setup, ITestOutputHelper testOutputHelper)
     {
+        _testOutputHelper = testOutputHelper;
         _client = setup.Client;
     }
 
@@ -64,11 +67,11 @@ public class Update : IClassFixture<Setup>
             NewObjects = new List<Endpoint.Req.NewObjectReq>
             {
                 new("newTestObjectName2",
-                    new ObjectCoordinates {X = 10, Y = 10, Width = 100, Height = 100}),
+                    new ObjectCoordinates { X = 10, Y = 10, Width = 100, Height = 100 }),
                 new("newTestObjectName3",
-                    new ObjectCoordinates { X = 20, Y = 20, Width = 200, Height = 200}),
+                    new ObjectCoordinates { X = 20, Y = 20, Width = 200, Height = 200 }),
                 new("newTestObjectName4",
-                    new ObjectCoordinates { X = 30, Y = 30, Width = 300, Height = 300})
+                    new ObjectCoordinates { X = 30, Y = 30, Width = 300, Height = 300 })
             }
         };
 
@@ -85,7 +88,7 @@ public class Update : IClassFixture<Setup>
         {
             Id = 1,
             ParentJobId = 1,
-            DeletedObjects = new List<int>{ 1, 2 },
+            DeletedObjects = new List<int> { 1, 2 },
         };
 
         var (responseDelete, result) = await _client.PUTAsync<Endpoint, Endpoint.Req, EmptyResponse>(reqDelete);
@@ -102,29 +105,60 @@ public class Update : IClassFixture<Setup>
             Id = 1,
             ParentJobId = 1,
             NewSteps = new List<Endpoint.Req.NewStepReq>
-                { new(0, TemplateState.Missing, TemplateState.Present, "Object 1"), new(0, TemplateState.Present, TemplateState.Missing, "Object 2") },
+            {
+                new(3, TemplateState.Missing, TemplateState.Present, "Object 1"),
+                new(4, TemplateState.Present, TemplateState.Missing, "Object 2")
+            }
         };
 
         var (response, result) = await _client.PUTAsync<Endpoint, Endpoint.Req, EmptyResponse>(req);
 
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+
+        GetByIdEP.Req getReq = new()
+        {
+            Id = 1
+        };
+
+        var (getResponse, getResult) = await _client.GETAsync<GetByIdEP, GetByIdEP.Req, GetByIdEP.Res>(getReq);
+
+        Assert.NotNull(getResponse);
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        Assert.NotNull(getResult);
+        Assert.Equal(4, getResult.MaxOrderNum);
     }
 
     [Fact, Priority(40)]
     public async Task CanDeleteSteps()
     {
+        // Delete step 2 & 3 and the two steps created in the previous test
         Endpoint.Req req = new()
         {
             Id = 1,
             ParentJobId = 1,
-            DeletedSteps = new List<int>{1, 2},
+            DeletedSteps = new List<int> { 2, 3, 13, 14 }
         };
 
         var (response, result) = await _client.PUTAsync<Endpoint, Endpoint.Req, EmptyResponse>(req);
 
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+        GetByIdEP.Req getReq = new()
+        {
+            Id = 1
+        };
+
+        var (getResponse, getResult) = await _client.GETAsync<GetByIdEP, GetByIdEP.Req, GetByIdEP.Res>(getReq);
+
+        Assert.NotNull(getResponse);
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        Assert.NotNull(getResult);
+        Assert.Equal(1, getResult.MaxOrderNum);
     }
 
     // [Fact]

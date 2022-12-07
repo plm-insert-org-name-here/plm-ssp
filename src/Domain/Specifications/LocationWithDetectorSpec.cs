@@ -3,10 +3,11 @@ using Domain.Entities.CompanyHierarchy;
 
 namespace Domain.Specifications;
 
-public sealed class LocationWithDetectorSpec : Specification<Location>
+public sealed class LocationWithDetectorSpec : Specification<Location>, ISingleResultSpecification
 {
     public LocationWithDetectorSpec(int id)
     {
-        Query.Where(l => l.Id == id).Include(l => l.Detector);
+        Query.Where(l => l.Id == id)
+            .Include(l => l.Detector);
     }
 }

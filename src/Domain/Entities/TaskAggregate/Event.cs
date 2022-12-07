@@ -4,16 +4,16 @@ namespace Domain.Entities.TaskAggregate;
 
 public class Event : IBaseEntity
 {
-    public int Id { get; set; }
-    public DateTime Timestamp { get; set; }
+    public int Id { get; private set; }
+    public DateTime Timestamp { get; private set; }
 
-    public EventResult Result { get; set; } = default!;
+    public EventResult Result { get; private set; } = default!;
 
-    public Step Step { get; set; } = default!;
-    public int StepId { get; set; }
+    public Step Step { get; private set; } = default!;
+    public int StepId { get; private set; }
 
-    public TaskInstance TaskInstance { get; set; } = default!;
-    public int TaskInstanceId { get; set; }
+    public TaskInstance TaskInstance { get; private set; } = default!;
+    public int TaskInstanceId { get; private set; }
 
     private Event() { }
 

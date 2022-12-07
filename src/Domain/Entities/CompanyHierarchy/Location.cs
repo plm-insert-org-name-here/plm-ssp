@@ -8,24 +8,28 @@ namespace Domain.Entities.CompanyHierarchy;
 
 public class Location : ICHNodeWithParent<Station>
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = default!;
-    public Station Parent { get; set; } = default!;
-    public int ParentId { get; set; }
-    public Detector? Detector { get; set; }
-    public List<Task> Tasks { get; set; } = default!;
-    public CalibrationCoordinates? Coordinates { get; set; } = default!;
+    public int Id { get; private set; }
+    public string Name { get; private set; } = default!;
+    public Station Parent { get; private set; } = default!;
+    public int ParentId { get; private set; }
+    public Detector? Detector { get; private set; }
+    public List<Task> Tasks { get; private set; } = default!;
+
+    public Task? OngoingTask { get; set; }
+    public int? OngoingTaskId { get; set; }
+    public CalibrationCoordinates? Coordinates { get; set; }
 
     public byte[]? Snapshot { get; set; }
 
     private Location() {}
 
-    private Location(int id, string name, int parentId, bool snapshot)
+    private Location(int id, string name, int parentId, bool snapshot, int? ongoingTaskId)
     {
         Id = id;
         Name = name;
         ParentId = parentId;
-        Snapshot = snapshot ? new[] { (byte) 2, (byte) 3 } : null ;
+        Snapshot = snapshot ? new[] { (byte) 2, (byte) 3 } : null;
+        OngoingTaskId = ongoingTaskId;
     }
 
     public Location(string name)
@@ -81,18 +85,18 @@ public class Location : ICHNodeWithParent<Station>
         return Ok();
     }
 
-    public async Task<Result> SendRecalibrate(IDetectorConnection DetectorConnection, int[]? newTrayCoordinates=null)
+    public async Task<Result> SendRecalibrate(IDetectorConnection detectorConnection, int[]? newTrayCoordinates=null)
     {
         if (Detector is null || Detector.State == DetectorState.Off)
         {
             return Fail("This location has no active detector!");
         }
 
-        var result = await Detector.SendRecalibrate(Coordinates, DetectorConnection, newTrayCoordinates);
+        var result = await Detector.SendRecalibrate(Coordinates, detectorConnection, newTrayCoordinates);
 
         Coordinates = result.Value;
 
         return Ok();
     }
-    
+
 }

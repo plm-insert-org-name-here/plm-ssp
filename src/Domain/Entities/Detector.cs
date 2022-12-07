@@ -64,8 +64,8 @@ public class Detector : IBaseEntity
         }
 
         var result = await detectorConnection.SendCalibrationData(this, coords, newTrayPoints);
-        //we working with a location's detector so the location will always be something
-        Location.Coordinates = result.Value;
+        // we working with a location's detector so the location will always be something
+        Location!.Coordinates = result.Value;
 
         return Result.Ok(result.Value);
     }

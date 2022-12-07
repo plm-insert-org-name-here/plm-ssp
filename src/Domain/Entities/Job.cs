@@ -1,3 +1,4 @@
+using Domain.Interfaces;
 using FluentResults;
 using Task = Domain.Entities.TaskAggregate.Task;
 
@@ -5,9 +6,9 @@ namespace Domain.Entities;
 
 public class Job : IBaseEntity
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = default!;
-    public List<Task> Tasks { get; set; } = default!;
+    public int Id { get; private set; }
+    public string Name { get; private set; } = default!;
+    public List<Task> Tasks { get; private set; } = default!;
 
     private Job()
     {
@@ -19,9 +20,22 @@ public class Job : IBaseEntity
         Name = name;
     }
 
-    public Job(string name)
+    public static Result<Job> Create(string name, IJobNameUniquenessChecker nameUniquenessChecker)
     {
-        Name = name;
+        if (nameUniquenessChecker.IsDuplicate(name, null).GetAwaiter().GetResult())
+            return Result.Fail("Duplicate name");
+
+        return Result.Ok(new Job { Name = name });
+    }
+
+    public Result Rename(string newName, IJobNameUniquenessChecker nameUniquenessChecker)
+    {
+        if (nameUniquenessChecker.IsDuplicate(newName, this).GetAwaiter().GetResult())
+            return Result.Fail("Duplicate name");
+
+        Name = newName;
+
+        return Result.Ok();
     }
 
     public void DeleteTask(Task task)
