@@ -9,7 +9,7 @@ public sealed class TaskWithOngoingInstanceSpec : Specification<Task>, ISingleRe
     {
         Query.Where(t => t.Id == id)
             .Include(t => t.OngoingInstance)
-            .ThenInclude(t => t.Events)
+            .ThenInclude(t => t!.Events)
             .ThenInclude(e => e.Step)
             .ThenInclude(s => s.Object);
     }

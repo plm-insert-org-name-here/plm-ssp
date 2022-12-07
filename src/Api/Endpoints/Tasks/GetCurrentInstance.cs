@@ -3,12 +3,14 @@ using Domain.Entities.TaskAggregate;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Api.Endpoints.Tasks;
 
 public class GetCurrentInstance : Endpoint<GetCurrentInstance.Req, GetCurrentInstance.Res>
 {
-    public IRepository<TaskInstance> InstanceRepo { get; set; } = default!;
+    public IRepository<Task> TaskRepo { get; set; } = default!;
+
     public class Req
     {
         public int TaskId { get; set; }
@@ -33,20 +35,20 @@ public class GetCurrentInstance : Endpoint<GetCurrentInstance.Req, GetCurrentIns
 
     public override async System.Threading.Tasks.Task HandleAsync(Req req, CancellationToken ct)
     {
-        var instance = await InstanceRepo.FirstOrDefaultAsync(new CurrentTaskInstanceWithEventsSpec(req.TaskId), ct);
+        var task = await TaskRepo.FirstOrDefaultAsync(new TaskWithOngoingInstanceSpec(req.TaskId), ct);
 
-        if (instance is null)
+        if (task?.OngoingInstance is null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
 
-        var resEvents = instance.Events.Select(e =>
+        var resEvents = task.OngoingInstance.Events.Select(e =>
             new Res.ResEvent(e.Id, e.Timestamp, e.Result.Success,  e.Result.FailureReason, e.StepId, e.TaskInstanceId));
 
         var res = new Res
         {
-            Instance = new Res.ResTaskInstance(instance.Id, instance.State, resEvents, instance.TaskId)
+            Instance = new Res.ResTaskInstance(task.OngoingInstance.Id, task.OngoingInstance.State, resEvents, task.OngoingInstance.TaskId)
         };
 
         await SendOkAsync(res, ct);
