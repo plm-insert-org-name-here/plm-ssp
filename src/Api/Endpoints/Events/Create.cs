@@ -1,6 +1,5 @@
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
-using Domain.Entities.TaskAggregate;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;

@@ -28,7 +28,6 @@ public static class DbExt
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddDbContext<Context>(dbOptions);
-        // services.AddDbContextFactory<Context>(dbOptions);
 
         return services;
     }

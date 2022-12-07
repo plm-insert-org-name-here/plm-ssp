@@ -1,7 +1,4 @@
 using System.Net;
-using System.Text;
-using System.Text.Json;
-using Api;
 using Domain.Common;
 using Domain.Common.DetectorCommand;
 using FastEndpoints;
@@ -57,7 +54,7 @@ public class DetectorLifecycle : IClassFixture<Setup>
         {
             LocationId = 2,
             MacAddress = "12:34:56:78:90:AB",
-            Coordinates = new List<IdentifyEP.Req.CalibrationCoordsReq>()
+            QrCoordinates = new int[3]
         };
 
         var (identityResponse, _) = await _client.POSTAsync<IdentifyEP, IdentifyEP.Req, EmptyResponse>(identifyReq);
@@ -109,10 +106,7 @@ public class DetectorLifecycle : IClassFixture<Setup>
         Assert.NotNull(taskResponse);
         Assert.Equal(HttpStatusCode.OK, taskResponse.StatusCode);
         Assert.NotNull(taskResult);
-        Assert.Equal(TaskState.Inactive, taskResult.State);
-        Assert.NotNull(taskResult.LatestInstance);
-        Assert.Equal(TaskInstanceFinalState.Completed, taskResult.LatestInstance.FinalState);
-        Assert.Equal(3, taskResult.LatestInstance.Events.Count());
+        Assert.Null(taskResult.OngoingInstance);
 
         await DetectorStateIsCorrect(2, DetectorState.Standby);
     }

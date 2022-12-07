@@ -5,12 +5,12 @@ namespace Domain.Entities.CompanyHierarchy;
 
 public class Line : ICHNode<OPU, Station>
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = default!;
-    public List<Station> Children { get; set; } = default!;
+    public int Id { get; private set; }
+    public string Name { get; private set; } = default!;
+    public List<Station> Children { get; private set; } = default!;
 
-    public OPU Parent { get; set; } = default!;
-    public int ParentId { get; set; }
+    public OPU Parent { get; private set; } = default!;
+    public int ParentId { get; private set; }
 
     private Line() {}
     private Line(int id, string name, int parentId)

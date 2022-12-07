@@ -9,6 +9,8 @@ public sealed class JobWithSpecificTaskSpec : Specification<Job>, ISingleResultS
     {
         Query.Where(j => j.Id == id)
             .Include(job => job.Tasks.Where(t => t.Id == taskId))
+            .ThenInclude(t => t.Location)
+            .Include(job => job.Tasks.Where(t => t.Id == taskId))
             .ThenInclude(t => t.Objects)
             .Include(j => j.Tasks.Where(t => t.Id == taskId))
             .ThenInclude(t => t.Steps);

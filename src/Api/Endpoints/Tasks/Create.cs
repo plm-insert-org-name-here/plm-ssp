@@ -1,12 +1,11 @@
+using Domain.Common;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 
-using Domain.Entities.TaskAggregate;
 using Domain.Specifications;
 using FastEndpoints;
 
-using Object = Domain.Entities.TaskAggregate.Object;
 using Task = Domain.Entities.TaskAggregate.Task;
 
 namespace Api.Endpoints.Tasks;
@@ -20,6 +19,7 @@ public class Create: Endpoint<Create.Req, Create.Res>
         public int ParentJobId { get; set; }
         public string Name { get; set; } = default!;
         public int LocationId { get; set; }
+        public TaskType TaskType { get; set; }
     }
 
     public class Res
@@ -64,14 +64,13 @@ public class Create: Endpoint<Create.Req, Create.Res>
             return;
         }
 
-        var task = new Task(name: req.Name, objects: new List<Object>(), steps: new List<Step>(), req.LocationId);
+        var task = new Task(req.Name, req.LocationId, req.TaskType);
 
         job.Tasks.Add(task);
 
         await JobRepo.SaveChangesAsync(ct);
 
         var res = MapOut(task);
-
         await SendCreatedAtAsync<Create>(new { task.Id }, res, null, null, false, ct);
     }
 }

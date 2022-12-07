@@ -1,4 +1,5 @@
 using System.Linq;
+using Domain.Common;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Entities.TaskAggregate;
@@ -37,9 +38,32 @@ public class Context : DbContext
             .WithOne(d => d.Location)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
-        
+
+        modelBuilder.Entity<Location>()
+            .HasOne(l => l.OngoingTask)
+            .WithOne()
+            .HasForeignKey<Location>(l => l.OngoingTaskId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Task>()
+            .HasOne(t => t.OngoingInstance)
+            .WithOne()
+            .HasForeignKey<Task>(t => t.OngoingInstanceId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
         modelBuilder.Entity<TaskInstance>().Property(x => x.RemainingStepIds).HasConversion(new ValueConverter<int[], string>(
             i => string.Join(",", i),
             s => string.IsNullOrWhiteSpace(s) ? new int[0] : s.Split(new[] { ',' }).Select(v => int.Parse(v)).ToArray()));
+
+        modelBuilder.Entity<CalibrationCoordinates>().Property(x => x.Qr).HasConversion(new ValueConverter<int[], string>(
+            i => string.Join(",", i),
+            s => string.IsNullOrWhiteSpace(s) ? new int[0] : s.Split(new[] { ',' }).Select(v => int.Parse(v)).ToArray()));
+
+        modelBuilder.Entity<CalibrationCoordinates>().Property(x => x.Tray).HasConversion(new ValueConverter<int[], string>(
+            i => string.Join(",", i),
+            s => string.IsNullOrWhiteSpace(s) ? new int[0] : s.Split(new[] { ',' }).Select(v => int.Parse(v)).ToArray()));
+
     }
 }

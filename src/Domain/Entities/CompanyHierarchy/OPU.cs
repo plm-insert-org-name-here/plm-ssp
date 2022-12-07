@@ -5,11 +5,11 @@ namespace Domain.Entities.CompanyHierarchy;
 
 public class OPU : ICHNodeWithParent<Site>, ICHNodeWithChildren<Line>
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = default!;
-    public List<Line> Children { get; set; } = default!;
-    public Site Parent { get; set; } = default!;
-    public int ParentId { get; set; }
+    public int Id { get; private set; }
+    public string Name { get; private set; } = default!;
+    public List<Line> Children { get; private set; } = default!;
+    public Site Parent { get; private set; } = default!;
+    public int ParentId { get; private set; }
 
     private OPU() {}
     private OPU(int id, string name, int parentId)

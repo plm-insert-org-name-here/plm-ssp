@@ -1,3 +1,5 @@
+// using System.Net.NetworkInformation;
+
 using System.Net.NetworkInformation;
 using Domain.Common;
 using Domain.Entities;
@@ -14,15 +16,14 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
 {
     public IRepository<Detector> DetectorRepo { get; set; } = default!;
     public IRepository<Location> LocationRepo { get; set; } = default!;
+    public IDetectorConnection DetectorConnection { get; set; } = default!;
 
     // TODO(rg): save calibration coords to database
     public class Req
     {
         public int LocationId { get; set; }
         public string MacAddress { get; set; } = default!;
-        public List<CalibrationCoordsReq> Coordinates { get; set; } = default!;
-
-        public record CalibrationCoordsReq(int X, int Y);
+        public int[] QrCoordinates { get; set; } = default!;
     }
 
     public override void Configure()
@@ -61,11 +62,28 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         {
             var newDetector = Detector.Create(req.MacAddress, physicalMacAddress, remoteIpAddress, location).Unwrap();
             await DetectorRepo.AddAsync(newDetector, ct);
+            detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(physicalMacAddress), ct);
         }
         else
         {
             detector.SetState(DetectorState.Standby);
             location.AttachDetector(detector).Unwrap();
+        }
+
+        //get the old coordinates for the difference calculation
+        var originalCoords = location.Coordinates;
+        if (originalCoords is null)
+        {
+            location.Coordinates = new CalibrationCoordinates()
+            {
+                Qr = req.QrCoordinates
+            };
+        }
+        else
+        {
+            //send to the RPI and get back the current coordinates
+            var result = await location.SendRecalibrate(DetectorConnection);
+            result.Unwrap();
         }
 
         await DetectorRepo.SaveChangesAsync(ct);

@@ -46,7 +46,7 @@ public class JsonSeedLoader
                 typeof(Event).GetProperty(nameof(Event.Timestamp))!, obj => DateTime.Parse(obj!.ToString()!)
             },
             {
-                typeof(TaskInstance).GetProperty(nameof(TaskInstance.FinalState))!, obj => obj == null ? null : Enum.Parse<TaskInstanceFinalState>(obj.ToString()!)
+                typeof(TaskInstance).GetProperty(nameof(TaskInstance.State))!, obj => obj == null ? null : Enum.Parse<TaskInstanceState>(obj.ToString()!)
             }
         };
     }

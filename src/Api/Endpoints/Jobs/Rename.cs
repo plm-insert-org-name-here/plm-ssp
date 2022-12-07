@@ -1,12 +1,14 @@
 using Domain.Entities;
 using Domain.Interfaces;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Jobs;
 
 public class Rename: Endpoint<Rename.Req, EmptyResponse>
 {
     public IRepository<Job> JobRepo { get; set; } = default!;
+    public IJobNameUniquenessChecker NameUniquenessChecker { get; set; } = default!;
 
     public class Req
     {
@@ -31,7 +33,7 @@ public class Rename: Endpoint<Rename.Req, EmptyResponse>
             return;
         }
 
-        job.Name = req.Name;
+        job.Rename(req.Name, NameUniquenessChecker).Unwrap();
 
         await JobRepo.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);

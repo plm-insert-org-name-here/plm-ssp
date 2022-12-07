@@ -1,0 +1,3042 @@
+{
+  "x-generator": "NSwag v13.17.0.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v9.0.0.0))",
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Api",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:9696"
+    }
+  ],
+  "paths": {
+    "/api/v1/tasks": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiEndpointsTasksCreate",
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TasksCreate_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasksCreate_Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/{id}": {
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiEndpointsTasksDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/TasksDelete_Req"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TasksDelete_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiEndpointsTasksGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasksGetById_Res"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiEndpointsTasksUpdate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TasksUpdate_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/instance/{id}": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiEndpointsTasksGetCurrentInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "TaskId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasksGetCurrentInstance_Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/{TaskId}/objects_and_steps": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiEndpointsTasksGetObjectsAndSteps",
+        "parameters": [
+          {
+            "name": "TaskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasksGetObjectsAndSteps_Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stations": {
+      "post": {
+        "tags": [
+          "Stations"
+        ],
+        "operationId": "ApiEndpointsStationsCreate",
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StationsCreate_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StationsCreate_Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stations/{id}": {
+      "delete": {
+        "tags": [
+          "Stations"
+        ],
+        "operationId": "ApiEndpointsStationsDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Stations"
+        ],
+        "operationId": "ApiEndpointsStationsGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StationsGetById_Res"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Stations"
+        ],
+        "operationId": "ApiEndpointsStationsRename",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StationsRename_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/sites": {
+      "post": {
+        "tags": [
+          "Sites"
+        ],
+        "operationId": "ApiEndpointsSitesCreate",
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SitesCreate_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitesCreate_Res"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Sites"
+        ],
+        "operationId": "ApiEndpointsSitesList",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SitesList_Res"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sites/{id}": {
+      "delete": {
+        "tags": [
+          "Sites"
+        ],
+        "operationId": "ApiEndpointsSitesDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Sites"
+        ],
+        "operationId": "ApiEndpointsSitesGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitesGetById_Res"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Sites"
+        ],
+        "operationId": "ApiEndpointsSitesRename",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SitesRename_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/opus": {
+      "post": {
+        "tags": [
+          "OPUs"
+        ],
+        "operationId": "ApiEndpointsOPUsCreate",
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OPUsCreate_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OPUsCreate_Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opus/{id}": {
+      "delete": {
+        "tags": [
+          "OPUs"
+        ],
+        "operationId": "ApiEndpointsOPUsDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "OPUs"
+        ],
+        "operationId": "ApiEndpointsOPUsGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OPUsGetById_Res"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "OPUs"
+        ],
+        "operationId": "ApiEndpointsOPUsRename",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OPUsRename_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/locations": {
+      "post": {
+        "tags": [
+          "Locations"
+        ],
+        "operationId": "ApiEndpointsLocationsCreate",
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationsCreate_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationsCreate_Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/locations/{id}": {
+      "delete": {
+        "tags": [
+          "Locations"
+        ],
+        "operationId": "ApiEndpointsLocationsDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "operationId": "ApiEndpointsLocationsGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationsGetById_Res"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Locations"
+        ],
+        "operationId": "ApiEndpointsLocationsRename",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationsRename_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/lines": {
+      "post": {
+        "tags": [
+          "Lines"
+        ],
+        "operationId": "ApiEndpointsLinesCreate",
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinesCreate_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinesCreate_Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lines/{id}": {
+      "delete": {
+        "tags": [
+          "Lines"
+        ],
+        "operationId": "ApiEndpointsLinesDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Lines"
+        ],
+        "operationId": "ApiEndpointsLinesGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinesGetById_Res"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Lines"
+        ],
+        "operationId": "ApiEndpointsLinesRename",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinesRename_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/jobs": {
+      "post": {
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "ApiEndpointsJobsCreate",
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobsCreate_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobsCreate_Res"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "ApiEndpointsJobsList",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobsList_Res"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{id}": {
+      "delete": {
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "ApiEndpointsJobsDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "ApiEndpointsJobsGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobsGetById_Res"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "ApiEndpointsJobsRename",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobsRename_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "operationId": "ApiEndpointsEventsCreate",
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventsCreate_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{LocationId}/attach/{DetectorId}": {
+      "post": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsAttach",
+        "parameters": [
+          {
+            "name": "LocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "DetectorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{id}/command": {
+      "post": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsCommand",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DetectorsCommand_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{LocationId}/detach": {
+      "post": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsDetach",
+        "parameters": [
+          {
+            "name": "LocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{id}": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectorsGetById_Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{id}/getinitialcalibrationdata": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsGetInitialCalibrationData",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              },
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{MacAddress}/heartbeat": {
+      "post": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsHeartBeat",
+        "parameters": [
+          {
+            "name": "MacAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DetectorsHeartBeat_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{LocationId}/identify": {
+      "post": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsIdentify",
+        "parameters": [
+          {
+            "name": "LocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "Req",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DetectorsIdentify_Req"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsList",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DetectorsList_Res"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{locationId}/recalibrate": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsReCalibrate",
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "NewTrayCoordinates",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{id}/requestcalibrationpreview": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsRequestCalibrationPreview",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "NewTrayPoints",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              },
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{id}/snapshot": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsSnapshot",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              },
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/detectors/{id}/stream": {
+      "get": {
+        "tags": [
+          "Detectors"
+        ],
+        "operationId": "ApiEndpointsDetectorsStream",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              },
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TasksCreate_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "TasksCreate_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ParentJobId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "LocationId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "EmptyResponse": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "TasksDelete_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ParentJobId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TasksGetById_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "State": {
+            "$ref": "#/components/schemas/TaskState"
+          },
+          "LatestInstance": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TasksGetById_Res_ResInstance"
+              }
+            ]
+          }
+        }
+      },
+      "TaskState": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Active",
+          "Paused",
+          "Inactive"
+        ],
+        "enum": [
+          "Active",
+          "Paused",
+          "Inactive"
+        ]
+      },
+      "TasksGetById_Res_ResInstance": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FinalState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TaskInstanceFinalState"
+              }
+            ]
+          },
+          "Events": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TasksGetById_Res_ResEvent"
+            }
+          }
+        }
+      },
+      "TaskInstanceFinalState": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Completed",
+          "Abandoned"
+        ],
+        "enum": [
+          "Completed",
+          "Abandoned"
+        ]
+      },
+      "TasksGetById_Res_ResEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Success": {
+            "type": "boolean"
+          },
+          "FailureReason": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TasksGetById_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "TasksGetCurrentInstance_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Instance": {
+            "$ref": "#/components/schemas/TasksGetCurrentInstance_Res_ResTaskInstance"
+          }
+        }
+      },
+      "TasksGetCurrentInstance_Res_ResTaskInstance": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FinalState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TaskInstanceFinalState"
+              }
+            ]
+          },
+          "Events": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TasksGetCurrentInstance_Res_ResEvent"
+            }
+          },
+          "TaskId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TasksGetCurrentInstance_Res_ResEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TimeStamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "EventResultSuccess": {
+            "type": "boolean"
+          },
+          "FailureReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "StepId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TaskInstanceId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TasksGetCurrentInstance_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "TasksGetObjectsAndSteps_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Objects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TasksGetObjectsAndSteps_Res_ResObject"
+            }
+          },
+          "Steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TasksGetObjectsAndSteps_Res_ResStep"
+            }
+          }
+        }
+      },
+      "TasksGetObjectsAndSteps_Res_ResObject": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Coordinates": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ObjectCoordinates"
+              }
+            ]
+          }
+        }
+      },
+      "ObjectCoordinates": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "X": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Y": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Height": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TasksGetObjectsAndSteps_Res_ResStep": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "OrderNum": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ExpectedInitialState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "ExpectedSubsequentState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "ObjectId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TemplateState": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Present",
+          "Missing",
+          "Uncertain",
+          "UnknownObject"
+        ],
+        "enum": [
+          "Present",
+          "Missing",
+          "Uncertain",
+          "UnknownObject"
+        ]
+      },
+      "TasksGetObjectsAndSteps_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "TasksUpdate_Req": {
+        "type": "object",
+        "example": {
+          "NewName": null,
+          "NewType": null,
+          "ParentJobId": 1,
+          "NewObjects": [
+            {
+              "Name": "Object 4",
+              "Coordinates": {
+                "X": 100,
+                "Y": 100,
+                "Width": 100,
+                "Height": 100
+              }
+            }
+          ],
+          "ModifiedObjects": [
+            {
+              "Id": 1,
+              "Name": "Object One",
+              "Coordinates": {
+                "X": 10,
+                "Y": 10,
+                "Width": 10,
+                "Height": 10
+              }
+            }
+          ],
+          "DeletedObjects": [
+            2
+          ],
+          "NewSteps": [
+            {
+              "OrderNum": 4,
+              "ExpectedInitialState": "Present",
+              "ExpectedSubsequentState": "Missing",
+              "ObjectName": "Object 4"
+            }
+          ],
+          "ModifiedSteps": [
+            {
+              "Id": 2,
+              "OrderNum": 2,
+              "ExpectedInitialState": "Present",
+              "ExpectedSubsequentState": "Missing",
+              "ObjectName": "Object One"
+            }
+          ],
+          "DeletedSteps": [
+            1
+          ]
+        },
+        "additionalProperties": false,
+        "properties": {
+          "NewName": {
+            "type": "string",
+            "nullable": true
+          },
+          "NewType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TaskType"
+              }
+            ]
+          },
+          "ParentJobId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NewObjects": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TasksUpdate_Req_NewObjectReq"
+            }
+          },
+          "ModifiedObjects": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TasksUpdate_Req_ModObjectReq"
+            }
+          },
+          "DeletedObjects": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "NewSteps": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TasksUpdate_Req_NewStepReq"
+            }
+          },
+          "ModifiedSteps": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TasksUpdate_Req_ModStepReq"
+            }
+          },
+          "DeletedSteps": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "TaskType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "ToolKit",
+          "ItemKit",
+          "QA"
+        ],
+        "enum": [
+          "ToolKit",
+          "ItemKit",
+          "QA"
+        ]
+      },
+      "TasksUpdate_Req_NewObjectReq": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          },
+          "Coordinates": {
+            "$ref": "#/components/schemas/ObjectCoordinates"
+          }
+        }
+      },
+      "TasksUpdate_Req_ModObjectReq": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Coordinates": {
+            "$ref": "#/components/schemas/ObjectCoordinates"
+          }
+        }
+      },
+      "TasksUpdate_Req_NewStepReq": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "OrderNum": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ExpectedInitialState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "ExpectedSubsequentState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "ObjectName": {
+            "type": "string"
+          }
+        }
+      },
+      "TasksUpdate_Req_ModStepReq": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "OrderNum": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ExpectedInitialState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "ExpectedSubsequentState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "ObjectName": {
+            "type": "string"
+          }
+        }
+      },
+      "StationsCreate_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "StationsCreate_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ParentLineId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "StationsDelete_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "StationsGetById_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StationsGetById_Res_LocationRes"
+            }
+          }
+        }
+      },
+      "StationsGetById_Res_LocationRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "HasSnapshot": {
+            "type": "boolean"
+          },
+          "Detector": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/StationsGetById_Res_DetectorRes"
+              }
+            ]
+          }
+        }
+      },
+      "StationsGetById_Res_DetectorRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "MacAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "State": {
+            "type": "string"
+          }
+        }
+      },
+      "StationsGetById_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "StatusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Message": {
+            "type": "string"
+          },
+          "Errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "StationsRename_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "SitesCreate_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "SitesCreate_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "SitesDelete_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SitesGetById_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "opus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SitesGetById_Res_ResOPU"
+            }
+          }
+        }
+      },
+      "SitesGetById_Res_ResOPU": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SitesGetById_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SitesList_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "SitesRename_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "OPUsCreate_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "OPUsCreate_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ParentSiteId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "OPUsDelete_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "OPUsGetById_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OPUsGetById_Res_LineRes"
+            }
+          }
+        }
+      },
+      "OPUsGetById_Res_LineRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "OPUsGetById_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "OPUsRename_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "LocationsCreate_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "LocationsCreate_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ParentStationId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "LocationsDelete_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LocationsGetById_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "HasSnapshot": {
+            "type": "boolean"
+          },
+          "OngoingTask": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationsGetById_Res_OngoingTaskRes"
+              }
+            ]
+          }
+        }
+      },
+      "LocationsGetById_Res_OngoingTaskRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Type": {
+            "$ref": "#/components/schemas/TaskType"
+          },
+          "State": {
+            "$ref": "#/components/schemas/TaskState"
+          },
+          "Job": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationsGetById_Res_OngoingJobRes"
+              }
+            ]
+          },
+          "TaskInstance": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationsGetById_Res_OngoingTaskInstanceRes"
+              }
+            ]
+          },
+          "Steps": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/LocationsGetById_Res_StepRes"
+            }
+          }
+        }
+      },
+      "LocationsGetById_Res_OngoingJobRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "LocationsGetById_Res_OngoingTaskInstanceRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FinalState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TaskInstanceFinalState"
+              }
+            ]
+          },
+          "Events": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/LocationsGetById_Res_EventRes"
+            }
+          }
+        }
+      },
+      "LocationsGetById_Res_EventRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Result": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EventResult"
+              }
+            ]
+          },
+          "Step": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationsGetById_Res_StepRes"
+              }
+            ]
+          }
+        }
+      },
+      "EventResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Success": {
+            "type": "boolean"
+          },
+          "FailureReason": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "LocationsGetById_Res_StepRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "OrderNum": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ExInitState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "ExSubsState": {
+            "$ref": "#/components/schemas/TemplateState"
+          },
+          "Object": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationsGetById_Res_ObjectRes"
+              }
+            ]
+          }
+        }
+      },
+      "LocationsGetById_Res_ObjectRes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Coords": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ObjectCoordinates"
+              }
+            ]
+          }
+        }
+      },
+      "LocationsGetById_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LocationsRename_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "LinesCreate_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "LinesCreate_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          },
+          "opuId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "LinesDelete_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LinesGetById_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinesGetById_Res_ResStation"
+            }
+          }
+        }
+      },
+      "LinesGetById_Res_ResStation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "LinesGetById_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LinesRename_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "JobsCreate_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "JobsCreate_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "JobsDelete_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "JobsGetById_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobsGetById_Res_ResTask"
+            }
+          }
+        }
+      },
+      "JobsGetById_Res_ResTask": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "JobsGetById_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "JobsList_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "JobsRename_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "EventsCreate_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "TaskId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "StepId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Success": {
+            "type": "boolean"
+          },
+          "FailureReason": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DetectorsAttach_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DetectorsCommand_Req": {
+        "type": "object",
+        "example": "{\"Command\":{\"msg\":\"start\",\"task_id\":2}}",
+        "additionalProperties": false,
+        "properties": {
+          "Command": {
+            "$ref": "#/components/schemas/DetectorCommandDetectorCommand"
+          }
+        }
+      },
+      "DetectorCommandDetectorCommand": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "DetectorsDetach_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DetectorsGetById_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "MacAddress": {
+            "type": "string"
+          },
+          "IpAddress": {
+            "type": "string"
+          },
+          "State": {
+            "type": "string"
+          },
+          "Location": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DetectorsGetById_Res_ResLocation"
+              }
+            ]
+          }
+        }
+      },
+      "DetectorsGetById_Res_ResLocation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DetectorsGetById_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DetectorsGetInitialCalibrationData_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DetectorsHeartBeat_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Temperature": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FreeStoragePercentage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Uptime": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DetectorsIdentify_Req": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "MacAddress": {
+            "type": "string"
+          },
+          "QrCoordinates": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "DetectorsList_Res": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "MacAddress": {
+            "type": "string"
+          },
+          "IpAddress": {
+            "type": "string"
+          },
+          "State": {
+            "type": "string"
+          },
+          "Location": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DetectorsList_Res_ResLocation"
+              }
+            ]
+          }
+        }
+      },
+      "DetectorsList_Res_ResLocation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DetectorsReCalibrate_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DetectorsRequestCalibrationPreview_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DetectorsSnapshot_Req": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DetectorsStream_Req": {
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "JWTBearerAuth": {
+        "type": "http",
+        "description": "Enter a JWT token to authorize the requests...",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
