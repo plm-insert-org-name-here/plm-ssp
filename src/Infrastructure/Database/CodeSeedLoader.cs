@@ -183,7 +183,7 @@ public class CodeSeedLoader
         var detectors = new List<Detector>
         {
             (Detector)DetectorConstructor.Invoke(new object?[]
-                { 1, "Detector 1", "11:22:33:44:55:66", "127.0.0.1", DetectorState.Off, 1 }),
+                { 1, "Detector 1", "11:22:33:44:55:66", "127.0.0.1", DetectorState.Standby, 1 }),
             (Detector)DetectorConstructor.Invoke(new object?[]
                 { 2, "Detector 2", "12:34:56:78:90:AB", "127.0.0.1", DetectorState.Off, 2 })
         };
