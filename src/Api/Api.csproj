@@ -11,6 +11,7 @@
     <ItemGroup>
       <PackageReference Include="FastEndpoints" Version="5.2.1.5-beta" />
       <PackageReference Include="FastEndpoints.ClientGen" Version="5.2.1.16-beta" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
       <PackageReference Include="NSwag.MSBuild" Version="13.17.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,9 +30,5 @@
     <ItemGroup>
         <InternalsVisibleTo Include="ApiIntegrationTests" />
     </ItemGroup>
-
-    <Target Name="OpenApi" AfterTargets="Build">
-        <Exec ConsoleToMSBuild="true" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="dotnet $(NSwagCmd) aspnetcore2openapi /assembly:$(TargetDir)Api.dll /output:swagger.json /noBuild:true" />
-    </Target>
 
 </Project>
