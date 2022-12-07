@@ -63,6 +63,7 @@ public class TaskInstance : IBaseEntity
 
         Console.WriteLine($"Next order num after adding Step {thisStep.Id}: {CurrentOrderNum}");
         return Result.Ok();
+    }
 
     public Result Abandon()
     {
