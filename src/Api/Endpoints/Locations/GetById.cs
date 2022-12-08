@@ -87,7 +87,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         }
 
         var currentOrderNumRemainingSteps = MapSteps(l.OngoingTask.Steps.Where(s =>
-            s.OrderNum == taskInstance.CurrentOrderNum && !taskInstance.RemainingStepIds.Contains(s.Id)));
+            s.OrderNum == taskInstance.CurrentOrderNum && taskInstance.RemainingStepIds.Contains(s.Id)));
 
         var taskInstanceRes = new Res.OngoingTaskInstanceRes(taskInstance.Id,
             taskInstance.State, taskInstance.Events
