@@ -22,6 +22,7 @@ builder.Services.Configure<HostOptions>(opt => opt.ShutdownTimeout = TimeSpan.Fr
 builder.Services.AddDatabase(builder.Configuration);
 
 // TODO(rg): into extension method
+builder.Services.AddScoped<IJobNameUniquenessChecker, JobNameUniquenessChecker>();
 builder.Services.AddScoped<ICHNameUniquenessChecker<Site>, SiteNameUniquenessChecker>();
 builder.Services.AddScoped(typeof(ICHNameUniquenessChecker<,>), typeof(CHNameUniquenessChecker<,>));
 
@@ -44,6 +45,7 @@ builder.Services.AddSwaggerDoc(s =>
     s.TypeMappers = new[] { new PrimitiveTypeMapper(typeof(DetectorState), x => x.Type = JsonObjectType.String) };
     s.TypeNameGenerator = new ShorterTypeNameGenerator();
     s.SerializerSettings.Converters.Add(new StringEnumConverter());
+    s.OperationProcessors.Add(new BinaryFormatOperationFilter());
     s.GenerateEnumMappingDescription = true;
     s.DocumentName = "v1";
 });

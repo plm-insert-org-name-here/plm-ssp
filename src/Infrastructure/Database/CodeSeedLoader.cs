@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Domain.Common;
 using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
@@ -15,6 +17,7 @@ namespace Infrastructure.Database;
 public class CodeSeedLoader
 {
     private readonly Context _context;
+    private readonly byte[] _snapshot;
 
     private static readonly ConstructorInfo SiteConstructor =
         typeof(Site).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
@@ -34,7 +37,7 @@ public class CodeSeedLoader
 
     private static readonly ConstructorInfo LocationConstructor =
         typeof(Location).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
-            new[] { typeof(int), typeof(string), typeof(int), typeof(bool), typeof(int?) })!;
+            new[] { typeof(int), typeof(string), typeof(int), typeof(byte[]), typeof(int?) })!;
 
     private static readonly ConstructorInfo ObjectConstructor =
         typeof(Object).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
@@ -70,9 +73,14 @@ public class CodeSeedLoader
         typeof(Event).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
             new[] { typeof(int), typeof(DateTime), typeof(bool), typeof(string), typeof(int), typeof(int) })!;
 
-    public CodeSeedLoader(Context context)
+    public CodeSeedLoader(Context context, string seedFolderRelativePath)
     {
         _context = context;
+
+        var cd = Directory.GetCurrentDirectory();
+        var path = Path.Combine(cd, seedFolderRelativePath, "Files", "snapshot.jpg");
+
+        _snapshot = File.ReadAllBytes(path);
     }
 
     public void Load()
@@ -109,10 +117,10 @@ public class CodeSeedLoader
 
         var locations = new List<Location>
         {
-            (Location)LocationConstructor.Invoke(new object?[] { 1, "Location 1", 1, true, null }),
-            (Location)LocationConstructor.Invoke(new object?[] { 2, "Location 2", 1, false, null }),
-            (Location)LocationConstructor.Invoke(new object?[] { 3, "Location 3", 2, true, null }),
-            (Location)LocationConstructor.Invoke(new object?[] { 4, "Location 4", 2, false, null })
+            (Location)LocationConstructor.Invoke(new object?[] { 1, "Location 1", 1, _snapshot, null }),
+            (Location)LocationConstructor.Invoke(new object?[] { 2, "Location 2", 1, null, null }),
+            (Location)LocationConstructor.Invoke(new object?[] { 3, "Location 3", 2, _snapshot, null }),
+            (Location)LocationConstructor.Invoke(new object?[] { 4, "Location 4", 2, null, null })
         };
 
         var objects = new List<Object>
@@ -177,7 +185,16 @@ public class CodeSeedLoader
 
         var jobs = new List<Job>
         {
-            (Job)JobConstructor.Invoke(new object?[] { 1, "Job 1" })
+            (Job)JobConstructor.Invoke(new object?[] { 1, "Job 1" }),
+            (Job)JobConstructor.Invoke(new object?[] { 2, "Job 2" }),
+            (Job)JobConstructor.Invoke(new object?[] { 3, "Job 3" }),
+            (Job)JobConstructor.Invoke(new object?[] { 4, "Job 4" }),
+            (Job)JobConstructor.Invoke(new object?[] { 5, "Job 5" }),
+            (Job)JobConstructor.Invoke(new object?[] { 6, "Job 6" }),
+            (Job)JobConstructor.Invoke(new object?[] { 7, "Job 7" }),
+            (Job)JobConstructor.Invoke(new object?[] { 8, "Job 8" }),
+            (Job)JobConstructor.Invoke(new object?[] { 9, "Job 9" }),
+            (Job)JobConstructor.Invoke(new object?[] { 10, "Job 10" })
         };
 
         var detectors = new List<Detector>

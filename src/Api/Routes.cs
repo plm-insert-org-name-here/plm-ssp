@@ -43,6 +43,7 @@ public static class Routes
         public const string Create = "locations";
         public const string Update = "locations/{id}";
         public const string Delete = "locations/{id}";
+        public const string GetSnapshot = "locations/{id}/snapshot";
     }
 
     public static class Detectors

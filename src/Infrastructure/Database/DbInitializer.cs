@@ -34,7 +34,7 @@ public static class DbInitializer
 
             try
             {
-                new CodeSeedLoader(context).Load();
+                new CodeSeedLoader(context, config.SeedFolderRelativePath).Load();
             }
             catch (Exception)
             {
