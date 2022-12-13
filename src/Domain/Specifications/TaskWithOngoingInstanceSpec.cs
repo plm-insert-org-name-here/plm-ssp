@@ -8,6 +8,8 @@ public sealed class TaskWithOngoingInstanceSpec : Specification<Task>, ISingleRe
     public TaskWithOngoingInstanceSpec(int id)
     {
         Query.Where(t => t.Id == id)
+            .Include(t => t.Job)
+            .Include(t => t.Location)
             .Include(t => t.OngoingInstance)
             .ThenInclude(t => t!.Events)
             .ThenInclude(e => e.Step)
