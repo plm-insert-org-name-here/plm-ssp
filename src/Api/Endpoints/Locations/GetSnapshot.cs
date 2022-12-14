@@ -10,7 +10,7 @@ namespace Api.Endpoints.Locations;
 
 public class GetSnapshot : Endpoint<GetSnapshot.Req>
 {
-    public IRepository<Location> LocationRepo { get; set; } = default;
+    public IRepository<Location> LocationRepo { get; set; } = default!;
 
     public class Req
     {

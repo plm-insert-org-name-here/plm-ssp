@@ -31,8 +31,8 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
         public record EventRes(int Id, DateTime Timestamp, bool Success, string? FailureReason, StepRes? Step);
 
-        public record StepRes(int Id, int? OrderNum, TemplateState ExInitState,
-            TemplateState ExSubsState, ObjectRes Object);
+        public record StepRes(int Id, int? OrderNum, TemplateState ExpectedInitialState,
+            TemplateState ExpectedSubsequentState, ObjectRes Object);
 
         public record ObjectRes(int Id, string Name, ObjectCoordinates Coords);
 
