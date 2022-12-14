@@ -66,6 +66,9 @@ public static class Routes
         public const string ReCalibrate = "detectors/{locationId}/recalibrate";
         public const string RequestCalibrationPreview = "detectors/{id}/requestcalibrationpreview";
         public const string GetInitialCalibrationData = "detectors/{id}/getinitialcalibrationdata";
+        
+        public const string ResetTaskInstance = "detectors/{locationId}/reset";
+        public const string CollectData = "detectors/{id}/collect";
     }
 
     public static class Jobs

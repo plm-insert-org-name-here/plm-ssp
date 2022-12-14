@@ -23,7 +23,8 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
     {
         public int LocationId { get; set; }
         public string MacAddress { get; set; } = default!;
-        public int[] QrCoordinates { get; set; } = default!;
+        public List<reqKoordinates> QrCoordinates { get; set; } = default!;
+        public record reqKoordinates(int X, int Y);
     }
 
     public override void Configure()
@@ -74,10 +75,12 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         var originalCoords = location.Coordinates;
         if (originalCoords is null)
         {
+            Logger.LogInformation("{@req}", req);
             location.Coordinates = new CalibrationCoordinates()
             {
-                Qr = req.QrCoordinates
+                Qr = req.QrCoordinates.Select(c => new CalibrationCoordinates.Koordinates(){X = c.X, Y = c.Y}).ToList()
             };
+            
         }
         else
         {

@@ -3,13 +3,11 @@ using Domain.Entities.CompanyHierarchy;
 
 namespace Domain.Specifications;
 
-public sealed class LocationWithTasksSpec : Specification<Location>, ISingleResultSpecification
+public sealed class LocationWithOngoingTaskSpec : Specification<Location>
 {
-    public LocationWithTasksSpec(int id)
+    public LocationWithOngoingTaskSpec(int id)
     {
         Query.Where(l => l.Id == id)
-            .Include(l => l.Tasks)
-            .ThenInclude(t => t.Instances)
             .Include(l => l.OngoingTask)
             .ThenInclude(t => t.OngoingInstance);
     }

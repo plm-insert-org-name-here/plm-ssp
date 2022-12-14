@@ -25,8 +25,10 @@ public class Detector : IBaseEntity
     {
         public int Id { get; set; }
         public int Temperature { get; set; }
-        public int FreeStoragePercentage { get; set; }
-        public int Uptime { get; set; }
+        public int StoragePercentage { get; set; }
+        public long Uptime { get; set; }
+        public float Cpu { get; set; }
+        public float Ram { get; set; } 
     }
 
     private Detector() { }
@@ -56,16 +58,21 @@ public class Detector : IBaseEntity
         return location.AttachDetector(detector).ToResult(detector);
     }
 
-    public async Task<Result<CalibrationCoordinates>> SendRecalibrate(CalibrationCoordinates? coords, IDetectorConnection detectorConnection, int[]? newTrayPoints=null)
+    public async Task<Result<List<CalibrationCoordinates.Koordinates>>> SendRecalibrate(CalibrationCoordinates? coords, IDetectorConnection detectorConnection, List<CalibrationCoordinates.Koordinates>? newTrayPoints=null)
     {
         if (coords is null)
         {
-            Result.Fail("This detector has no original coordinates!");
+            return Result.Fail("This detector has no original coordinates!");
         }
 
         var result = await detectorConnection.SendCalibrationData(this, coords, newTrayPoints);
+        if (result.IsFailed)
+        {
+            return result;
+        }
         // we working with a location's detector so the location will always be something
-        Location!.Coordinates = result.Value;
+        var newCords = new CalibrationCoordinates(result.Value, Location!.Coordinates.Tray);
+        Location!.Coordinates = newCords;
 
         return Result.Ok(result.Value);
     }

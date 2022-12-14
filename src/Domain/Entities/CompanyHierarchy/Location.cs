@@ -85,7 +85,7 @@ public class Location : ICHNodeWithParent<Station>
         return Ok();
     }
 
-    public async Task<Result> SendRecalibrate(IDetectorConnection detectorConnection, int[]? newTrayCoordinates=null)
+    public async Task<Result<List<CalibrationCoordinates.Koordinates>>> SendRecalibrate(IDetectorConnection detectorConnection, List<CalibrationCoordinates.Koordinates>? newTrayCoordinates=null)
     {
         if (Detector is null || Detector.State == DetectorState.Off)
         {
@@ -93,10 +93,12 @@ public class Location : ICHNodeWithParent<Station>
         }
 
         var result = await Detector.SendRecalibrate(Coordinates, detectorConnection, newTrayCoordinates);
-
-        Coordinates = result.Value;
-
-        return Ok();
+        if (result.IsFailed)
+        {
+            return result.ToResult();
+        }
+        
+        return Ok(result.Value);
     }
 
 }
