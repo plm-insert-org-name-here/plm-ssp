@@ -32,7 +32,7 @@ public class Create : IClassFixture<Setup>
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
         Assert.NotNull(result);
-        Assert.Equal(3, result.Id);
+        Assert.Equal(4, result.Id);
         Assert.Equal("New Task", result.Name);
     }
 
@@ -58,7 +58,7 @@ public class Create : IClassFixture<Setup>
         Endpoint.Req req = new()
         {
             Name = "New Task 3",
-            ParentJobId = 10,
+            ParentJobId = 100,
             LocationId = 1
         };
 

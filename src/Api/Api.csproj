@@ -30,8 +30,4 @@
         <InternalsVisibleTo Include="ApiIntegrationTests" />
     </ItemGroup>
 
-    <Target Name="OpenApi" AfterTargets="Build">
-        <Exec ConsoleToMSBuild="true" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="dotnet $(NSwagCmd) aspnetcore2openapi /assembly:$(TargetDir)Api.dll /output:swagger.json /noBuild:true" />
-    </Target>
-
 </Project>

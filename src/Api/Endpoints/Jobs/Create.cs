@@ -1,12 +1,14 @@
 using Domain.Entities;
 using Domain.Interfaces;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Jobs;
 
 public class Create : Endpoint<Create.Req, Create.Res>
 {
     public IRepository<Job> JobRepo { get; set; } = default!;
+    public IJobNameUniquenessChecker NameUniquenessChecker { get; set; } = default!;
 
     public class Req
     {
@@ -20,9 +22,6 @@ public class Create : Endpoint<Create.Req, Create.Res>
         public string Name { get; set; } = default!;
 
     }
-    
-    private static Job MapIn(Req r) =>
-        new(name: r.Name);
 
     private static Res MapOut(Job j) =>
         new()
@@ -30,7 +29,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
             Id = j.Id,
             Name = j.Name
         };
-    
+
     public override void Configure()
     {
         Post(Api.Routes.Jobs.Create);
@@ -40,7 +39,7 @@ public class Create : Endpoint<Create.Req, Create.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var job = MapIn(req);
+        var job = Job.Create(req.Name, NameUniquenessChecker).Unwrap();
 
         await JobRepo.AddAsync(job, ct);
 

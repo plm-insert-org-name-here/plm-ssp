@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -30,8 +31,18 @@ public static class DbInitializer
         if (env.IsDevelopment())
         {
             logger.Debug("Loading seed data");
-            // new SeedLoader(context, env, logger).Load(config);
-            new CodeSeedLoader(context).Load();
+
+            try
+            {
+                new CodeSeedLoader(context, config.SeedFolderRelativePath).Load();
+            }
+            catch (Exception)
+            {
+                // NOTE(rg): If anything goes wrong while seeding the database, it's probably unrecoverable.
+                // In this case we want to get rid of the empty database that was created
+                context.Database.EnsureDeleted();
+                throw;
+            }
         }
 
         logger.Debug("Database initialization finished");

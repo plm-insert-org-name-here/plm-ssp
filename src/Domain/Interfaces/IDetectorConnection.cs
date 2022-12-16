@@ -1,3 +1,4 @@
+using Domain.Common;
 using Domain.Common.DetectorCommand;
 using Domain.Entities;
 using FluentResults;
@@ -14,4 +15,11 @@ public interface IDetectorConnection
     public Task<Result<byte[]>> RequestSnapshot(Detector detector);
     
     public Task<Result<Stream>> RequestStream(Detector detector);
+
+    public Task<Result<CalibrationCoordinates>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates,
+        int[]? newTrayPoints);
+
+    public Task<Result<byte[]>> RequestCalibrationPreview(Detector detector, CalibrationCoordinates coordinates,
+        int[]? newTrayPoints);
+
 }

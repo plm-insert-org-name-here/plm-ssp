@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -58,6 +59,20 @@ public class Detector : IBaseEntity
         }
 
         return location.AttachDetector(detector).ToResult(detector);
+    }
+
+    public async Task<Result<CalibrationCoordinates>> SendRecalibrate(CalibrationCoordinates? coords, IDetectorConnection detectorConnection, int[]? newTrayPoints=null)
+    {
+        if (coords is null)
+        {
+            Result.Fail("This detector has no original coordinates!");
+        }
+
+        var result = await detectorConnection.SendCalibrationData(this, coords, newTrayPoints);
+        // we working with a location's detector so the location will always be something
+        Location!.Coordinates = result.Value;
+
+        return Result.Ok(result.Value);
     }
 
     public void SetState(DetectorState state)

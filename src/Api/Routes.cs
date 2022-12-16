@@ -39,9 +39,11 @@ public static class Routes
     {
         public const string GetAllFree = "locations/free";
         public const string GetById = "locations/{id}";
+        public const string GetTasks = "locations/{id}/tasks";
         public const string Create = "locations";
         public const string Update = "locations/{id}";
         public const string Delete = "locations/{id}";
+        public const string GetSnapshot = "locations/{id}/snapshot";
     }
 
     public static class Detectors
@@ -63,6 +65,9 @@ public static class Routes
         public const string Identify = "detectors/{LocationId}/identify";
         public const string HeartBeat = "detectors/{MacAddress}/heartbeat";
 
+        public const string ReCalibrate = "detectors/{locationId}/recalibrate";
+        public const string RequestCalibrationPreview = "detectors/{id}/requestcalibrationpreview";
+        public const string GetInitialCalibrationData = "detectors/{id}/getinitialcalibrationdata";
     }
 
     public static class Jobs

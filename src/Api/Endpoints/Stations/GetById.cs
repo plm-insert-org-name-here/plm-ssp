@@ -22,7 +22,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
         public IEnumerable<LocationRes> Locations { get; set; } = default!;
 
-        public record LocationRes(int Id, string Name, DetectorRes? Detector);
+        public record LocationRes(int Id, string Name, bool HasSnapshot, DetectorRes? Detector);
 
         public record DetectorRes(int Id, string Name, string MacAddress, DetectorState State);
     }
@@ -33,7 +33,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
             Id = s.Id,
             Name = s.Name,
             Locations = s.Children.Select(l =>
-                new Res.LocationRes(l.Id, l.Name,
+                new Res.LocationRes(l.Id, l.Name, l.Snapshot != null,
                     l.Detector is null
                         ? null
                         : new Res.DetectorRes(l.Detector.Id, l.Detector.Name, l.Detector.MacAddress.ToString(),

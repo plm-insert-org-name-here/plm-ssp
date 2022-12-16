@@ -21,31 +21,38 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
     {
         public int Id { get; set; }
         public string Name { get; set; } = default!;
-        public TaskState State { get; set; }
-        public ResInstance? LatestInstance { get; set; }
+        public int MaxOrderNum { get; set; }
+        public TaskType TaskType { get; set; }
+        public ResLocation Location { get; set; } = default!;
+        public ResJob Job { get; set; } = default!;
+        public ResInstance? OngoingInstance { get; set; }
 
-        public record ResInstance(int Id, TaskInstanceFinalState? FinalState, IEnumerable<ResEvent> Events);
+        public record ResLocation(int Id, string Name);
+        public record ResJob(int Id, string Name);
+
+        public record ResInstance(int Id, TaskInstanceState State, IEnumerable<ResEvent> Events);
 
         // TODO(rg): might need to extend with steps and objects
         public record ResEvent(DateTime Timestamp, bool Success, string? FailureReason);
 
     }
 
-    private static Res MapOut(Domain.Entities.TaskAggregate.Task t, TaskInstance? ti)
+    private static Res MapOut(Domain.Entities.TaskAggregate.Task t)
     {
         var res = new Res
         {
             Id = t.Id,
             Name = t.Name,
-            State = t.State
+            MaxOrderNum = t.MaxOrderNum,
+            TaskType = t.Type,
+            Location = new Res.ResLocation(t.Location.Id, t.Location.Name),
+            Job = new Res.ResJob(t.Job.Id, t.Job.Name)
         };
 
-        if (ti is not null)
+        if (t.OngoingInstance is not null)
         {
-            var events = ti.Events.Select(e => new Res.ResEvent(e.Timestamp, e.Result.Success, e.Result.FailureReason));
-            var resInstance = new Res.ResInstance(ti.Id, ti.FinalState, events);
-
-            res.LatestInstance = resInstance;
+            var events = t.OngoingInstance.Events.Select(e => new Res.ResEvent(e.Timestamp, e.Result.Success, e.Result.FailureReason));
+            res.OngoingInstance = new Res.ResInstance(t.OngoingInstance.Id, t.OngoingInstance.State, events);
         }
 
         return res;
@@ -60,10 +67,8 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var task = await TaskRepo.GetByIdAsync(req.Id, ct);
-        var latestInstance = await TaskInstanceRepo.FirstOrDefaultAsync(
-            new LatestTaskInstanceByTaskIdWithEventsSpec(req.Id), ct
-        );
+        var task = await TaskRepo.FirstOrDefaultAsync(
+            new TaskWithOngoingInstanceSpec(req.Id), ct);
 
         if (task is null)
         {
@@ -71,7 +76,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
             return;
         }
 
-        var res = MapOut(task, latestInstance);
+        var res = MapOut(task);
         await SendOkAsync(res, ct);
     }
 }

@@ -6,21 +6,34 @@ namespace Domain.Entities.TaskAggregate;
 
 public class Step : IBaseEntity
 {
-    public int Id { get; set; }
-    public int? OrderNum { get; set; }
-    public TemplateState ExpectedInitialState { get; set; }
-    public TemplateState ExpectedSubsequentState { get; set; }
+    public int Id { get; private set; }
+    public int OrderNum { get; private set; }
+    public TemplateState ExpectedInitialState { get; private set; }
+    public TemplateState ExpectedSubsequentState { get; private set; }
 
-    public Object Object { get; set; } = default!;
-    public int ObjectId { get; set; }
+    public Object Object { get; private set; } = default!;
+    public int ObjectId { get; private set; }
 
-    public int TaskId { get; set; }
+    public int TaskId { get; private set; }
 
     private Step()
     {
     }
 
-    private Step(int id, int? orderNum, TemplateState init, TemplateState subs, int objectId, int taskId)
+    public Result Update(int orderNum, TemplateState init, TemplateState subs, Object obj)
+    {
+        if (!init.IsValid()) return Result.Fail("Invalid expected initial state");
+        if (!subs.IsValid()) return Result.Fail("Invalid subsequent initial state");
+
+        OrderNum = orderNum;
+        ExpectedInitialState = init;
+        ExpectedSubsequentState = subs;
+        Object = obj;
+
+        return Result.Ok();
+    }
+
+    private Step(int id, int orderNum, TemplateState init, TemplateState subs, int objectId, int taskId)
     {
         Id = id;
         OrderNum = orderNum;

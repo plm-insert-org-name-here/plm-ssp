@@ -7,6 +7,10 @@ public sealed class LocationWithTasksSpec : Specification<Location>, ISingleResu
 {
     public LocationWithTasksSpec(int id)
     {
-        Query.Where(l => l.Id == id).Include(l => l.Tasks).ThenInclude(t => t.Instances);
+        Query.Where(l => l.Id == id)
+            .Include(l => l.Tasks)
+            .ThenInclude(t => t.Job)
+            .Include(l => l.Tasks)
+            .ThenInclude(t => t.Instances);
     }
 }
