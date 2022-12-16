@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure;
 
 namespace Api.Endpoints.Detectors;
 
@@ -26,11 +27,13 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
+        var physicalMacAddress = PhysicalAddress.Parse(req.MacAddress);
+        var remoteIpAddress = HttpContext.Connection.RemoteIpAddress!;
+        
         var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(PhysicalAddress.Parse(req.MacAddress)), ct);
         if (detector is null)
         {
-            await SendNotFoundAsync(ct);
-            return;
+            detector = Detector.Create(req.MacAddress, physicalMacAddress, remoteIpAddress, null).Unwrap();
         }
 
         var newLog = new Detector.HeartBeatLog
