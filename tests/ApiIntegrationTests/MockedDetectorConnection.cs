@@ -32,4 +32,9 @@ public class MockedDetectorConnection : IDetectorConnection
     {
         throw new NotImplementedException();
     }
+
+    public Task<Result<byte[]>> RequestCollectData(Detector detector)
+    {
+        throw new NotImplementedException();
+    }
 }
