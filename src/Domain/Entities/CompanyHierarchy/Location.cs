@@ -23,12 +23,12 @@ public class Location : ICHNodeWithParent<Station>
 
     private Location() {}
 
-    private Location(int id, string name, int parentId, bool snapshot, int? ongoingTaskId)
+    private Location(int id, string name, int parentId, byte[]? snapshot, int? ongoingTaskId)
     {
         Id = id;
         Name = name;
         ParentId = parentId;
-        Snapshot = snapshot ? new[] { (byte) 2, (byte) 3 } : null;
+        Snapshot = snapshot;
         OngoingTaskId = ongoingTaskId;
     }
 

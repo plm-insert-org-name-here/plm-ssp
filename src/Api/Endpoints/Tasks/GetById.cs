@@ -22,7 +22,13 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         public int Id { get; set; }
         public string Name { get; set; } = default!;
         public int MaxOrderNum { get; set; }
+        public TaskType TaskType { get; set; }
+        public ResLocation Location { get; set; } = default!;
+        public ResJob Job { get; set; } = default!;
         public ResInstance? OngoingInstance { get; set; }
+
+        public record ResLocation(int Id, string Name);
+        public record ResJob(int Id, string Name);
 
         public record ResInstance(int Id, TaskInstanceState State, IEnumerable<ResEvent> Events);
 
@@ -37,7 +43,10 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         {
             Id = t.Id,
             Name = t.Name,
-            MaxOrderNum = t.MaxOrderNum
+            MaxOrderNum = t.MaxOrderNum,
+            TaskType = t.Type,
+            Location = new Res.ResLocation(t.Location.Id, t.Location.Name),
+            Job = new Res.ResJob(t.Job.Id, t.Job.Name)
         };
 
         if (t.OngoingInstance is not null)
