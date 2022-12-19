@@ -1,6 +1,7 @@
 ﻿using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Xunit.Abstractions;
 
 namespace ApiIntegrationTests;
 

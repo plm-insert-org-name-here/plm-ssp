@@ -42,7 +42,8 @@ public class DetectorHttpConnection : IDetectorConnection
         }
         catch (Exception ex)
         {
-            return Result.Fail(ex.Message);
+            // TODO(rg): logging
+            return Result.Fail($"Failed to connect to detector '{detector.Name}'");
         }
 
         return Result.Ok();
@@ -125,11 +126,11 @@ public class DetectorHttpConnection : IDetectorConnection
         {
             var client = _httpClientFactory.CreateClient();
             var json = JsonSerializer.Serialize(data);
-            
+
             var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/snapshot", new StringContent(json));
 
             var res = await response.Content.ReadFromJsonAsync<byte[]>();
-            
+
             return Result.Ok(res);
         }
         catch (Exception ex)
