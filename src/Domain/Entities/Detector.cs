@@ -44,7 +44,7 @@ public class Detector : IBaseEntity
         LocationId = locationId;
     }
 
-    public static Result<Detector> Create(string newName, PhysicalAddress newMacAddress, IPAddress newAddress, Location location)
+    public static Result<Detector> Create(string newName, PhysicalAddress newMacAddress, IPAddress newAddress, Location? location)
     {
         var detector = new Detector
         {
@@ -54,6 +54,11 @@ public class Detector : IBaseEntity
             State = DetectorState.Standby,
             HeartBeatLogs = new List<HeartBeatLog>()
         };
+
+        if (location is null)
+        {
+            return Result.Ok(detector);
+        }
 
         return location.AttachDetector(detector).ToResult(detector);
     }

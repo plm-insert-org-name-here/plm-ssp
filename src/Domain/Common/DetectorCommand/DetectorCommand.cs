@@ -39,15 +39,18 @@ public abstract class DetectorCommand
     public class StopDetection : DetectorCommand
     {
         [JsonPropertyName("msg")] public override string Message => StopDetectionMessage;
+        [JsonPropertyName("task_id")] public string TaskId => "gessdasdsci";
     }
 
     public class ResumeDetection : DetectorCommand
     {
         [JsonPropertyName("msg")] public override string Message => ResumeDetectionMessage;
+        [JsonPropertyName("task_id")] public int? TaskId => null;
     }
 
     public class PauseDetection : DetectorCommand
     {
         [JsonPropertyName("msg")] public override string Message => PauseDetectionMessage;
+        [JsonPropertyName("task_id")] public int? TaskId => null;
     }
 }

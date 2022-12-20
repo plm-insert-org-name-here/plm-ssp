@@ -73,17 +73,15 @@ public class DetectorHttpConnection : IDetectorConnection
         {
             var existingStream = _detectorStreams.GetStream(detector.IpAddress);
 
-            if (existingStream is not null)
-            {
-                // TODO(rg): 1st stream request works, but subsequent requests will fail;
-                // find out why
-                // Stream newStream = new MemoryStream();
-                // await existingStream.CopyToAsync(newStream);
-                return existingStream;
-            }
+            // if (existingStream is not null)
+            // {
+            //     // TODO(rg): 1st stream request works, but subsequent requests will fail;
+            //     // find out why
+            //     return existingStream;
+            // }
 
             var stream = await client.GetStreamAsync($"{Scheme}://{detector.IpAddress}:{Port}/stream");
-            _detectorStreams.AddStream(detector.IpAddress, stream);
+            // _detectorStreams.AddStream(detector.IpAddress, stream);
 
             return stream;
         }
