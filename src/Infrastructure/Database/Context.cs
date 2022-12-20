@@ -30,6 +30,7 @@ public class Context : DbContext
     public DbSet<TaskInstance> TaskInstances => Set<TaskInstance>();
     public DbSet<Step> Steps => Set<Step>();
     public DbSet<Object> Objects => Set<Object>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
