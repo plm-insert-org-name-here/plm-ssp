@@ -72,6 +72,7 @@ public class DetectorCommandService
                 var result = location.OngoingTask.StopCurrentInstance();
                 if (result.IsFailed) return result;
 
+                location.OngoingTask.OngoingInstance = null; 
                 location.OngoingTask = null;
 
                 detector.RemoveFromState(DetectorState.Monitoring);

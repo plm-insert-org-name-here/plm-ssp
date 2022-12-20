@@ -14,7 +14,8 @@ public class ReCalibrate : Endpoint<ReCalibrate.Req, EmptyResponse>
     public class Req
     {
         public int LocationId { get; set; }
-        public int[]? NewTrayCoordinates { get; set; }
+        public reqKoordinates[]? NewTrayCoordinates { get; set; }
+        public record reqKoordinates(int X, int Y);
     }
     
     public override void Configure()
@@ -26,7 +27,7 @@ public class ReCalibrate : Endpoint<ReCalibrate.Req, EmptyResponse>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(req.LocationId), ct);
+        var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorAndCoordinatesSpec(req.LocationId), ct);
 
         if (location is null)
         {
@@ -39,9 +40,14 @@ public class ReCalibrate : Endpoint<ReCalibrate.Req, EmptyResponse>
             ThrowError("This location has no active detector!");
             return;
         }
+        Logger.LogInformation("{@coords}", location.Coordinates);
 
-        var result = await location.SendRecalibrate(DetectorConnection, req.NewTrayCoordinates);
-        result.Unwrap();
+        var result = await location.SendRecalibrate(DetectorConnection, req.NewTrayCoordinates.Select(c => new CalibrationCoordinates.Koordinates(){X = c.X, Y = c.Y}).ToList());
+        var test = result.Unwrap();
+        
+        Logger.LogInformation("{@test}", test);
+
+        await LocationRepo.SaveChangesAsync();
 
         await SendNoContentAsync(ct);
     }

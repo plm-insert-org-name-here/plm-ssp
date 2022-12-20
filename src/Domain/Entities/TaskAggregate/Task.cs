@@ -149,7 +149,9 @@ public class Task : IBaseEntity
         {
             detector.RemoveFromState(DetectorState.Monitoring);
             detector.AddToState(DetectorState.Standby);
+            
             OngoingInstance = null;
+            Location.OngoingTask = null;
         }
 
         return Result.Ok();

@@ -16,10 +16,11 @@ public interface IDetectorConnection
     
     public Task<Result<Stream>> RequestStream(Detector detector);
 
-    public Task<Result<CalibrationCoordinates>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates,
-        int[]? newTrayPoints);
+    public Task<Result<List<CalibrationCoordinates.Koordinates>>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates,
+        List<CalibrationCoordinates.Koordinates>? newTrayPoints);
 
     public Task<Result<byte[]>> RequestCalibrationPreview(Detector detector, CalibrationCoordinates coordinates,
-        int[]? newTrayPoints);
+        List<CalibrationCoordinates.Koordinates>? newTrayPoints);
+    public Task<Result<byte[]>> RequestCollectData(Detector detector);
 
 }
