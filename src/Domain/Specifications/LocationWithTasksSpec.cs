@@ -9,8 +9,10 @@ public sealed class LocationWithTasksSpec : Specification<Location>, ISingleResu
     {
         Query.Where(l => l.Id == id)
             .Include(l => l.Tasks)
+            .ThenInclude(t => t.Job)
+            .Include(l => l.Tasks)
             .ThenInclude(t => t.Instances)
             .Include(l => l.OngoingTask)
-            .ThenInclude(t => t.OngoingInstance);
+            .ThenInclude(t => t!.OngoingInstance);
     }
 }

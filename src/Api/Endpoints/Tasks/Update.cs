@@ -17,7 +17,7 @@ public class Update : Endpoint<Update.Req, EmptyResponse>
     public class Req
     {
         public int Id { get; set; }
-        public string? NewName { get; set; } = default!;
+        public string? NewName { get; set; }
         public TaskType? NewType { get; set; }
         public int ParentJobId { get; set; }
 
