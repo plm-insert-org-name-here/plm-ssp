@@ -11,10 +11,12 @@
     <ItemGroup>
       <PackageReference Include="FastEndpoints" Version="5.2.1.5-beta" />
       <PackageReference Include="FastEndpoints.ClientGen" Version="5.2.1.16-beta" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
       <PackageReference Include="NSwag.MSBuild" Version="13.17.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
     </ItemGroup>
 
     <ItemGroup>
