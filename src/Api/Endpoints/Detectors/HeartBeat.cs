@@ -14,8 +14,10 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
     {
         public string MacAddress { get; set; } = default!;
         public int Temperature { get; set; }
-        public int FreeStoragePercentage { get; set; }
-        public int Uptime { get; set; }
+        public int StoragePercentage { get; set; }
+        public long Uptime { get; set; }
+        public float Cpu { get; set; }
+        public float Ram { get; set; }
     }
 
     public override void Configure()
@@ -39,8 +41,10 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
         var newLog = new Detector.HeartBeatLog
         {
             Temperature = req.Temperature,
-            FreeStoragePercentage = req.FreeStoragePercentage,
-            Uptime = req.Uptime
+            StoragePercentage = req.StoragePercentage,
+            Uptime = req.Uptime,
+            Cpu = req.Cpu,
+            Ram = req.Ram
         };
 
         detector.HeartBeatLogs.Add(newLog);

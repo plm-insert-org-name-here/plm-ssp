@@ -43,6 +43,7 @@ public class DetectorHttpConnection : IDetectorConnection
         catch (Exception ex)
         {
             // TODO(rg): logging
+            Console.WriteLine(ex);
             return Result.Fail($"Failed to connect to detector '{detector.Name}'");
         }
 
@@ -67,6 +68,7 @@ public class DetectorHttpConnection : IDetectorConnection
 
     public async Task<Result<Stream>> RequestStream(Detector detector)
     {
+        var client = _httpClientFactory.CreateClient();
         try
         {
             var existingStream = _detectorStreams.GetStream(detector.IpAddress);
@@ -78,7 +80,6 @@ public class DetectorHttpConnection : IDetectorConnection
             //     return existingStream;
             // }
 
-            var client = _httpClientFactory.CreateClient();
             var stream = await client.GetStreamAsync($"{Scheme}://{detector.IpAddress}:{Port}/stream");
             // _detectorStreams.AddStream(detector.IpAddress, stream);
 
@@ -90,19 +91,19 @@ public class DetectorHttpConnection : IDetectorConnection
         }
     }
 
-    public record CalibrationMessageData(int Id, int[] Qr, int[] Tray, int[]? newTray);
-    public async Task<Result<CalibrationCoordinates>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates, int[]? newTrayPoints)
+    public record CalibrationMessageData(int Id, List<CalibrationCoordinates.Koordinates> Qr, List<CalibrationCoordinates.Koordinates>? Tray);
+    public async Task<Result<List<CalibrationCoordinates.Koordinates>>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates, List<CalibrationCoordinates.Koordinates>? newTrayPoints)
     {
-        var data = new CalibrationMessageData(coordinates.Id, coordinates.Qr, coordinates.Tray, newTrayPoints);
+        var data = new CalibrationMessageData(coordinates.Id, coordinates.Qr, newTrayPoints);
 
         try
         {
             var client = _httpClientFactory.CreateClient();
             var json = JsonSerializer.Serialize(data);
 
-            var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/recalibrate", new StringContent(json));
-
-            var res = await response.Content.ReadFromJsonAsync<CalibrationCoordinates>();
+            var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/calibrate", new StringContent(json));
+            Console.WriteLine(response);
+            var res = await response.Content.ReadFromJsonAsync<List<CalibrationCoordinates.Koordinates>>();
 
             if (res is null)
             {
@@ -116,9 +117,9 @@ public class DetectorHttpConnection : IDetectorConnection
         }
     }
 
-    public async Task<Result<byte[]>> RequestCalibrationPreview(Detector detector, CalibrationCoordinates coordinates, int[]? newTrayPoints )
+    public async Task<Result<byte[]>> RequestCalibrationPreview(Detector detector, CalibrationCoordinates coordinates, List<CalibrationCoordinates.Koordinates>? newTrayPoints )
     {
-        var data = new CalibrationMessageData(coordinates.Id, coordinates.Qr, coordinates.Tray, newTrayPoints);
+        var data = new CalibrationMessageData(coordinates.Id, coordinates.Qr, newTrayPoints);
 
         try
         {
@@ -129,7 +130,27 @@ public class DetectorHttpConnection : IDetectorConnection
 
             var res = await response.Content.ReadFromJsonAsync<byte[]>();
 
+            if (res is null)
+            {
+                return Result.Fail("result does not contain any data");
+            }
+
             return Result.Ok(res);
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(ex.Message);
+        }
+    }
+    public async Task<Result<byte[]>> RequestCollectData(Detector detector)
+    {
+        try
+        {
+            var client = _httpClientFactory.CreateClient();
+            
+            var response = await client.GetByteArrayAsync($"{Scheme}://{detector.IpAddress}:{Port}/collect");
+
+            return response;
         }
         catch (Exception ex)
         {
