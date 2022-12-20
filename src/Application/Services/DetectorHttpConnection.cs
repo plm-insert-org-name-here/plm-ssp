@@ -43,6 +43,7 @@ public class DetectorHttpConnection : IDetectorConnection
         catch (Exception ex)
         {
             // TODO(rg): logging
+            Console.WriteLine(ex);
             return Result.Fail($"Failed to connect to detector '{detector.Name}'");
         }
 
@@ -130,6 +131,11 @@ public class DetectorHttpConnection : IDetectorConnection
             var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/snapshot", new StringContent(json));
 
             var res = await response.Content.ReadFromJsonAsync<byte[]>();
+
+            if (res is null)
+            {
+                return Result.Fail("result does not contain any data");
+            }
 
             return Result.Ok(res);
         }

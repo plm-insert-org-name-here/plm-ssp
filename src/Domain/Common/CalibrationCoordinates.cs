@@ -5,8 +5,8 @@ namespace Domain.Common;
 public class CalibrationCoordinates
 {
     public int Id { get; set; }
-    public List<Koordinates> Qr { get; set; }
-    public List<Koordinates>? Tray { get; set; }
+    public List<Koordinates> Qr { get; set; } = default!;
+    public List<Koordinates>? Tray { get; set; } = default!;
 
     public CalibrationCoordinates()
     {
