@@ -9,6 +9,6 @@ public sealed class LocationWithOngoingTaskSpec : Specification<Location>
     {
         Query.Where(l => l.Id == id)
             .Include(l => l.OngoingTask)
-            .ThenInclude(t => t.OngoingInstance);
+            .ThenInclude(t => t!.OngoingInstance);
     }
 }

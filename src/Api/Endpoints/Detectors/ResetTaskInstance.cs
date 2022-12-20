@@ -1,3 +1,4 @@
+using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
@@ -36,7 +37,14 @@ public class ResetTaskInstance : Endpoint<ResetTaskInstance.Req, EmptyResponse>
          await SendNotFoundAsync(ct);
          return;
       }
-      
+
+      if (location.OngoingTask.OngoingInstance is null)
+      {
+         await SendNotFoundAsync(ct);
+         return;
+      }
+
+      location.OngoingTask.OngoingInstance.Abandon();
       location.OngoingTask.OngoingInstance = null;
       // location.OngoingTask.OngoingInstanceId = null;
       location.OngoingTask = null;
