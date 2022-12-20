@@ -18,7 +18,8 @@ public class SetRole : Endpoint<SetRole.Req, EmptyResponse>
     public override void Configure()
     {
         Post(Api.Routes.Users.SetRole);
-        AllowAnonymous();
+        // AllowAnonymous();
+        Roles("SuperUser");
         Options(x => x.WithTags("Users"));
     }
 

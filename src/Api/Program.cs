@@ -17,9 +17,11 @@ using Infrastructure.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using NJsonSchema;
 using NJsonSchema.Generation.TypeMappers;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseLogging();
@@ -36,7 +38,6 @@ builder.Services.AddSingleton<IDetectorStreamCollection, DetectorStreamCollectio
 builder.Services.AddScoped<DetectorCommandService>();
 
 builder.Services.AddHttpClient();
-builder.Services.AddAuthorization();
 
 builder.Services.AddFastEndpoints();
 
@@ -51,53 +52,86 @@ builder.Services.AddSwaggerDoc(s =>
     s.SerializerSettings.Converters.Add(new StringEnumConverter());
     s.GenerateEnumMappingDescription = true;
     s.DocumentName = "v1";
+    // s.AddSecurity("oauth2", new OpenApiSecurityScheme
+    // {
+    //     Description = "Standard Authorization header using the Bearer scheme (\"{token}\")",
+    //     Name = "Authorization"
+    // });
 });
 builder.Services.AddSignalR();
 builder.Services.AddCors();
 
-var jwtOptions = new JwtOptions();
-builder.Configuration.GetSection(JwtOptions.ConfigurationEntryName).Bind(jwtOptions);
+// var jwtOptions = new JwtOptions();
+// builder.Configuration.GetSection(JwtOptions.ConfigurationEntryName).Bind(jwtOptions);
 
-builder.Services.AddIdentityCore<User>(opt =>
+// builder.Services.AddIdentityCore<User>(opt =>
+// {
+//     opt.Password.RequiredLength = 8;
+//     opt.Password.RequireDigit = false;
+//     opt.Password.RequireLowercase = false;
+//     opt.Password.RequireUppercase = false;
+//     opt.Password.RequireNonAlphanumeric = false;
+// })
+//     .AddRoles<ApplicationRole>()
+//     //nemtom erre mi az új solution, edit: ig ez
+//     .AddEntityFrameworkStores<Context>();
+
+// JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+//
+// var tokenValidationParameters = new TokenValidationParameters
+// {
+//     // ValidIssuer = jwtOptions.ValidIssuer,
+//     // ValidAudience = jwtOptions.ValidAudience,
+//     // NameClaimType = JwtRegisteredClaimNames.Sub,
+//     // RoleClaimType = jwtOptions.RoleClaimName,
+//     ValidateIssuerSigningKey = true,
+//     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
+//     ValidateIssuer = false,
+//     ValidateAudience = false
+// };
+
+// builder.Services.AddAuthentication(opt =>
+//     {
+//         // TODO(rg): not all of these are needed
+//         //ez a todo örökké itt lesz
+//         opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+//         opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//         opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//         opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+//     })
+//     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, "DefaultScheme", opt =>
+//     {
+//         opt.TokenValidationParameters = tokenValidationParameters;
+//     });
+builder.Services.AddSwaggerGen(options =>
 {
-    opt.Password.RequiredLength = 8;
-    opt.Password.RequireDigit = false;
-    opt.Password.RequireLowercase = false;
-    opt.Password.RequireUppercase = false;
-    opt.Password.RequireNonAlphanumeric = false;
-})
-    .AddRoles<ApplicationRole>()
-    //nemtom erre mi az új solution, edit: ig ez
-    .AddEntityFrameworkStores<Context>();
-
-JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
-
-var tokenValidationParameters = new TokenValidationParameters
-{
-    ValidIssuer = jwtOptions.ValidIssuer,
-    ValidAudience = jwtOptions.ValidAudience,
-    NameClaimType = JwtRegisteredClaimNames.Sub,
-    RoleClaimType = jwtOptions.RoleClaimName,
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret))
-};
-
-builder.Services.AddAuthentication(opt =>
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
-        // TODO(rg): not all of these are needed
-        //ez a todo örökké itt lesz
-        opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, "DefaultScheme", opt =>
+        Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        opt.TokenValidationParameters = tokenValidationParameters;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes("StrONGKAutHENTICATIONKEy")),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
     });
 
 builder.Services.Configure<DefaultUserOptions>(builder.Configuration.GetSection(DefaultUserOptions.ConfigurationEntryName));
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.ConfigurationEntryName));
-builder.Services.AddSingleton<IOptions<TokenValidationParameters>>(new OptionsWrapper<TokenValidationParameters>(tokenValidationParameters));
+// builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.ConfigurationEntryName));
+// builder.Services.AddSingleton<IOptions<TokenValidationParameters>>(new OptionsWrapper<TokenValidationParameters>(tokenValidationParameters));
 
 var app = builder.Build();
 

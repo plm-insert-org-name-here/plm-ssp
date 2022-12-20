@@ -19,6 +19,7 @@ public class Registrate : Endpoint<Registrate.Req, EmptyResponse>
     {
         Post(Api.Routes.Users.Create);
         AllowAnonymous();
+        // Roles("SuperUser");
         Options(x => x.WithTags("Users"));
     }
 

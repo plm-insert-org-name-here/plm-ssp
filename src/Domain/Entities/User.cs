@@ -9,11 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 namespace Domain.Entities;
 using System.Security.Cryptography; 
 
-public class User : IdentityUser<int>
+public sealed class User : IdentityUser<int>
 {
-    public int Id { get; set; }
-    public string UserName { get; set; } = default!;
-    public byte[] PasswordHash { get; set; } = default!;
     public byte[] PasswordSalt { get; set; } = default!;
     public UserRole Role { get; set; }
 
@@ -27,7 +24,7 @@ public class User : IdentityUser<int>
         var salt = GenerateSalt();
         
         //hashing algorithm
-        HashAlgorithm algorithm = new SHA256Managed();
+        HashAlgorithm algorithm = SHA256.Create();
         
         //hash the password and the salt
         var byteSalt = algorithm.ComputeHash(Encoding.UTF8.GetBytes(salt));
@@ -41,20 +38,20 @@ public class User : IdentityUser<int>
         UserName = newName;
         PasswordSalt = byteSalt;
         //hash again the combination
-        PasswordHash = algorithm.ComputeHash(hash);
+        PasswordHash = hash;
         Role = newRole;
     }
 
     public Result<string> Authenticate(string password)
     {
-        HashAlgorithm algorithm = new SHA256Managed();
+        HashAlgorithm algorithm = SHA256.Create();
         
         var bytePassword = algorithm.ComputeHash(Encoding.UTF8.GetBytes(password));
         
         //concatenate the two hashed values
         var hash = ConcatTwoHashes(bytePassword, PasswordSalt);
 
-        if (!PasswordHash.SequenceEqual(algorithm.ComputeHash(hash)))
+        if (!PasswordHash.Equals(hash))
         {
             return Result.Fail("invalid password");
         }
@@ -67,7 +64,8 @@ public class User : IdentityUser<int>
     {
         List<Claim> claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.Name, user.UserName)
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("StrONGKAutHENTICATIONKEy"));
@@ -87,7 +85,7 @@ public class User : IdentityUser<int>
         return jwt;
     }
 
-    private byte[] ConcatTwoHashes(byte[] hash1, byte[] hash2)
+    private string ConcatTwoHashes(byte[] hash1, byte[] hash2)
     {
         byte[] plainTextWithSaltBytes = 
             new byte[hash1.Length + hash2.Length];
@@ -101,7 +99,7 @@ public class User : IdentityUser<int>
             plainTextWithSaltBytes[hash1.Length + i] = hash2[i];
         }
 
-        return plainTextWithSaltBytes;
+        return Encoding.UTF8.GetString( plainTextWithSaltBytes);
     }
 
     private string GenerateSalt()
