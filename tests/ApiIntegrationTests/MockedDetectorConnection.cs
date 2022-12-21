@@ -13,7 +13,7 @@ public class MockedDetectorConnection : IDetectorConnection
         return Task.FromResult(Result.Ok());
     }
 
-    public Task<Result<byte[]>> RequestSnapshot(Detector detector)
+    public Task<Result<byte[]>> RequestSnapshot(Detector detector, string type)
     {
         throw new NotImplementedException();
     }
