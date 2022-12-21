@@ -15,6 +15,7 @@ public class Snapshot : Endpoint<Snapshot.Req>
     public class Req
     {
         public int Id { get; set; }
+        public string Type { get; set; }
     }
 
     public override void Configure()
@@ -46,7 +47,7 @@ public class Snapshot : Endpoint<Snapshot.Req>
             return;
         }
 
-        var result = await DetectorConnection.RequestSnapshot(detector);
+        var result = await DetectorConnection.RequestSnapshot(detector, req.Type);
         var snapshot = result.Unwrap();
 
         detector.Location.Snapshot = snapshot;

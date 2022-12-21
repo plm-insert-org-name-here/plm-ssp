@@ -12,7 +12,7 @@ public interface IDetectorConnection
     public Task<Result> SendCommand(Detector detector, DetectorCommand command);
     
     // TODO(rg): wrap byte[] into a more descriptive object (e.g. Image / Frame / Snapshot)
-    public Task<Result<byte[]>> RequestSnapshot(Detector detector);
+    public Task<Result<byte[]>> RequestSnapshot(Detector detector, string type);
     
     public Task<Result<Stream>> RequestStream(Detector detector);
 

@@ -50,12 +50,12 @@ public class DetectorHttpConnection : IDetectorConnection
         return Result.Ok();
     }
 
-    public async Task<Result<byte[]>> RequestSnapshot(Detector detector)
+    public async Task<Result<byte[]>> RequestSnapshot(Detector detector, string type)
     {
         try
         {
             var client = _httpClientFactory.CreateClient();
-            var snapshot = await client.GetByteArrayAsync($"{Scheme}://{detector.IpAddress}:{Port}/snapshot");
+            var snapshot = await client.GetByteArrayAsync($"{Scheme}://{detector.IpAddress}:{Port}/snapshot?type={type}");
 
             return snapshot;
         }
