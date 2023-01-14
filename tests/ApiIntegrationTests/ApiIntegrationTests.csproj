@@ -17,6 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Lib.AspNetCore.ServerSentEvents" Version="8.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.10" />
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0-preview-20221003-04" />
       <PackageReference Include="xunit" Version="2.4.2" />

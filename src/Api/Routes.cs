@@ -44,6 +44,7 @@ public static class Routes
         public const string Update = "locations/{id}";
         public const string Delete = "locations/{id}";
         public const string GetSnapshot = "locations/{id}/snapshot";
+        public const string notify = "locations/{id}/sse-notify";
     }
 
     public static class Detectors

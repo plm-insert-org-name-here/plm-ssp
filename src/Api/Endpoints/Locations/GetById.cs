@@ -34,7 +34,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         public record StepRes(int Id, int? OrderNum, TemplateState ExpectedInitialState,
             TemplateState ExpectedSubsequentState, ObjectRes Object);
 
-        public record ObjectRes(int Id, string Name, ObjectCoordinates Coords);
+        public record ObjectRes(int Id, string Name, ObjectCoordinates Coordinates);
 
         public record OngoingTaskInstanceRes(int Id, TaskInstanceState State,
             IEnumerable<EventRes> Events, int CurrentOrderNum, IEnumerable<StepRes> CurrentOrderNumRemainingSteps);

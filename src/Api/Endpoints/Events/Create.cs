@@ -12,6 +12,7 @@ public class Create: Endpoint<Create.Req, EmptyResponse>
 {
     public IRepository<Task> TaskRepo { get; set; } = default!;
     public IRepository<Location> LocationRepo { get; set; } = default!;
+    public INotifyChannel NotifyChannel { get; set; } = default!;
     public class Req
     {
         public int TaskId { get; set; }
@@ -60,6 +61,9 @@ public class Create: Endpoint<Create.Req, EmptyResponse>
         task.AddEventToCurrentInstance(req.StepId, eventResult, location.Detector).Unwrap();
 
         await TaskRepo.SaveChangesAsync(ct);
+        
+        //SSE
+        NotifyChannel.AddNotify(location.Id);
         await SendNoContentAsync(ct);
     }
 }

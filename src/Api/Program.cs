@@ -14,10 +14,13 @@ using FastEndpoints.Swagger;
 using Infrastructure.Database;
 using Infrastructure.Logging;
 using Infrastructure.OpenApi;
+using Lib.AspNetCore.ServerSentEvents;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema;
 using NJsonSchema.Generation.TypeMappers;
@@ -136,6 +139,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.Configure<DefaultUserOptions>(builder.Configuration.GetSection(DefaultUserOptions.ConfigurationEntryName));
 // builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.ConfigurationEntryName));
 // builder.Services.AddSingleton<IOptions<TokenValidationParameters>>(new OptionsWrapper<TokenValidationParameters>(tokenValidationParameters));
+
+//bg service test
+builder.Services.AddSingleton<INotifyChannel, NotifyChannel>();
 
 var app = builder.Build();
 
