@@ -26,6 +26,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         public DetectorRes? Detector { get; set; }
 
         public OngoingTaskRes? OngoingTask { get; set; }
+        public int StationId { get; set; }
 
         public record DetectorRes(int Id, string Name, DetectorState State);
 
@@ -63,6 +64,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
             Id = l.Id,
             Name = l.Name,
             HasSnapshot = l.Snapshot is not null,
+            StationId = l.ParentId
         };
 
         if (l.Detector is not null)
@@ -114,6 +116,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         var location =
             await LocationRepo.FirstOrDefaultAsync(new LocationWithActiveTaskSpec(req.Id), ct);
 
+        Console.WriteLine(location.ParentId);
         if (location is null)
         {
             await SendNotFoundAsync(ct);
@@ -121,6 +124,8 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         }
 
         var res = MapOut(location);
+        
+        Console.WriteLine(res.StationId);
         await SendOkAsync(res, ct);
     }
 }
