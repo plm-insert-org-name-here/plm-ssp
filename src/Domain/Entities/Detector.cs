@@ -96,4 +96,9 @@ public class Detector : IBaseEntity
     {
         State &= ~state;
     }
+
+    public void setIpAddress(IPAddress newIp)
+    {
+        IpAddress = newIp;
+    }
 }

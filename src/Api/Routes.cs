@@ -45,6 +45,7 @@ public static class Routes
         public const string Delete = "locations/{id}";
         public const string GetSnapshot = "locations/{id}/snapshot";
         public const string notify = "locations/{id}/sse-notify";
+        public const string GetOngoingTask = "locations{id}/get_ongoing_task";
     }
 
     public static class Detectors
@@ -105,5 +106,6 @@ public static class Routes
         public const string Update = "users/{id}";
         public const string SignIn = "user";
         public const string SetRole = "users/{id}/setrole";
+        public const string GetUser = "user";
     }
 }

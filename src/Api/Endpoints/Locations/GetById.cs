@@ -113,10 +113,14 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
+        DateTime start = DateTime.Now;
         var location =
             await LocationRepo.FirstOrDefaultAsync(new LocationWithActiveTaskSpec(req.Id), ct);
+        DateTime end = DateTime.Now;
+        TimeSpan runtime = end - start;
+        Console.WriteLine("Runtime: " + runtime);
 
-        Console.WriteLine(location.ParentId);
+        // Console.WriteLine(location.ParentId);
         if (location is null)
         {
             await SendNotFoundAsync(ct);
@@ -125,7 +129,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
         var res = MapOut(location);
         
-        Console.WriteLine(res.StationId);
+        // Console.WriteLine(res.StationId);
         await SendOkAsync(res, ct);
     }
 }

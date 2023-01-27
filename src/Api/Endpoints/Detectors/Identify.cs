@@ -67,6 +67,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
         }
         else
         {
+            detector.setIpAddress(remoteIpAddress);
             detector.SetState(DetectorState.Standby);
             location.AttachDetector(detector).Unwrap();
         }

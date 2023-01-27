@@ -13,6 +13,7 @@
       <PackageReference Include="FastEndpoints.ClientGen" Version="5.2.1.16-beta" />
       <PackageReference Include="Lib.AspNetCore.ServerSentEvents" Version="8.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
+      <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
       <PackageReference Include="NSwag.MSBuild" Version="13.17.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

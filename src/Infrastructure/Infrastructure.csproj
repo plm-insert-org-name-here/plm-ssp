@@ -11,6 +11,7 @@
         <PackageReference Include="FastEndpoints" Version="5.2.1.5-beta" />
         <PackageReference Include="FastEndpoints.Swagger" Version="5.2.1.5-beta" />
         <PackageReference Include="Lib.AspNetCore.ServerSentEvents" Version="8.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="6.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.10">

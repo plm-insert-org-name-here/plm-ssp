@@ -20,6 +20,9 @@ public class NotifyChannel : INotifyChannel
     //if a location need to be refreshed at client side, notify every attached observer about it
     public async void AddNotify(int id)
     {
+        Console.WriteLine("------");
+        Console.WriteLine(Subscribers.Count);
+        Console.WriteLine("------");
         foreach (var channel in Subscribers)
         {
             await channel.Writer.WriteAsync(id);

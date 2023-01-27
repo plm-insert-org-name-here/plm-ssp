@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Text;
 using System.Text.Json.Serialization;
 using Api;
@@ -153,6 +154,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors(options =>
 {
+    options.WithOrigins(new[] { "http://localhost:9694/" });
     options.AllowAnyMethod();
     options.AllowAnyHeader();
     // NOTE(rg): workaround; the JS SignalR requires credentials to be allowed,

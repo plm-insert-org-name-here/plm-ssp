@@ -11,6 +11,7 @@
       <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="6.1.0" />
       <PackageReference Include="FluentResults" Version="3.14.0" />
       <PackageReference Include="Lib.AspNetCore.ServerSentEvents" Version="8.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />

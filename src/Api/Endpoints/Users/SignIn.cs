@@ -17,8 +17,8 @@ public class SignIn : Endpoint<SignIn.Req, SignIn.Res>
 
     public class Res
     {
-        public string Status { get; set; } = default!;
-        public string Token { get; set; } = default!;
+        // public string Status { get; set; } = default!;
+        public string Message { get; set; } = default!;
     }
     
     public override void Configure()
@@ -40,11 +40,18 @@ public class SignIn : Endpoint<SignIn.Req, SignIn.Res>
 
         var res = user.Authenticate(req.Password);
         res.Unwrap();
+        
+        HttpContext.Response.Cookies.Append("jwt",res.Value, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.Now.AddMinutes(30)
+        });
 
         var response = new Res
         {
-            Status = "Success",
-            Token = res.Value
+            Message = "Success"
         };
 
         await SendOkAsync(response, ct);

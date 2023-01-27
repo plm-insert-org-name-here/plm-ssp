@@ -49,15 +49,18 @@ public class TaskInstance : IBaseEntity
 
         Events.Add(new Event(DateTime.Now, result, thisStep.Id, Id));
 
-        RemoveRemainingStep(thisStep.Id);
+        if (result.Success)
+        {
+            RemoveRemainingStep(thisStep.Id);
 
-        CurrentOrderNum = !RemainingStepIds.Any()
-            ? 0
-            : steps.FindAll(s => RemainingStepIds.Contains(s.Id)).Select(s => s.OrderNum).Min();
+            CurrentOrderNum = !RemainingStepIds.Any()
+                ? 0
+                : steps.FindAll(s => RemainingStepIds.Contains(s.Id)).Select(s => s.OrderNum).Min();
 
-        if (!RemainingStepIds.Any())
-            State = TaskInstanceState.Completed;
-
+            if (!RemainingStepIds.Any())
+                State = TaskInstanceState.Completed; 
+        }
+        
         return Result.Ok();
     }
 

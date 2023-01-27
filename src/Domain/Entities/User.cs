@@ -73,7 +73,7 @@ public sealed class User : IdentityUser<int>
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
         var token = new JwtSecurityToken(
-            issuer: "https://localhost:5001",
+            issuer: user.Id.ToString(),
             audience:"http://localhost:3000",
             claims: claims,
             expires: DateTime.Now.AddDays(1),
@@ -111,4 +111,5 @@ public sealed class User : IdentityUser<int>
         return new string(Enumerable.Repeat(chars, 8)
             .Select(s => s[random.Next(s.Length)]).ToArray());
     }
+
 }

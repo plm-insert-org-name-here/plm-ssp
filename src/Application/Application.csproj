@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="Lib.AspNetCore.ServerSentEvents" Version="8.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     </ItemGroup>
     
