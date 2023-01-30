@@ -10,6 +10,7 @@ public sealed class TaskWithChildrenSpec : Specification<Task>
         Query.Where(t => t.Id == id)
             .Include(t => t.Objects)
             .Include(t => t.Steps)
+            .Include(t => t.Job)
             .Include(t => t.Instances)
             .ThenInclude(i => i.Events)
             .AsSplitQuery();
