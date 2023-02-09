@@ -11,6 +11,7 @@ using Domain.Entities.TaskAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using File = System.IO.File;
 
 namespace Infrastructure.Database;
 

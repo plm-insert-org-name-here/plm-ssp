@@ -31,6 +31,7 @@ public class Context : DbContext
     public DbSet<Step> Steps => Set<Step>();
     public DbSet<Object> Objects => Set<Object>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<PLM_File> Files => Set<PLM_File>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

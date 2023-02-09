@@ -9,6 +9,7 @@ using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Entities.TaskAggregate;
 using BindingFlags = System.Reflection.BindingFlags;
+using File = System.IO.File;
 using Object = Domain.Entities.TaskAggregate.Object;
 using Task = Domain.Entities.TaskAggregate.Task;
 

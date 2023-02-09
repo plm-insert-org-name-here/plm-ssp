@@ -108,4 +108,11 @@ public static class Routes
         public const string SetRole = "users/{id}/setrole";
         public const string GetUser = "user";
     }
+
+    public static class PLM_Files
+    {
+        public const string Upload = "files/upload";
+        public const string Download = "files/{name}/download";
+        public const string GetNewestVersion = "files/{name}/version";
+    }
 }
