@@ -107,6 +107,7 @@ public static class Routes
         public const string SignIn = "user";
         public const string SetRole = "users/{id}/setrole";
         public const string GetUser = "user";
+        public const string SignOut = "user/signout";
     }
 
     public static class PLM_Files

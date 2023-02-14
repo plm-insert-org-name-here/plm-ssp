@@ -154,7 +154,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors(options =>
 {
-    options.WithOrigins(new[] { "http://localhost:9694/" });
+    options.WithOrigins();
     options.AllowAnyMethod();
     options.AllowAnyHeader();
     // NOTE(rg): workaround; the JS SignalR requires credentials to be allowed,
