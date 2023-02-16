@@ -6,6 +6,7 @@ public interface INotifyChannel
 {
     public void AddNotify(int id);
     public void Subscribe(Channel<int> channel);
+    public void Unsubscribe(Channel<int> channel);
 }
 
 public class NotifyChannel : INotifyChannel
@@ -33,5 +34,10 @@ public class NotifyChannel : INotifyChannel
     public void Subscribe(Channel<int> newChannel)
     {
         Subscribers.Add(newChannel);
+    }
+
+    public void Unsubscribe(Channel<int> channel)
+    {
+        Subscribers.Remove(channel);
     }
 }
