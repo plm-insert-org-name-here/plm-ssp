@@ -33,9 +33,11 @@ public class sse_notify : Endpoint<sse_notify.Req, sse_notify.Res>
     {
         while (true)
         {
+            Thread.Sleep(1000000);
             if (_ct.IsCancellationRequested)
             {
                 NotifyChannel.Unsubscribe(_channel);
+                return;
             }
         }
         

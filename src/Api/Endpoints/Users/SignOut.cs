@@ -45,7 +45,7 @@ public class SignOut : EndpointWithoutRequest<SignOut.Res>
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTimeOffset.Now
+            Expires = DateTimeOffset.Now.AddSeconds(-1)
         });
 
         var res = new Res

@@ -112,4 +112,45 @@ public sealed class User : IdentityUser<int>
             .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
+    public Result<User> Update(string? newName, string? newPassword, UserRole? newRole)
+    {
+        try
+        {
+            if (!newName.IsNullOrEmpty())
+            {
+                UserName = newName;
+            }
+
+            if (!newPassword.IsNullOrEmpty())
+            {
+                var salt = GenerateSalt();
+
+                //hashing algorithm
+                HashAlgorithm algorithm = SHA256.Create();
+
+                //hash the password and the salt
+                var byteSalt = algorithm.ComputeHash(Encoding.UTF8.GetBytes(salt));
+
+                var bytePassword = algorithm.ComputeHash(Encoding.UTF8.GetBytes(newPassword));
+
+                //concatenate the two hashed values
+                var hash = ConcatTwoHashes(bytePassword, byteSalt);
+
+                PasswordSalt = byteSalt;
+                PasswordHash = hash;
+            }
+
+            if (newRole != null)
+            {
+                Role = (UserRole)newRole;
+            }
+            
+            return Result.Ok(this);
+        }
+        catch (Exception e)
+        {
+            return Result.Fail(e.Message);
+        }
+    }
+
 }

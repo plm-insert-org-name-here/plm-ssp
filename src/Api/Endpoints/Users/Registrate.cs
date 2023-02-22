@@ -5,14 +5,19 @@ using FastEndpoints;
 
 namespace Api.Endpoints.Users;
 
-public class Registrate : Endpoint<Registrate.Req, EmptyResponse>
+public class Registrate : Endpoint<Registrate.Req, Registrate.Res>
 {
     public IRepository<User> UserRepo { get; set; } = default!;
     public class Req
     {
         public string Name { get; set; } = default!;
         public string Password { get; set; } = default!;
-        public int Role { get; set; }
+        public UserRole Role { get; set; }
+    }
+
+    public class Res
+    {
+        public int Id { get; set; }
     }
 
     public override void Configure()
@@ -25,13 +30,19 @@ public class Registrate : Endpoint<Registrate.Req, EmptyResponse>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        var role = req.Role == 0 ? UserRole.SuperUser : UserRole.Operator;
         try
         {
-            var user = new User(req.Name, req.Password, role);
+            var user = new User(req.Name, req.Password, req.Role);
             await UserRepo.AddAsync(user, ct);
 
             await UserRepo.SaveChangesAsync(ct);
+
+            var res = new Res
+            {
+                Id = user.Id
+            };
+            
+            await SendOkAsync(res ,ct);
         }
         catch(Exception exception)
         {
@@ -39,7 +50,7 @@ public class Registrate : Endpoint<Registrate.Req, EmptyResponse>
             // ThrowError("Could not register the user");
         }
 
-        await SendOkAsync(ct);
+        
     }
 
 }

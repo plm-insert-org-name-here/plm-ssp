@@ -3,5 +3,6 @@ namespace Domain.Common;
 public enum UserRole
 {
     SuperUser,
-    Operator
+    Operator,
+    Engineer
 }
