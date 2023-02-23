@@ -1,6 +1,7 @@
 using Domain.Common;
 using Domain.Entities;
 using Domain.Interfaces;
+using Domain.Specifications;
 using FastEndpoints;
 
 namespace Api.Endpoints.Users;
@@ -18,6 +19,7 @@ public class Registrate : Endpoint<Registrate.Req, Registrate.Res>
     public class Res
     {
         public int Id { get; set; }
+        public string ErrorMessage { get; set; }
     }
 
     public override void Configure()
@@ -30,6 +32,21 @@ public class Registrate : Endpoint<Registrate.Req, Registrate.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
+        var isASame = await UserRepo.AnyAsync(new UserNameUniquenessCheckerSpec(req.Name), ct);
+
+        if (isASame)
+        {
+            var errorRes = new Res()
+            {
+                Id = 0,
+                ErrorMessage = "This name is already taken!"
+            };
+            
+            // await SendNotFoundAsync(ct);
+            await SendAsync(errorRes);
+            return;
+        }
+        
         try
         {
             var user = new User(req.Name, req.Password, req.Role);
