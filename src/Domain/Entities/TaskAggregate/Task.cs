@@ -1,8 +1,12 @@
 using System.Diagnostics.Tracing;
+using System.Globalization;
 using System.Runtime;
 using System.Runtime.InteropServices;
+using CsvHelper;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Interfaces;
+using Domain.Specifications;
 using FluentResults;
 
 namespace Domain.Entities.TaskAggregate;
@@ -26,8 +30,9 @@ public class Task : IBaseEntity
 
     public TaskInstance? OngoingInstance { get; set; }
     public int? OngoingInstanceId { get; set; }
-
-    private Task() {}
+    
+    
+   private Task() {}
 
     private Task(int id, string name, TaskType type, int locationId, int jobId, int? ongoingInstanceId, int maxOrderNum)
     {
@@ -133,7 +138,7 @@ public class Task : IBaseEntity
         return Result.Ok();
     }
 
-    public Result AddEventToCurrentInstance(int stepId, EventResult eventResult, Detector detector)
+    public Result<bool> AddEventToCurrentInstance(int stepId, EventResult eventResult, Detector detector)
     {
         if (OngoingInstance is null)
             return Result.Fail("Task does not have an ongoing instance");
@@ -152,9 +157,11 @@ public class Task : IBaseEntity
             
             OngoingInstance = null;
             Location.OngoingTask = null;
+            
+            return Result.Ok(true);
         }
 
-        return Result.Ok();
+        return Result.Ok(false);
     }
 
     public Result StopCurrentInstance()
@@ -186,5 +193,55 @@ public class Task : IBaseEntity
 
         var resumeResult = OngoingInstance.Resume();
         return resumeResult.IsFailed ? resumeResult : Result.Ok();
+    }
+
+    private class EventDTO
+    {
+        public int Id { get; set; }
+        public DateTime Timestamp { get; set; }
+        public string EventResult { get; set; } = default!;
+        public string? FailureReason { get; set; } = default!;
+        public int StepId { get; set; }
+        public int TaskInstanceId { get; set; }
+    }
+    public async Task<Result> SaveEventLog(IRepository<TaskInstance> instanceRepo)
+    {
+        try
+        {
+            var instance = await instanceRepo.FirstOrDefaultAsync(new TaskInstanceWithEventsByIdSpec(Id));
+            if (instance is null)
+            {
+                
+                return Result.Fail("instance is not found");
+                
+            }
+
+            var output = instance.Events.Select(element => new EventDTO
+                {
+                    Id = element.Id,
+                    Timestamp = element.Timestamp,
+                    EventResult = element.Result.Success.ToString(),
+                    FailureReason = element.Result.FailureReason,
+                    StepId = element.StepId,
+                    TaskInstanceId = element.TaskInstanceId
+                })
+                .ToList();
+
+
+            using (var writer = new StreamWriter($"../../../plm-new/logs/events/{Name}-{DateTime.Now}.csv"))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                // Console.WriteLine(instance.Events);
+                csv.WriteRecords(output);
+                // Console.WriteLine("kutyáidat sétáltatod");
+            }
+        }
+        catch(Exception e)
+        {
+            return Result.Fail(e.Message);
+        }
+        
+        
+        return Result.Ok();
     }
 }

@@ -117,4 +117,9 @@ public static class Routes
         public const string Download = "files/{name}/download";
         public const string GetNewestVersion = "files/{name}/version";
     }
+
+    public static class CAA
+    {
+        public const string Example = "caa/example";
+    }
 }

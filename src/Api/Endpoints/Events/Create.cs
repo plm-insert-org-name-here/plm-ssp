@@ -1,5 +1,6 @@
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
+using Domain.Entities.TaskAggregate;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
@@ -13,6 +14,7 @@ public class Create: Endpoint<Create.Req, EmptyResponse>
     public IRepository<Task> TaskRepo { get; set; } = default!;
     public IRepository<Location> LocationRepo { get; set; } = default!;
     public INotifyChannel NotifyChannel { get; set; } = default!;
+    public IRepository<TaskInstance> InstanceRepo { get; set; }
     public class Req
     {
         public int TaskId { get; set; }
@@ -58,8 +60,14 @@ public class Create: Endpoint<Create.Req, EmptyResponse>
 
         var eventResult = EventResult.Create(req.Success, req.FailureReason).Unwrap();
 
-        task.AddEventToCurrentInstance(req.StepId, eventResult, location.Detector).Unwrap();
-
+        var isEnded = task.AddEventToCurrentInstance(req.StepId, eventResult, location.Detector).Unwrap();
+        if (isEnded)
+        {
+            var res = await task.SaveEventLog(InstanceRepo);
+            res.Unwrap();
+            Console.WriteLine("SaveEventLog:" + res);
+        }
+        
         await TaskRepo.SaveChangesAsync(ct);
         
         //SSE

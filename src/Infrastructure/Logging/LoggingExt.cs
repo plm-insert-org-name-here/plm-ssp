@@ -5,6 +5,7 @@ namespace Infrastructure.Logging;
 
 public static class LoggingExt
 {
+    private static string LogPath = "../../../plm-new/logs/SeriLogs.log";
     public static void UseLogging(this IHostBuilder builder)
     {
         // TODO: write to log file
@@ -13,7 +14,7 @@ public static class LoggingExt
             .ReadFrom.Configuration(context.Configuration)
             .ReadFrom.Services(services)
             .Enrich.FromLogContext()
-            .WriteTo.Console()
+            .WriteTo.File(LogPath)
         );
     }
 
