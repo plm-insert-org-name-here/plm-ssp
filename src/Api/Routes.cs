@@ -46,6 +46,7 @@ public static class Routes
         public const string GetSnapshot = "locations/{id}/snapshot";
         public const string notify = "locations/{id}/sse-notify";
         public const string GetOngoingTask = "locations{id}/get_ongoing_task";
+        public const string GetPrevInstances = "locations/{locationId}/prev-instances";
     }
 
     public static class Detectors
@@ -97,6 +98,7 @@ public static class Routes
     public static class Events
     {
         public const string Create = "events";
+        public const string GetByInstanceId = "{instanceId}/events";
     }
     
     public static class Users

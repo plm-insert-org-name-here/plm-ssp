@@ -14,7 +14,8 @@ public static class LoggingExt
             .ReadFrom.Configuration(context.Configuration)
             .ReadFrom.Services(services)
             .Enrich.FromLogContext()
-            .WriteTo.File(LogPath)
+            // .WriteTo.File(LogPath)
+            .WriteTo.Console()
         );
     }
 
