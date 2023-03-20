@@ -30,6 +30,7 @@ public class Task : IBaseEntity
 
     public TaskInstance? OngoingInstance { get; set; }
     public int? OngoingInstanceId { get; set; }
+    public List<Coordinate>? MarkerCoordinates { get; set; } = default!;
     
     
    private Task() {}
