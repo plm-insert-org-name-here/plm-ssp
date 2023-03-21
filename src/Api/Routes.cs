@@ -47,6 +47,7 @@ public static class Routes
         public const string notify = "locations/{id}/sse-notify";
         public const string GetOngoingTask = "locations{id}/get_ongoing_task";
         public const string GetPrevInstances = "locations/{locationId}/prev-instances";
+        public const string RequestSnapshot = "location/{id}/request-snapshot";
     }
 
     public static class Detectors
