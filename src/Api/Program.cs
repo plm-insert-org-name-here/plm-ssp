@@ -31,7 +31,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseLogging();
 builder.Services.Configure<HostOptions>(opt => opt.ShutdownTimeout = TimeSpan.FromSeconds(1));
 builder.Services.AddDatabase(builder.Configuration);
-
 builder.Services.AddScoped<IJobNameUniquenessChecker, JobNameUniquenessChecker>();
 
 // TODO(rg): into extension method
@@ -43,6 +42,9 @@ builder.Services.AddScoped(typeof(ICHNameUniquenessChecker<,>), typeof(CHNameUni
 builder.Services.AddScoped<IDetectorConnection, DetectorHttpConnection>();
 builder.Services.AddSingleton<IDetectorStreamCollection, DetectorStreamCollection>();
 builder.Services.AddScoped<DetectorCommandService>();
+
+//calibration service
+builder.Services.AddScoped<DetectorCalibrationHttpService>();
 
 builder.Services.AddHttpClient();
 

@@ -50,22 +50,6 @@ public class DetectorHttpConnection : IDetectorConnection
         return Result.Ok();
     }
 
-    public async Task<Result<byte[]>> RequestSnapshot(Detector detector, string type)
-    {
-        try
-        {
-            var client = _httpClientFactory.CreateClient();
-            var snapshot = await client.GetByteArrayAsync($"{Scheme}://{detector.IpAddress}:{Port}/snapshot?type={type}");
-
-            return snapshot;
-        }
-        catch (Exception ex)
-        {
-            return Result.Fail(ex.Message);
-        }
-    }
-
-
     public async Task<Result<Stream>> RequestStream(Detector detector)
     {
         var client = _httpClientFactory.CreateClient();
@@ -91,57 +75,6 @@ public class DetectorHttpConnection : IDetectorConnection
         }
     }
 
-    public record CalibrationMessageData(int Id, List<CalibrationCoordinates.Koordinates> Qr, List<CalibrationCoordinates.Koordinates>? Tray);
-    public async Task<Result<List<CalibrationCoordinates.Koordinates>>> SendCalibrationData(Detector detector, CalibrationCoordinates coordinates, List<CalibrationCoordinates.Koordinates>? newTrayPoints)
-    {
-        var data = new CalibrationMessageData(coordinates.Id, coordinates.Qr, newTrayPoints);
-
-        try
-        {
-            var client = _httpClientFactory.CreateClient();
-            var json = JsonSerializer.Serialize(data);
-
-            var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/calibrate", new StringContent(json));
-            Console.WriteLine(response);
-            var res = await response.Content.ReadFromJsonAsync<List<CalibrationCoordinates.Koordinates>>();
-
-            if (res is null)
-            {
-                return Result.Fail("invalid response content");
-            }
-            return Result.Ok(res);
-        }
-        catch (Exception ex)
-        {
-            return Result.Fail(ex.Message);
-        }
-    }
-
-    public async Task<Result<byte[]>> RequestCalibrationPreview(Detector detector, CalibrationCoordinates coordinates, List<CalibrationCoordinates.Koordinates>? newTrayPoints )
-    {
-        var data = new CalibrationMessageData(coordinates.Id, coordinates.Qr, newTrayPoints);
-
-        try
-        {
-            var client = _httpClientFactory.CreateClient();
-            var json = JsonSerializer.Serialize(data);
-
-            var response = await client.PostAsync($"{Scheme}://{detector.IpAddress}:{Port}/snapshot", new StringContent(json));
-
-            var res = await response.Content.ReadFromJsonAsync<byte[]>();
-
-            if (res is null)
-            {
-                return Result.Fail("result does not contain any data");
-            }
-
-            return Result.Ok(res);
-        }
-        catch (Exception ex)
-        {
-            return Result.Fail(ex.Message);
-        }
-    }
     public async Task<Result<byte[]>> RequestCollectData(Detector detector)
     {
         try

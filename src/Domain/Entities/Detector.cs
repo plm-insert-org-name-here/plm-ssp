@@ -63,24 +63,24 @@ public class Detector : IBaseEntity
         return location.AttachDetector(detector).ToResult(detector);
     }
 
-    public async Task<Result<List<CalibrationCoordinates.Koordinates>>> SendRecalibrate(CalibrationCoordinates? coords, IDetectorConnection detectorConnection, List<CalibrationCoordinates.Koordinates>? newTrayPoints=null)
-    {
-        if (coords is null)
-        {
-            return Result.Fail("This detector has no original coordinates!");
-        }
-
-        var result = await detectorConnection.SendCalibrationData(this, coords, newTrayPoints);
-        if (result.IsFailed)
-        {
-            return result;
-        }
-        // we working with a location's detector so the location will always be something
-        var newCords = new CalibrationCoordinates(result.Value, Location!.Coordinates.Tray);
-        Location!.Coordinates = newCords;
-
-        return Result.Ok(result.Value);
-    }
+    // public async Task<Result<List<CalibrationCoordinates.Koordinates>>> SendRecalibrate(CalibrationCoordinates? coords, IDetectorConnection detectorConnection, List<CalibrationCoordinates.Koordinates>? newTrayPoints=null)
+    // {
+    //     if (coords is null)
+    //     {
+    //         return Result.Fail("This detector has no original coordinates!");
+    //     }
+    //
+    //     var result = await detectorConnection.SendCalibrationData(this, coords, newTrayPoints);
+    //     if (result.IsFailed)
+    //     {
+    //         return result;
+    //     }
+    //     // we working with a location's detector so the location will always be something
+    //     var newCords = new CalibrationCoordinates(result.Value, Location!.Coordinates.Tray);
+    //     Location!.Coordinates = newCords;
+    //
+    //     return Result.Ok(result.Value);
+    // }
 
     public void SetState(DetectorState state)
     {

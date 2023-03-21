@@ -3,13 +3,14 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure.Logging;
+using Serilog;
 
 namespace Api.Endpoints.Detectors;
 
 public class List : EndpointWithoutRequest<IEnumerable<List.Res>>
 {
     public IRepository<Detector> DetectorRepo { get; set; } = default!;
-
     public class Res
     {
         public int Id { get; set; }

@@ -16,15 +16,12 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
 {
     public IRepository<Detector> DetectorRepo { get; set; } = default!;
     public IRepository<Location> LocationRepo { get; set; } = default!;
-    public IDetectorConnection DetectorConnection { get; set; } = default!;
 
     // TODO(rg): save calibration coords to database
     public class Req
     {
         public int LocationId { get; set; }
         public string MacAddress { get; set; } = default!;
-        public List<reqKoordinates> QrCoordinates { get; set; } = default!;
-        public record reqKoordinates(int X, int Y);
     }
 
     public override void Configure()
@@ -58,6 +55,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
             ThrowError("Location not found");
             return;
         }
+        
 
         if (detector is null)
         {
@@ -72,24 +70,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
             location.AttachDetector(detector).Unwrap();
         }
 
-        //get the old coordinates for the difference calculation
-        var originalCoords = location.Coordinates;
-        if (originalCoords is null)
-        {
-            Logger.LogInformation("{@req}", req);
-            location.Coordinates = new CalibrationCoordinates()
-            {
-                Qr = req.QrCoordinates.Select(c => new CalibrationCoordinates.Koordinates(){X = c.X, Y = c.Y}).ToList()
-            };
-            
-        }
-        else
-        {
-            //send to the RPI and get back the current coordinates
-            var result = await location.SendRecalibrate(DetectorConnection);
-            result.Unwrap();
-        }
-
+        Console.WriteLine(req.MacAddress);
         await DetectorRepo.SaveChangesAsync(ct);
         await LocationRepo.SaveChangesAsync(ct);
 

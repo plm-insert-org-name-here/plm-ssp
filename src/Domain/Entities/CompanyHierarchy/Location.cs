@@ -17,7 +17,7 @@ public class Location : ICHNodeWithParent<Station>
 
     public Task? OngoingTask { get; set; }
     public int? OngoingTaskId { get; set; }
-    public CalibrationCoordinates? Coordinates { get; set; }
+    // public CalibrationCoordinates? Coordinates { get; set; }
 
     public byte[]? Snapshot { get; set; }
 
@@ -85,20 +85,20 @@ public class Location : ICHNodeWithParent<Station>
         return Ok();
     }
 
-    public async Task<Result<List<CalibrationCoordinates.Koordinates>>> SendRecalibrate(IDetectorConnection detectorConnection, List<CalibrationCoordinates.Koordinates>? newTrayCoordinates=null)
-    {
-        if (Detector is null || Detector.State == DetectorState.Off)
-        {
-            return Fail("This location has no active detector!");
-        }
-
-        var result = await Detector.SendRecalibrate(Coordinates, detectorConnection, newTrayCoordinates);
-        if (result.IsFailed)
-        {
-            return result.ToResult();
-        }
-        
-        return Ok(result.Value);
-    }
+    // public async Task<Result<List<CalibrationCoordinates.Koordinates>>> SendRecalibrate(IDetectorConnection detectorConnection, List<CalibrationCoordinates.Koordinates>? newTrayCoordinates=null)
+    // {
+    //     if (Detector is null || Detector.State == DetectorState.Off)
+    //     {
+    //         return Fail("This location has no active detector!");
+    //     }
+    //
+    //     var result = await Detector.SendRecalibrate(Coordinates, detectorConnection, newTrayCoordinates);
+    //     if (result.IsFailed)
+    //     {
+    //         return result.ToResult();
+    //     }
+    //     
+    //     return Ok(result.Value);
+    // }
 
 }

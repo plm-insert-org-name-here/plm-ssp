@@ -8,6 +8,7 @@ public sealed class TaskWithChildrenSpec : Specification<Task>
     public TaskWithChildrenSpec(int id)
     {
         Query.Where(t => t.Id == id)
+            .Include(t => t.MarkerCoordinates)
             .Include(t => t.Objects)
             .Include(t => t.Steps)
             .Include(t => t.Job)
