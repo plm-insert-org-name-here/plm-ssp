@@ -10,11 +10,11 @@ namespace Domain.Entities;
 
 public class Detector : IBaseEntity
 {
-    public int Id { get; private set; }
+    public int Id { get; set; }
     public string Name { get; private set; } = default!;
     public PhysicalAddress MacAddress { get; private set; } = default!;
     public IPAddress IpAddress { get; private set; } = default!;
-    public DetectorState State { get; private set; }
+    public DetectorState State { get; set; }
     public List<HeartBeatLog> HeartBeatLogs { get; private set; } = default!;
 
     public Location? Location { get; private set; }
@@ -30,7 +30,10 @@ public class Detector : IBaseEntity
         public float Cpu { get; set; }
         public float Ram { get; set; } 
     }
-
+    public Detector(string name)
+    {
+        Name = name;
+    }
     private Detector() { }
 
     private Detector(int id, string name, string macAddressString, string ipAddressString, DetectorState state, int locationId)
