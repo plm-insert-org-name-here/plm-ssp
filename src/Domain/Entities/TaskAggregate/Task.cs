@@ -9,7 +9,7 @@ namespace Domain.Entities.TaskAggregate;
 
 public class Task : IBaseEntity
 {
-    public int Id { get; private set; }
+    public int Id { get; set; }
     public string Name { get; private set; } = default!;
     public TaskType Type { get; set; }
 
