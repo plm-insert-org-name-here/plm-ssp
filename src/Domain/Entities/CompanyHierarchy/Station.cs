@@ -1,5 +1,6 @@
 using Domain.Interfaces;
 using FluentResults;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Domain.Entities.CompanyHierarchy;
 
@@ -34,6 +35,10 @@ public class Station : ICHNode<Line, Location>
         }
 
         var location = new Location(locationName);
+        if (Children.IsNullOrEmpty())
+        {
+            Children = new List<Location>();
+        }
         Children.Add(location);
 
         return Result.Ok(location);
