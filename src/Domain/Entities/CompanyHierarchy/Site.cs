@@ -7,7 +7,7 @@ namespace Domain.Entities.CompanyHierarchy;
 public class Site : ICHNodeWithChildren<OPU>
 {
     public int Id { get; private set; }
-    public string Name { get; private set; } = default!;
+    public string Name { get; set; } = default!;
     public List<OPU> Children { get; private set; } = default!;
 
     private Site() {}

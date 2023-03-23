@@ -75,5 +75,36 @@ namespace Domain.Tests.Entities.CompanyHierarchy
             result.Should().BeOfType<Result>();
             result.IsSuccess.Should().BeFalse();
         }
+        [Fact]
+        public void Site_New_ReturnResultOK()
+        {
+            //Arrange
+            var site = A.Fake<Site>();
+            site.Name = "test";
+            string name = "test";
+            var nameUniquenessChechker = A.Fake<ICHNameUniquenessChecker<Site>>();
+            A.CallTo(() => nameUniquenessChechker.IsDuplicate(name,null)).Returns(false);
+            //Act
+            var result = Site.New(name, nameUniquenessChechker);
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result<Site>>();
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Name.Should().Be(site.Name);
+        }
+        [Fact]
+        public void Site_New_ReturnResultFail()
+        {
+            //Arrange
+            string name = "test";
+            var nameUniquenessChechker = A.Fake<ICHNameUniquenessChecker<Site>>();
+            A.CallTo(() => nameUniquenessChechker.IsDuplicate(name, null)).Returns(true);
+            //Act
+            var result = Site.New(name, nameUniquenessChechker);
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result<Site>>();
+            result.IsSuccess.Should().BeFalse();
+        }
     }
 }
