@@ -19,7 +19,11 @@ public class Step : IBaseEntity
     private Step()
     {
     }
-
+    //for the UnitTest
+    public Step(int id)
+    {
+        Id = id;
+    }
     public Result Update(int orderNum, TemplateState init, TemplateState subs, Object obj)
     {
         if (!init.IsValid()) return Result.Fail("Invalid expected initial state");
