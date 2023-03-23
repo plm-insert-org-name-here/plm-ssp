@@ -126,9 +126,9 @@ namespace Domain.Tests.Entities.TaskAggregate
             var testObject = A.Fake<Object>();
             var objectCoordinates = A.Fake<ObjectCoordinates>();
             objectCoordinates.X = 300;
-            objectCoordinates.X = 300;
-            objectCoordinates.X = 300;
-            objectCoordinates.X = 300;
+            objectCoordinates.Height = 3;
+            objectCoordinates.Y = 300;
+            objectCoordinates.Width = 3;
             //Act
             var result = testObject.UpdateCoordinates(objectCoordinates);
             //Assert
@@ -136,20 +136,22 @@ namespace Domain.Tests.Entities.TaskAggregate
             result.Should().BeOfType<Result>();
             result.IsSuccess.Should().BeTrue();
             testObject.Coordinates.X.Should().Be(300);
+            testObject.Coordinates.Height.Should().Be(3);
+            testObject.Coordinates.Y.Should().Be(300);
+            testObject.Coordinates.Width.Should().Be(3);
         }
         [Fact]
         public void Object_UpdateCoordinates_ReturnResultFail()
         {
             //Arrange
             var testObject = A.Fake<Object>();
-
-            testObject.Id = 1000;
-            var task = A.Fake<Task>();
-            var dummyObject = new Object("test");
-            task.Objects.Add(dummyObject);
-            string newName = "test";
+            var objectCoordinates = A.Fake<ObjectCoordinates>();
+            objectCoordinates.X = 800;
+            objectCoordinates.Height = 3;
+            objectCoordinates.Y = 300;
+            objectCoordinates.Width = 3;
             //Act
-            var result = testObject.Rename(newName, task);
+            var result = testObject.UpdateCoordinates(objectCoordinates);
             //Assert
             result.Should().NotBeNull();
             result.Should().BeOfType<Result>();
