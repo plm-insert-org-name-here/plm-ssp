@@ -7,6 +7,8 @@ public class DetectorWithLocationAndTasksSpec : Specification<Detector>, ISingle
 {
     public DetectorWithLocationAndTasksSpec(int id)
     {
-        Query.Where(d => d.Id == id).Include(d => d.Location).ThenInclude(l => l!.Tasks);
+        Query.Where(d => d.Id == id)
+            .Include(d => d.Location)
+            .ThenInclude(l => l!.Tasks);
     }
 }

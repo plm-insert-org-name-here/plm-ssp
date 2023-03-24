@@ -24,7 +24,7 @@ public class GetSnapshot : Endpoint<GetSnapshot.Req>
         Options(x =>
         {
             x.WithTags("Locations");
-        });
+       });
         Description(x =>
         {
             x.Produces(200, null, "application/octet-stream");
