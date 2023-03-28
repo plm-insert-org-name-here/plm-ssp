@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
 using FluentResults;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Domain.Entities.TaskAggregate;
 
@@ -66,6 +67,10 @@ public class Task : IBaseEntity
         var instance = new TaskInstance(this);
 
         OngoingInstance = instance;
+        if (Instances.IsNullOrEmpty())
+        {
+            Instances = new List<TaskInstance>();
+        }
         Instances.Add(instance);
 
         return Result.Ok();
@@ -73,11 +78,19 @@ public class Task : IBaseEntity
 
     public void AddObjects(IEnumerable<Object> objects)
     {
+        if (Objects.IsNullOrEmpty())
+        {
+            Objects = new List<Object>();
+        }
         Objects.AddRange(objects);
     }
 
     public void AddSteps(IEnumerable<Step> steps)
     {
+        if (Steps.IsNullOrEmpty())
+        {
+            Steps = new List<Step>();
+        }
         Steps.AddRange(steps);
         UpdateMaxOrderNum();
     }
