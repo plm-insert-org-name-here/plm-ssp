@@ -11,7 +11,7 @@ namespace Domain.Entities.TaskAggregate;
 public class Task : IBaseEntity
 {
     public int Id { get; set; }
-    public string Name { get; private set; } = default!;
+    public string Name { get; set; } = default!;
     public TaskType Type { get; set; }
 
     public int MaxOrderNum { get; private set; }
@@ -56,7 +56,10 @@ public class Task : IBaseEntity
 
     private void UpdateMaxOrderNum()
     {
-        MaxOrderNum = Steps.Select(s => s.OrderNum).Max();
+        if (!Steps.IsNullOrEmpty())
+        {
+            MaxOrderNum = Steps.Select(s => s.OrderNum).Max();
+        }
     }
 
     public Result CreateInstance()

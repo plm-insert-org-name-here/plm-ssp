@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Entities;
 using Domain.Entities.TaskAggregate;
 using FakeItEasy;
 using FluentAssertions;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xunit.Sdk;
 using Object = Domain.Entities.TaskAggregate.Object;
 using Task = Domain.Entities.TaskAggregate.Task;
 
@@ -231,6 +233,125 @@ namespace Domain.Tests.Entities.TaskAggregate
             result.Should().NotBeNull();
             result.Should().BeOfType<Result>();
             result.IsSuccess.Should().BeFalse();
+        }
+        [Fact]
+        public void Task_RemoveObjects_ObjectsRemoved()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            Object object1 = new Object("test1");
+            object1.Id = 1;
+            Object object2 = new Object("test2");
+            object2.Id = 2;
+            List<int> objectIds = new List<int>();
+            task.Objects.Add(object1);
+            task.Objects.Add(object2);
+            objectIds.Add(1);
+            objectIds.Add(2);
+            //Act
+            task.RemoveObjects(objectIds);
+            //Assert
+            task.Objects.Should().HaveCount(0);
+        }
+        [Fact]
+        public void Task_RemoveSteps_StepsRemoved()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            Step step1 = new Step(1);
+            Step step2 = new Step(2);
+            List<int> stepIds = new List<int>();
+            task.Steps.Add(step1);
+            task.Steps.Add(step2);
+            stepIds.Add(1);
+            stepIds.Add(2);
+            //Act
+            task.RemoveSteps(stepIds);
+            //Assert
+            task.Steps.Should().HaveCount(0);
+        }
+        [Fact]
+        public void Task_Rename_ReturnResultOK()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.Id = 1;
+            var taskTest = A.Fake<Task>();
+            task.Id = 2;
+            taskTest.Name = "test";
+            string newName = "newName";
+            var job = A.Fake<Job>();
+            job.Tasks = A.Fake<List<Task>>();
+            job.Tasks.Add(taskTest);
+            //Act
+            var result = task.Rename(newName, job);
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeTrue();
+            task.Name.Should().Be(newName);
+        }
+        [Fact]
+        public void Task_Rename_ReturnResultFail()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.Id = 1;
+            var taskTest = A.Fake<Task>();
+            taskTest.Name = "test";
+            task.Id = 2;
+            string newName = "test";
+            var job = A.Fake<Job>();
+            job.Tasks = A.Fake<List<Task>>();
+            job.Tasks.Add(taskTest);
+            //Act
+            var result = task.Rename(newName, job);
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
+        }
+        /*
+        [Fact]
+        public void Task_AddEventToCurrentInstance_ReturnResultOK()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            task.OngoingInstance.State = TaskInstanceState.Completed;
+            Step stepTest = new Step(1);
+            task.Steps.Add(stepTest);
+            int stepId = 1;
+            var taskInstance = A.Fake<TaskInstance>();
+            taskInstance.RemainingStepIds.Append(0);
+            taskInstance.RemainingStepIds.Append(1);
+            taskInstance.RemainingStepIds.Append(2);
+            var eventResult = A.Fake<EventResult>();
+            eventResult.Success = false;
+            var detector = A.Fake<Detector>();
+            //Act
+            var result = task.AddEventToCurrentInstance(stepId, eventResult, detector);
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeTrue();
+            task.OngoingInstance.Should().BeNull();
+        }
+        */
+        [Fact]
+        public void Task_AddEventToCurrentInstance_ReturnResultFailV1_OnGoingInstanceNull()
+        {
+
+        }
+        [Fact]
+        public void Task_AddEventToCurrentInstance_ReturnResultFailV2_StepNull()
+        {
+
+        }
+        [Fact]
+        public void Task_AddEventToCurrentInstance_ReturnResultFailV3_AddEventFail()
+        {
+
         }
     }
 }
