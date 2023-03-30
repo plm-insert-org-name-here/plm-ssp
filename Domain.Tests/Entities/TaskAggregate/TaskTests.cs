@@ -1,5 +1,6 @@
 ﻿using Domain.Common;
 using Domain.Entities;
+using Domain.Entities.CompanyHierarchy;
 using Domain.Entities.TaskAggregate;
 using FakeItEasy;
 using FluentAssertions;
@@ -311,7 +312,6 @@ namespace Domain.Tests.Entities.TaskAggregate
             result.Should().BeOfType<Result>();
             result.IsSuccess.Should().BeFalse();
         }
-        /*
         [Fact]
         public void Task_AddEventToCurrentInstance_ReturnResultOK()
         {
@@ -319,13 +319,12 @@ namespace Domain.Tests.Entities.TaskAggregate
             var task = A.Fake<Task>();
             task.OngoingInstance = A.Fake<TaskInstance>();
             task.OngoingInstance.State = TaskInstanceState.Completed;
-            Step stepTest = new Step(1);
-            task.Steps.Add(stepTest);
+            task.OngoingInstance.RemainingStepIds = new int[] { 1 };
+            task.Location = A.Fake<Location>();
+            var step = A.Fake<Step>();
+            step.Id = 1;
+            task.Steps.Add(step);
             int stepId = 1;
-            var taskInstance = A.Fake<TaskInstance>();
-            taskInstance.RemainingStepIds.Append(0);
-            taskInstance.RemainingStepIds.Append(1);
-            taskInstance.RemainingStepIds.Append(2);
             var eventResult = A.Fake<EventResult>();
             eventResult.Success = false;
             var detector = A.Fake<Detector>();
@@ -337,21 +336,192 @@ namespace Domain.Tests.Entities.TaskAggregate
             result.IsSuccess.Should().BeTrue();
             task.OngoingInstance.Should().BeNull();
         }
-        */
         [Fact]
         public void Task_AddEventToCurrentInstance_ReturnResultFailV1_OnGoingInstanceNull()
         {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            task.OngoingInstance = null;
+            int stepId = 1;
+            var eventResult = A.Fake<EventResult>();
+            var detector = A.Fake<Detector>();
+            //Act
+            var result = task.AddEventToCurrentInstance(stepId, eventResult, detector);
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
+            task.OngoingInstance.Should().BeNull();
 
         }
         [Fact]
         public void Task_AddEventToCurrentInstance_ReturnResultFailV2_StepNull()
         {
-
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            var step = A.Fake<Step>();
+            step.Id = 3;
+            task.Steps.Add(step);
+            int stepId = 1;
+            var eventResult = A.Fake<EventResult>();
+            eventResult.Success = false;
+            var detector = A.Fake<Detector>();
+            //Act
+            var result = task.AddEventToCurrentInstance(stepId, eventResult, detector);
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
         }
         [Fact]
         public void Task_AddEventToCurrentInstance_ReturnResultFailV3_AddEventFail()
         {
-
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            task.OngoingInstance.RemainingStepIds = new int[] { 3 };
+            var step = A.Fake<Step>();
+            step.Id = 1;
+            task.Steps.Add(step);
+            int stepId = 1;
+            var eventResult = A.Fake<EventResult>();
+            eventResult.Success = false;
+            var detector = A.Fake<Detector>();
+            //Act
+            var result = task.AddEventToCurrentInstance(stepId, eventResult, detector);
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
+        }
+        [Fact]
+        public void Task_StopCurrentInstance_ReturnResultOK()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            task.OngoingInstance.State = TaskInstanceState.InProgress;
+            //Act
+            var result = task.StopCurrentInstance();
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeTrue();
+            task.OngoingInstance.Should().BeNull();
+        }
+        [Fact]
+        public void Task_StopCurrentInstance_ReturnResultFailV1_OngoingInstanceNull()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = null;
+            //Act
+            var result = task.StopCurrentInstance();
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
+            task.OngoingInstance.Should().BeNull();
+        }
+        [Fact]
+        public void Task_StopCurrentInstance_ReturnResultFailV2_AbandonReturnedFail()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            task.OngoingInstance.State = TaskInstanceState.Completed;
+            //Act
+            var result = task.StopCurrentInstance();
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
+        }
+        [Fact]
+        public void Task_PauseCurrentInstance_ReturnResultOK()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            task.OngoingInstance.State = TaskInstanceState.InProgress;
+            //Act
+            var result = task.PauseCurrentInstance();
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeTrue();
+        }
+        [Fact]
+        public void Task_PauseCurrentInstance_ReturnResultFailV1_OngoingInstanceNull()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = null;
+            //Act
+            var result = task.PauseCurrentInstance();
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
+            task.OngoingInstance.Should().BeNull();
+        }
+        [Fact]
+        public void Task_PauseCurrentInstance_ReturnResultFailV2_PauseReturnedFail()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            task.OngoingInstance.State = TaskInstanceState.Abandoned;
+            //Act
+            var result = task.PauseCurrentInstance();
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
+        }
+        [Fact]
+        public void Task_ResumeCurrentInstance_ReturnResultOK()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            task.OngoingInstance.State = TaskInstanceState.Paused;
+            //Act
+            var result = task.ResumeCurrentInstance();
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeTrue();
+        }
+        [Fact]
+        public void Task_ResumeCurrentInstance_ReturnResultFailV1_OngoingInstanceNull()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = null;
+            //Act
+            var result = task.ResumeCurrentInstance();
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
+            task.OngoingInstance.Should().BeNull();
+        }
+        [Fact]
+        public void Task_ResumeCurrentInstance_ReturnResultFailV2_ResumeReturnedFail()
+        {
+            //Arrange
+            var task = A.Fake<Task>();
+            task.OngoingInstance = A.Fake<TaskInstance>();
+            task.OngoingInstance.State = TaskInstanceState.Completed;
+            //Act
+            var result = task.ResumeCurrentInstance();
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<Result>();
+            result.IsSuccess.Should().BeFalse();
         }
     }
 }

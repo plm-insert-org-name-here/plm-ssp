@@ -20,7 +20,7 @@ public class Task : IBaseEntity
     public Job Job { get; private set; } = default!;
     public int LocationId { get; private set; }
 
-    public Location Location { get; private set; } = default!;
+    public Location Location { get; set; } = default!;
     public List<TaskInstance> Instances { get; private set; } = default!;
     public List<Object> Objects { get; private set; } = default!;
     public List<Step> Steps { get; private set; } = default!;
