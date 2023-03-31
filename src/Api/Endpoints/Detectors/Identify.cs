@@ -55,38 +55,40 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
             ThrowError("Location not found");
             return;
         }
-        
-        if (location.Detector?.Id == detector?.Id)
+
+        var temp = false;
+        if (location.Detector != null && location.Detector?.Id == detector?.Id)
         {
-            //belefut ha mindkettő null ?
-            detector?.SetState(DetectorState.Standby);
+            detector?.setIpAddress(remoteIpAddress);
+            temp = true;
         }
-        else
+        else if (location.Detector != null)
+        {
+            if (location.Detector!.State == DetectorState.Streaming)
+            {
+                ThrowError("Location has already an active detector!");
+                return;
+            }
+            location.DetachDetector();
+        }
+
+        if (!temp)
         {
             if (detector is null)
             {
                 var newDetector = Detector.Create(req.MacAddress, physicalMacAddress, remoteIpAddress, location).Unwrap();
                 await DetectorRepo.AddAsync(newDetector, ct);
+                await DetectorRepo.SaveChangesAsync(ct);
                 detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(physicalMacAddress), ct);
             }
             else
             {
                 detector.setIpAddress(remoteIpAddress);
-            }
-
-            if (location.Detector is not null)
-            {
-                if (location.Detector.State == DetectorState.Streaming)
-                {
-                    ThrowError("Location has already an active detector!");
-                    return;
-                }
-                location.DetachDetector();
-            }
-        
-            detector!.SetState(DetectorState.Standby);
-            location.AttachDetector(detector).Unwrap(); 
+            } 
         }
+        
+        detector!.SetState(DetectorState.Standby);
+        location.AttachDetector(detector).Unwrap(); 
         
         await DetectorRepo.SaveChangesAsync(ct);
         await LocationRepo.SaveChangesAsync(ct);
