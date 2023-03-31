@@ -1,5 +1,6 @@
 using FluentResults;
 using Infrastructure.Exceptions;
+using Infrastructure.Logging;
 
 namespace Infrastructure;
 
@@ -9,6 +10,10 @@ public static class FluentResultsExt
     {
         if (result.IsFailed)
         {
+            foreach (var error in result.Errors)
+            {
+                PlmLogger.Log(error.Message);
+            }
             throw new DomainFailureException(result.Errors);
         }
     }
@@ -17,6 +22,10 @@ public static class FluentResultsExt
     {
         if (result.IsFailed)
         {
+            foreach (var error in result.Errors)
+            {
+                PlmLogger.Log(error.Message);
+            }
             throw new DomainFailureException(result.Errors);
         }
 
