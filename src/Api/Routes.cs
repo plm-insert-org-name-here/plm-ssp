@@ -75,6 +75,7 @@ public static class Routes
         
         public const string ResetTaskInstance = "detectors/{locationId}/reset";
         public const string CollectData = "detectors/{id}/collect";
+        public const string GetHeartBeat = "detectors/{id}/getheartbeat";
     }
 
     public static class Jobs
