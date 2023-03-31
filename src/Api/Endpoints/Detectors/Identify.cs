@@ -46,7 +46,7 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
 
         // Endpoint is always called through TCP, so the IP address is never null
         var remoteIpAddress = HttpContext.Connection.RemoteIpAddress!;
-
+    
         var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(physicalMacAddress), ct);
         var location = await LocationRepo.FirstOrDefaultAsync(new LocationWithDetectorSpec(req.LocationId), ct);
 
@@ -56,21 +56,38 @@ public class Identify : Endpoint<Identify.Req, EmptyResponse>
             return;
         }
         
-
-        if (detector is null)
+        if (location.Detector?.Id == detector?.Id)
         {
-            var newDetector = Detector.Create(req.MacAddress, physicalMacAddress, remoteIpAddress, location).Unwrap();
-            await DetectorRepo.AddAsync(newDetector, ct);
-            detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(physicalMacAddress), ct);
+            //belefut ha mindkettő null ?
+            detector?.SetState(DetectorState.Standby);
         }
         else
         {
-            detector.setIpAddress(remoteIpAddress);
-            detector.SetState(DetectorState.Standby);
-            location.AttachDetector(detector).Unwrap();
-        }
+            if (detector is null)
+            {
+                var newDetector = Detector.Create(req.MacAddress, physicalMacAddress, remoteIpAddress, location).Unwrap();
+                await DetectorRepo.AddAsync(newDetector, ct);
+                detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByMacAddressSpec(physicalMacAddress), ct);
+            }
+            else
+            {
+                detector.setIpAddress(remoteIpAddress);
+            }
 
-        Console.WriteLine(req.MacAddress);
+            if (location.Detector is not null)
+            {
+                if (location.Detector.State == DetectorState.Streaming)
+                {
+                    ThrowError("Location has already an active detector!");
+                    return;
+                }
+                location.DetachDetector();
+            }
+        
+            detector!.SetState(DetectorState.Standby);
+            location.AttachDetector(detector).Unwrap(); 
+        }
+        
         await DetectorRepo.SaveChangesAsync(ct);
         await LocationRepo.SaveChangesAsync(ct);
 
