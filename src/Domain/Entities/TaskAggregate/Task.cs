@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Runtime;
@@ -209,12 +210,15 @@ public class Task : IBaseEntity
     {
         try
         {
-            var instance = await instanceRepo.FirstOrDefaultAsync(new TaskInstanceWithEventsByIdSpec(Id));
+            if (OngoingInstanceId is null)
+            {
+                return Result.Fail("task has no ongoing instance");
+            }
+            
+            var instance = await instanceRepo.FirstOrDefaultAsync(new TaskInstanceWithEventsByIdSpec(OngoingInstanceId.Value));
             if (instance is null)
             {
-                
                 return Result.Fail("instance is not found");
-                
             }
 
             var output = instance.Events.Select(element => new EventDTO
@@ -229,20 +233,16 @@ public class Task : IBaseEntity
                 .ToList();
 
 
-            using (var writer = new StreamWriter($"../../../plm-new/logs/events/{Name}-{DateTime.Now}.csv"))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                // Console.WriteLine(instance.Events);
-                csv.WriteRecords(output);
-                // Console.WriteLine("kutyáidat sétáltatod");
-            }
+            await using var writer = new StreamWriter($"../../../plm-ssp/logs/events/{Name}-{DateTime.Now}.csv");
+            await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            
+            await csv.WriteRecordsAsync(output);
         }
         catch(Exception e)
         {
             return Result.Fail(e.Message);
         }
-        
-        
+
         return Result.Ok();
     }
 }
