@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json.Serialization;
 using Api;
+using Api.Endpoints.CAA;
 using Application.Interfaces;
 using Application.Services;
 using Domain.Common;
@@ -145,6 +146,7 @@ builder.Services.Configure<DefaultUserOptions>(builder.Configuration.GetSection(
 
 //bg service test
 builder.Services.AddSingleton<INotifyChannel, NotifyChannel>();
+builder.Services.AddSingleton<IMockCAA, MockCAA>();
 
 var app = builder.Build();
 

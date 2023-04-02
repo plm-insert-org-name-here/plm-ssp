@@ -125,5 +125,6 @@ public static class Routes
     public static class CAA
     {
         public const string Example = "caa/example";
+        public const string TriggerMock = "caa/mock";
     }
 }
