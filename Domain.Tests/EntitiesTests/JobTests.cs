@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Common;
+using Domain.Entities;
 using Domain.Entities.TaskAggregate;
 using Domain.Interfaces;
 using FakeItEasy;
@@ -81,7 +82,7 @@ namespace Domain.Tests.Entities
             //Arrange
             var job = A.Fake<Job>();
             job.Tasks = A.Fake<List<Task>>();
-            Task taskInList = new Task("test", 1, Common.TaskType.ToolKit);
+            Task taskInList = new Task("test", 1, TaskType.ToolKit);
             job.Tasks.Add(taskInList);
             Task taskToDelete = taskInList;
             //Act
