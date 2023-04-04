@@ -53,67 +53,16 @@ builder.Services.AddFastEndpoints();
 
 builder.Services.AddSwaggerDoc(s =>
 {
-    // NOTE(rg): DetectorState is a "bitfield" enum which is serialized into a comma-separated string
-    // if multiple fields are set. As far as I can tell, the generated typescript-fetch API client
-    // does not handle bitfields at all, and generates a regular DetectorState enum no matter what. Making it serialize
-    // into a regular string and then "manually" converting into a DetectorState array feels more correct to me
     s.TypeMappers = new[] { new PrimitiveTypeMapper(typeof(DetectorState), x => x.Type = JsonObjectType.String) };
     s.TypeNameGenerator = new ShorterTypeNameGenerator();
     s.SerializerSettings.Converters.Add(new StringEnumConverter());
     s.OperationProcessors.Add(new BinaryFormatOperationFilter());
     s.GenerateEnumMappingDescription = true;
     s.DocumentName = "v1";
-    // s.AddSecurity("oauth2", new OpenApiSecurityScheme
-    // {
-    //     Description = "Standard Authorization header using the Bearer scheme (\"{token}\")",
-    //     Name = "Authorization"
-    // });
 });
 builder.Services.AddSignalR();
 builder.Services.AddCors();
 
-// var jwtOptions = new JwtOptions();
-// builder.Configuration.GetSection(JwtOptions.ConfigurationEntryName).Bind(jwtOptions);
-
-// builder.Services.AddIdentityCore<User>(opt =>
-// {
-//     opt.Password.RequiredLength = 8;
-//     opt.Password.RequireDigit = false;
-//     opt.Password.RequireLowercase = false;
-//     opt.Password.RequireUppercase = false;
-//     opt.Password.RequireNonAlphanumeric = false;
-// })
-//     .AddRoles<ApplicationRole>()
-//     //nemtom erre mi az új solution, edit: ig ez
-//     .AddEntityFrameworkStores<Context>();
-
-// JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
-//
-// var tokenValidationParameters = new TokenValidationParameters
-// {
-//     // ValidIssuer = jwtOptions.ValidIssuer,
-//     // ValidAudience = jwtOptions.ValidAudience,
-//     // NameClaimType = JwtRegisteredClaimNames.Sub,
-//     // RoleClaimType = jwtOptions.RoleClaimName,
-//     ValidateIssuerSigningKey = true,
-//     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
-//     ValidateIssuer = false,
-//     ValidateAudience = false
-// };
-
-// builder.Services.AddAuthentication(opt =>
-//     {
-//         // TODO(rg): not all of these are needed
-//         //ez a todo örökké itt lesz
-//         opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-//         opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//         opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//         opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-//     })
-//     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, "DefaultScheme", opt =>
-//     {
-//         opt.TokenValidationParameters = tokenValidationParameters;
-//     });
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
@@ -141,12 +90,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.Configure<DefaultUserOptions>(builder.Configuration.GetSection(DefaultUserOptions.ConfigurationEntryName));
-// builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.ConfigurationEntryName));
-// builder.Services.AddSingleton<IOptions<TokenValidationParameters>>(new OptionsWrapper<TokenValidationParameters>(tokenValidationParameters));
 
-//bg service test
 builder.Services.AddSingleton<INotifyChannel, NotifyChannel>();
-builder.Services.AddSingleton<IMockCAA, MockCAA>();
 
 var app = builder.Build();
 
@@ -164,7 +109,6 @@ app.UseCors(options =>
     // NOTE(rg): workaround; the JS SignalR requires credentials to be allowed,
     // but AllowAnyOrigin and AllowCredentials can't be used together
     options.SetIsOriginAllowed(_ => true);
-    // options.AllowAnyOrigin();
     options.AllowCredentials();
 });
 app.UseHttpsRedirection();
