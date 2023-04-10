@@ -7,7 +7,7 @@ namespace Application.Services;
 public interface IDetectorStatusService
 {
     public void AddHeartBeat(Detector detector);
-
+    public void CheckStatus();
 }
 
 public class DetectorStatusService : IDetectorStatusService
@@ -45,6 +45,7 @@ public class DetectorStatusService : IDetectorStatusService
 
             foreach (var det in unavailableDetectors)
             {
+                Console.WriteLine(det.Id);
                 var detectorFromDb = await DetectorRepo.GetByIdAsync(det.Id);
                 detectorFromDb?.SetState(DetectorState.Off);
             }

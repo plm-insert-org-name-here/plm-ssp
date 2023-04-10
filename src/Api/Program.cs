@@ -93,7 +93,6 @@ builder.Services.Configure<DefaultUserOptions>(builder.Configuration.GetSection(
 
 builder.Services.AddSingleton<INotifyChannel, NotifyChannel>();
 builder.Services.AddSingleton<IDetectorStatusService, DetectorStatusService>();
-new DetectorStatusService().CheckStatus();
 
 var app = builder.Build();
 
