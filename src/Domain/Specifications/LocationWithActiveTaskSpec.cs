@@ -1,5 +1,4 @@
 using Ardalis.Specification;
-using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
 
 namespace Domain.Specifications;
@@ -18,6 +17,6 @@ public sealed class LocationWithActiveTaskSpec : Specification<Location>
             .ThenInclude(t => t!.Objects)
             .Include(l => l.OngoingTask)
             .ThenInclude(t => t!.OngoingInstance)
-            .ThenInclude(ti => ti!.Events);
+            .ThenInclude(ti => ti!.Events).AsSplitQuery();
     }
 }

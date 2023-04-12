@@ -3,6 +3,7 @@ using System.Net.NetworkInformation;
 using Domain.Common;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
+using Domain.Specifications;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,7 @@ public class Detector : IBaseEntity
         public long Uptime { get; set; }
         public float Cpu { get; set; }
         public float Ram { get; set; } 
+        public DateTime TimeStamp { get; set; }
     }
 
     private Detector() { }
@@ -100,5 +102,20 @@ public class Detector : IBaseEntity
     public void setIpAddress(IPAddress newIp)
     {
         IpAddress = newIp;
+    }
+
+    public void CheckState()
+    {
+        var lastLog = HeartBeatLogs.LastOrDefault();
+        if (lastLog != null)
+        {
+            Console.WriteLine(lastLog.TimeStamp);
+            if (lastLog.TimeStamp.AddSeconds(10) < DateTime.Now)
+            {
+                State = DetectorState.Off;
+            }
+        }
+        
+        
     }
 }
