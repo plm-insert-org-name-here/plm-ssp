@@ -92,7 +92,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.Configure<DefaultUserOptions>(builder.Configuration.GetSection(DefaultUserOptions.ConfigurationEntryName));
 
 builder.Services.AddSingleton<INotifyChannel, NotifyChannel>();
-builder.Services.AddSingleton<IDetectorStatusService, DetectorStatusService>();
 
 var app = builder.Build();
 

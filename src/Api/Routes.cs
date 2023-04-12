@@ -126,9 +126,4 @@ public static class Routes
     {
         public const string Example = "caa/example";
     }
-
-    public static class Other
-    {
-        public const string StartCheckDetectorState = "check/start";
-    }
 }
