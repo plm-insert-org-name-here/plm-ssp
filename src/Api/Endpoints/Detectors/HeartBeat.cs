@@ -46,7 +46,8 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
             StoragePercentage = req.StoragePercentage,
             Uptime = req.Uptime,
             Cpu = req.Cpu,
-            Ram = req.Ram
+            Ram = req.Ram,
+            TimeStamp = DateTime.Now
         };
 
         detector.HeartBeatLogs.Add(newLog);

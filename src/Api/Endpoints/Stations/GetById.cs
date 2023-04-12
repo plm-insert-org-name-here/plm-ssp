@@ -1,4 +1,5 @@
 using Domain.Common;
+using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Interfaces;
 using Domain.Specifications;
@@ -9,6 +10,7 @@ namespace Api.Endpoints.Stations;
 public class GetById : Endpoint<GetById.Req, GetById.Res>
 {
     public IRepository<Station> StationRepo { get; set; } = default!;
+    public IRepository<Detector> DetectorRepo { get; set; } = default!;
 
     public class Req
     {
@@ -56,6 +58,18 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
             await SendNotFoundAsync(ct);
             return;
         }
+
+        foreach (var location in station.Children)
+        {
+            if (location.Detector != null)
+            {
+                var detector = await DetectorRepo.FirstOrDefaultAsync(new HeartBeatByDetectorIdSpec(location.Detector.Id), ct);
+
+                detector?.CheckState();
+            } 
+        }
+        await DetectorRepo.SaveChangesAsync(ct);
+        
 
         var res = MapOut(station);
         await SendOkAsync(res, ct);

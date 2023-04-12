@@ -1,9 +1,11 @@
 using Domain.Common;
+using Domain.Entities;
 using Domain.Entities.CompanyHierarchy;
 using Domain.Entities.TaskAggregate;
 using Domain.Interfaces;
 using Domain.Specifications;
 using FastEndpoints;
+using Infrastructure.Logging;
 using Task = System.Threading.Tasks.Task;
 
 namespace Api.Endpoints.Locations;
@@ -11,6 +13,7 @@ namespace Api.Endpoints.Locations;
 public class GetById : Endpoint<GetById.Req, GetById.Res>
 {
     public IRepository<Location> LocationRepo { get; set; } = default!;
+    public IRepository<Detector> DetectorRepo { get; set; } = default!;
 
     public class Req
     {
@@ -113,18 +116,22 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
-        DateTime start = DateTime.Now;
         var location =
             await LocationRepo.FirstOrDefaultAsync(new LocationWithActiveTaskSpec(req.Id), ct);
-        DateTime end = DateTime.Now;
-        TimeSpan runtime = end - start;
-        Console.WriteLine("Runtime: " + runtime);
-
+        
         // Console.WriteLine(location.ParentId);
         if (location is null)
         {
             await SendNotFoundAsync(ct);
             return;
+        }
+
+        if (location.Detector != null)
+        {
+            var detector = await DetectorRepo.FirstOrDefaultAsync(new HeartBeatByDetectorIdSpec(location.Detector.Id), ct);
+
+            detector?.CheckState();
+            await DetectorRepo.SaveChangesAsync(ct);
         }
 
         var res = MapOut(location);
