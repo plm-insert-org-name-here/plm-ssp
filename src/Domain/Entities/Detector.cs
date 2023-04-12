@@ -110,7 +110,7 @@ public class Detector : IBaseEntity
         if (lastLog != null)
         {
             Console.WriteLine(lastLog.TimeStamp);
-            if (lastLog.TimeStamp.AddSeconds(10) < DateTime.Now)
+            if (lastLog.TimeStamp.AddSeconds(6) < DateTime.Now)
             {
                 State = DetectorState.Off;
             }

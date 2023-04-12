@@ -11,7 +11,6 @@ namespace Api.Endpoints.Detectors;
 public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
 {
     public IRepository<Detector> DetectorRepo { get; set; } = default!;
-    public IDetectorStatusService DetectorStatusService { get; set; } = default!;
     public class Req
     {
         public string MacAddress { get; set; } = default!;
@@ -51,8 +50,6 @@ public class HeartBeat : Endpoint<HeartBeat.Req, EmptyResponse>
         };
 
         detector.HeartBeatLogs.Add(newLog);
-        
-        DetectorStatusService.AddHeartBeat(detector);
         
         await DetectorRepo.SaveChangesAsync(ct);
         await SendOkAsync(ct);
