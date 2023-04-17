@@ -18,7 +18,7 @@ public class GetHeartBeat : Endpoint<GetHeartBeat.Req, GetHeartBeat.Res>
         public IEnumerable<HeartBeatRes> HeartBeats { get; set; } = default!;
 
         public record HeartBeatRes(
-            string MacAddress, int Temperature, int StoragePercentage, long Uptime, float Cpu, float Ram
+            string MacAddress, int Temperature, int StoragePercentage, long Uptime, float Cpu, float Ram, DateTime TimeStamp
             );
     }
     
@@ -42,7 +42,7 @@ public class GetHeartBeat : Endpoint<GetHeartBeat.Req, GetHeartBeat.Res>
         var res = new Res
         {
             HeartBeats = detector.HeartBeatLogs.Select(log => new Res.HeartBeatRes(detector.MacAddress.ToString(),
-                log.Temperature, log.StoragePercentage, log.Uptime, log.Cpu, log.Ram))
+                log.Temperature, log.StoragePercentage, log.Uptime, log.Cpu, log.Ram, log.TimeStamp))
         };
         
         await SendOkAsync(res, ct);
