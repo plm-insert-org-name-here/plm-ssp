@@ -7,6 +7,8 @@ public sealed class StationWithLocationsAndDetectorsSpec : Specification<Station
 {
     public StationWithLocationsAndDetectorsSpec(int id)
     {
-        Query.Where(s => s.Id == id).Include(s => s.Children).ThenInclude(l => l.Detector);
+        Query.Where(s => s.Id == id)
+            .Include(s => s.Children)
+            .ThenInclude(l => l.Detector);
     }
 }

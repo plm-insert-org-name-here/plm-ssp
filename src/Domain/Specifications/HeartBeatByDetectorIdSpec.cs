@@ -8,6 +8,7 @@ public sealed class HeartBeatByDetectorIdSpec : Specification<Detector>
     public HeartBeatByDetectorIdSpec(int id)
     {
         Query.Where(d => d.Id == id)
-            .Include(d => d.HeartBeatLogs);
+            .Include(d => d.HeartBeatLogs)
+            .Include(d => d.Location);
     }
 }
