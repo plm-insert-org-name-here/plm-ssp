@@ -1,0 +1,5 @@
+.idea/
+backend.sln.DotSettings.user
+bin/*.jar
+bin/api_client
+bin/openapitools.json

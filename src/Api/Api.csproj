@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <PreserveCompilationContext>true</PreserveCompilationContext>
+        <Nullable>enable</Nullable>
+        <NswagCmd>$(NSwagDir_Net60)dotnet-nswag.dll</NswagCmd>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FastEndpoints" Version="5.2.1.5-beta" />
+      <PackageReference Include="FastEndpoints.ClientGen" Version="5.2.1.16-beta" />
+      <PackageReference Include="Lib.AspNetCore.ServerSentEvents" Version="8.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
+      <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+      <PackageReference Include="NSwag.MSBuild" Version="13.17.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Application\Application.csproj" />
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="SeedData\seed.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="ApiIntegrationTests" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="docs" />
+    </ItemGroup>
+
+</Project>
