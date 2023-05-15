@@ -110,10 +110,10 @@ public class Detector : IBaseEntity
         if (lastLog != null)
         {
             Console.WriteLine(lastLog.TimeStamp);
-            if (lastLog.TimeStamp.AddSeconds(8) < DateTime.Now)
+            if (lastLog.TimeStamp.AddSeconds(10) < DateTime.Now)
             {
                 State = DetectorState.Off;
-                Location.OngoingTask = null;
+                // Location.OngoingTask = null;
             }
         }
         

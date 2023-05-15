@@ -10,10 +10,10 @@ public static class FluentResultsExt
     {
         if (result.IsFailed)
         {
-            foreach (var error in result.Errors)
-            {
-                PlmLogger.Log(error.Message);
-            }
+            // foreach (var error in result.Errors)
+            // {
+            //     PlmLogger.Log(error.Message);
+            // }
             throw new DomainFailureException(result.Errors);
         }
     }
@@ -22,10 +22,10 @@ public static class FluentResultsExt
     {
         if (result.IsFailed)
         {
-            foreach (var error in result.Errors)
-            {
-                PlmLogger.Log(error.Message);
-            }
+            // foreach (var error in result.Errors)
+            // {
+            //     PlmLogger.Log(error.Message);
+            // }
             throw new DomainFailureException(result.Errors);
         }
 
