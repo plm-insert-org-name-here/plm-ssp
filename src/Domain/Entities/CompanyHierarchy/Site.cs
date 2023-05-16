@@ -5,23 +5,16 @@ namespace Domain.Entities.CompanyHierarchy;
 
 public class Site : ICHNodeWithChildren<OPU>
 {
-    public int Id { get; private set; }
+    public int Id { get; private set; } = 1;
     public string Name { get; private set; } = default!;
     public List<OPU> Children { get; private set; } = default!;
 
     private Site() {}
 
-    private Site(int id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
-
     private Site(string name)
     {
         Name = name;
     }
-
     public static Result<Site> New(string name,
         ICHNameUniquenessChecker<Site> nameUniquenessChecker)
     {

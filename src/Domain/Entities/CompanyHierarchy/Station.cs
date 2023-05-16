@@ -5,22 +5,14 @@ namespace Domain.Entities.CompanyHierarchy;
 
 public class Station : ICHNode<Line, Location>
 {
-    public int Id { get; private set; }
+    public int Id { get; private set; } = 1; 
     public string Name { get; private set; } = default!;
     public List<Location> Children { get; private set; } = default!;
 
     public Line Parent { get; set; } = default!;
-    public int ParentId { get; set; }
+    public int ParentId { get; set; } = 1;
 
     private Station() {}
-
-    private Station(int id, string name, int parentId)
-    {
-        Id = id;
-        Name = name;
-        ParentId = parentId;
-    }
-
     public Station(string name)
     {
         Name = name;
