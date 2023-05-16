@@ -1,5 +1,6 @@
 using Domain.Interfaces;
 using FluentResults;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Domain.Entities.CompanyHierarchy;
 
@@ -27,6 +28,10 @@ public class Line : ICHNode<OPU, Station>
         }
 
         var station = new Station(stationName);
+        if (Children.IsNullOrEmpty())
+        {
+            Children = new List<Station>();
+        }
         Children.Add(station);
 
         return Result.Ok(station);

@@ -1,5 +1,6 @@
 using Domain.Interfaces;
 using FluentResults;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Domain.Entities.CompanyHierarchy;
 
@@ -25,6 +26,10 @@ public class OPU : ICHNodeWithParent<Site>, ICHNodeWithChildren<Line>
         }
 
         var line = new Line(lineName);
+        if (Children.IsNullOrEmpty())
+        {
+            Children = new List<Line>();
+        }
         Children.Add(line);
 
         return Result.Ok(line);
