@@ -35,17 +35,4 @@ public class Station : ICHNode<Line, Location>
 
         return Result.Ok(location);
     }
-
-    public Result Rename(string newName,
-        ICHNameUniquenessChecker<Line, Station> nameUniquenessChecker)
-    {
-        if (nameUniquenessChecker.IsDuplicate(Parent, newName, this).GetAwaiter().GetResult())
-        {
-            return Result.Fail("Duplicate name");
-        }
-
-        Name = newName;
-
-        return Result.Ok();
-    }
 }

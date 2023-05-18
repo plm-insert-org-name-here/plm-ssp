@@ -34,16 +34,4 @@ public class OPU : ICHNodeWithParent<Site>, ICHNodeWithChildren<Line>
 
         return Result.Ok(line);
     }
-
-    public Result Rename(string newName, ICHNameUniquenessChecker<Site, OPU> nameUniquenessChecker)
-    {
-        if (nameUniquenessChecker.IsDuplicate(Parent, newName, this).GetAwaiter().GetResult())
-        {
-            return Result.Fail("Duplicate name");
-        }
-
-        Name = newName;
-
-        return Result.Ok();
-    }
 }

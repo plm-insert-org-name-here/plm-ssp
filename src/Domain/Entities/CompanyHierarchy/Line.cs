@@ -36,16 +36,4 @@ public class Line : ICHNode<OPU, Station>
 
         return Result.Ok(station);
     }
-
-    public Result Rename(string newName, ICHNameUniquenessChecker<OPU, Line> nameUniquenessChecker)
-    {
-        if (nameUniquenessChecker.IsDuplicate(Parent, newName, this).GetAwaiter().GetResult())
-        {
-            return Result.Fail("Duplicate name");
-        }
-
-        Name = newName;
-
-        return Result.Ok();
-    }
 }
