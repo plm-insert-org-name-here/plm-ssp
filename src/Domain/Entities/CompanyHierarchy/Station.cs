@@ -6,14 +6,20 @@ namespace Domain.Entities.CompanyHierarchy;
 
 public class Station : ICHNode<Line, Location>
 {
-    public int Id { get; private set; } = 1; 
+    public int Id { get; private set; }
     public string Name { get; private set; } = default!;
     public List<Location> Children { get; private set; } = default!;
 
     public Line Parent { get; set; } = default!;
-    public int ParentId { get; private set; } = 1;
+    public int ParentId { get; private set; }
 
     private Station() {}
+    public Station(int id, string name, int parentID)
+    {
+        Id = id;
+        Name = name;
+        ParentId = parentID;
+    }
     public Station(string name)
     {
         Name = name;

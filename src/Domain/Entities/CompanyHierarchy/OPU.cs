@@ -6,13 +6,19 @@ namespace Domain.Entities.CompanyHierarchy;
 
 public class OPU : ICHNodeWithParent<Site>, ICHNodeWithChildren<Line>
 {
-    public int Id { get; private set; } = 1;
+    public int Id { get; private set; }
     public string Name { get; private set; } = default!;
     public List<Line> Children { get; private set; } = default!;
     public Site Parent { get; private set; } = default!;
-    public int ParentId { get; private set; } = 1;
+    public int ParentId { get; private set; }
 
     private OPU() {}
+    public OPU(int id, string name, int parentID)
+    {
+        Id = id;
+        Name = name;
+        ParentId = parentID;
+    }
     public OPU(string name)
     {
         Name = name;

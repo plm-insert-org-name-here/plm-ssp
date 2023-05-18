@@ -6,7 +6,7 @@ namespace Domain.Entities.CompanyHierarchy;
 
 public class Line : ICHNode<OPU, Station>
 {
-    public int Id { get; private set; } = 1;
+    public int Id { get; private set; }
     public string Name { get; private set; } = default!;
     public List<Station> Children { get; private set; } = default!;
 
@@ -14,6 +14,12 @@ public class Line : ICHNode<OPU, Station>
     public int ParentId { get; private set; } = 1;
 
     private Line() {}
+    public Line(int id, string name, int parentID)
+    {
+        Id = id;
+        Name = name;
+        ParentId = parentID;
+    }
     public Line(string name)
     {
         Name = name;

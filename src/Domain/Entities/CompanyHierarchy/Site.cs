@@ -6,12 +6,17 @@ namespace Domain.Entities.CompanyHierarchy;
 
 public class Site : ICHNodeWithChildren<OPU>
 {
-    public int Id { get; private set; } = 1;
+    public int Id { get; private set; }
     public string Name { get; private set; } = default!;
     public List<OPU> Children { get; private set; } = default!;
 
     private Site() {}
 
+    public Site(int id, string name)
+    {
+        Id = id;
+        Name = name;
+    }
     public Site(string name)
     {
         Name = name;
