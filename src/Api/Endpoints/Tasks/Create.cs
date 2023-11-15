@@ -58,11 +58,11 @@ public class Create: Endpoint<Create.Req, Create.Res>
             return;
         }
 
-        if (location.Snapshot is null)
-        {
-            ThrowError("Snapshot not found");
-            return;
-        }
+        // if (location.Snapshot is null)
+        // {
+        //     ThrowError("Snapshot not found");
+        //     return;
+        // }
 
         var task = new Task(req.Name, req.LocationId, req.TaskType);
 
