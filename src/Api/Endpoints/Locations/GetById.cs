@@ -132,7 +132,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         //
         //     detector?.CheckState();
         //     await DetectorRepo.SaveChangesAsync(ct);
-        }
+        // }
 
         var res = MapOut(location);
         
