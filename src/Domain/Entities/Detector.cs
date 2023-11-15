@@ -112,7 +112,7 @@ public class Detector : IBaseEntity
             Console.WriteLine(lastLog.TimeStamp);
             if (lastLog.TimeStamp.AddSeconds(10) < DateTime.Now)
             {
-                State = DetectorState.Off;
+                // State = DetectorState.Off;
                 // Location.OngoingTask = null;
             }
         }

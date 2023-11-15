@@ -126,12 +126,12 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
             return;
         }
 
-        if (location.Detector != null)
-        {
-            var detector = await DetectorRepo.FirstOrDefaultAsync(new HeartBeatByDetectorIdSpec(location.Detector.Id), ct);
-
-            detector?.CheckState();
-            await DetectorRepo.SaveChangesAsync(ct);
+        // if (location.Detector != null)
+        // {
+        //     var detector = await DetectorRepo.FirstOrDefaultAsync(new HeartBeatByDetectorIdSpec(location.Detector.Id), ct);
+        //
+        //     detector?.CheckState();
+        //     await DetectorRepo.SaveChangesAsync(ct);
         }
 
         var res = MapOut(location);
