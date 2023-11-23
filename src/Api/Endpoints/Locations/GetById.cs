@@ -130,6 +130,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         stopwatch.Stop();
         Console.WriteLine("**********Query Time*************");
         Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
+        PlmLogger.Log($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} - Query Time:");
         PlmLogger.Log($"{stopwatch.Elapsed.TotalSeconds}");
         Console.WriteLine("*********************************");
         // Console.WriteLine(location.ParentId);
@@ -151,6 +152,7 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         
         total.Stop();
         Console.WriteLine("**********Total Time time*************");
+        PlmLogger.Log($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} - Total Time:");
         Console.WriteLine(total.Elapsed.TotalSeconds);
         Console.WriteLine("*********************************");
         // Console.WriteLine(res.StationId);
