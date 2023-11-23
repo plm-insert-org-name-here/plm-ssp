@@ -128,10 +128,9 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
             await LocationRepo.FirstOrDefaultAsync(new LocationWithActiveTaskSpec(req.Id), ct);
         
         stopwatch.Stop();
-        Console.WriteLine("*********************************");
-        Console.WriteLine("Query Time");
-        Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
-        PlmLogger.Log("***************************");
+        // Console.WriteLine("*********************************");
+        // Console.WriteLine("Query Time");
+        // Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
         PlmLogger.Log($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} - Query Time:");
         PlmLogger.Log($"{stopwatch.Elapsed.TotalSeconds}");
         // Console.WriteLine(location.ParentId);
@@ -152,12 +151,12 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
         var res = MapOut(location);
         
         total.Stop();
-        Console.WriteLine("Total Time time");
+        // Console.WriteLine("Total Time time");
         PlmLogger.Log($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} - Total Time:");
         PlmLogger.Log($"{total.Elapsed.TotalSeconds}");
         PlmLogger.Log("***************************");
-        Console.WriteLine(total.Elapsed.TotalSeconds);
-        Console.WriteLine("*********************************");
+        // Console.WriteLine(total.Elapsed.TotalSeconds);
+        // Console.WriteLine("*********************************");
         // Console.WriteLine(res.StationId);
         await SendOkAsync(res, ct);
     }

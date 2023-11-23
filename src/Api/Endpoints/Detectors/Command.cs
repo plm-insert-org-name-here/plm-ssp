@@ -6,6 +6,9 @@ using Domain.Services;
 using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure;
+using System;
+using System.Diagnostics;
+using Infrastructure.Logging;
 
 namespace Api.Endpoints.Detectors;
 
@@ -34,6 +37,9 @@ public class Command : Endpoint<Command.Req, EmptyResponse>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+
         var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByIdWithLocationSpec(req.Id), ct);
 
         if (detector is null)
@@ -53,6 +59,11 @@ public class Command : Endpoint<Command.Req, EmptyResponse>
 
         await DetectorRepo.SaveChangesAsync(ct);
         
+        sw.Stop();
+        PlmLogger.Log("***************************");
+        PlmLogger.Log("Command Time");
+        PlmLogger.Log($"{sw.Elapsed.TotalSeconds}");
+
         //SSE
         NotifyChannel.AddNotify(detector.Location.Id);
         await SendNoContentAsync(ct);

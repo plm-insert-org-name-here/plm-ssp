@@ -49,9 +49,9 @@ public class sse_notify : Endpoint<sse_notify.Req, sse_notify.Res>
         _channel = Channel.CreateUnbounded<int>();
         // Console.WriteLine(_channel);
         
-        var ts = new ThreadStart(CheckLife);
-        var backgroundThread = new Thread(ts);
-        backgroundThread.Start();
+        // var ts = new ThreadStart(CheckLife);
+        // var backgroundThread = new Thread(ts);
+        // backgroundThread.Start();
         
         //subscribe to get the notifications
         NotifyChannel.Subscribe(_channel);
