@@ -124,7 +124,9 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
             await LocationRepo.FirstOrDefaultAsync(new LocationWithActiveTaskSpec(req.Id), ct);
         
         stopwatch.Stop();
+        Console.WriteLine("**********Query time*************");
         Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
+        Console.WriteLine("*********************************");
         // Console.WriteLine(location.ParentId);
         if (location is null)
         {
