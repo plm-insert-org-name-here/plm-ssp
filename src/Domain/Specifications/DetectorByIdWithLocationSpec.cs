@@ -7,6 +7,6 @@ public sealed class DetectorByIdWithLocationSpec : Specification<Detector>
 {
     public DetectorByIdWithLocationSpec(int id)
     {
-        Query.Where(d => d.Id == id).Include(d => d.Location);
+        Query.Where(d => d.Id == id).Include(d => d.Location).AsSplitQuery();
     }
 }
