@@ -9,6 +9,7 @@ using Infrastructure.Logging;
 using Task = System.Threading.Tasks.Task;
 using System;
 using System.Diagnostics;
+using Infrastructure.Logging;
 
 namespace Api.Endpoints.Locations;
 
@@ -118,14 +119,18 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
+        Stopwatch total = new Stopwatch();
+        total.Start();
+
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
         var location =
             await LocationRepo.FirstOrDefaultAsync(new LocationWithActiveTaskSpec(req.Id), ct);
         
         stopwatch.Stop();
-        Console.WriteLine("**********Query time*************");
+        Console.WriteLine("**********Query Time*************");
         Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
+        PlmLogger.Log($"{stopwatch.Elapsed.TotalSeconds}");
         Console.WriteLine("*********************************");
         // Console.WriteLine(location.ParentId);
         if (location is null)
@@ -144,6 +149,10 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
         var res = MapOut(location);
         
+        total.Stop();
+        Console.WriteLine("**********Total Time time*************");
+        Console.WriteLine(total.Elapsed.TotalSeconds);
+        Console.WriteLine("*********************************");
         // Console.WriteLine(res.StationId);
         await SendOkAsync(res, ct);
     }
