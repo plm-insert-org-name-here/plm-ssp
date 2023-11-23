@@ -23,7 +23,7 @@ public static class DbExt
 
 
             var serverVersion = ServerVersion.AutoDetect(dbOpt.ConnectionString);
-            options.UseMySql(dbOpt.ConnectionString, serverVersion);
+            options.UseMySql(dbOpt.ConnectionString, serverVersion, o => o.UseQuerySplittingBehavior(UseQuerySplittingBehavior.SplitQuery));
         };
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
