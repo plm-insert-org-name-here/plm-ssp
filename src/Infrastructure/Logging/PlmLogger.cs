@@ -10,8 +10,10 @@ public static class PlmLogger
     {
         if (message is not null)
         {
-            using StreamWriter file = new(LogPath, append: true);
-            await file.WriteLineAsync(message);
+            using(StreamWriter sw = File.AppendText(LogPath))
+            {
+                sw.WriteLine(message);
+            }
         }
         
     }
