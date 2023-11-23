@@ -7,6 +7,8 @@ using Domain.Specifications;
 using FastEndpoints;
 using Infrastructure.Logging;
 using Task = System.Threading.Tasks.Task;
+using System;
+using System.Diagnostics;
 
 namespace Api.Endpoints.Locations;
 
@@ -116,9 +118,13 @@ public class GetById : Endpoint<GetById.Req, GetById.Res>
 
     public override async Task HandleAsync(Req req, CancellationToken ct)
     {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
         var location =
             await LocationRepo.FirstOrDefaultAsync(new LocationWithActiveTaskSpec(req.Id), ct);
         
+        stopwatch.Stop();
+        Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
         // Console.WriteLine(location.ParentId);
         if (location is null)
         {
