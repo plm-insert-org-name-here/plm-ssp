@@ -46,6 +46,7 @@ public class Command : Endpoint<Command.Req, EmptyResponse>
         var detector = await DetectorRepo.GetByIdAsync(req.Id, ct);
         
         q.Stop();
+        PlmLogger.Log("***************************");
         PlmLogger.Log("Command Query Time");
         PlmLogger.Log($"{sw.Elapsed.TotalSeconds}");
 
@@ -61,7 +62,6 @@ public class Command : Endpoint<Command.Req, EmptyResponse>
         await DetectorRepo.SaveChangesAsync(ct);
         
         sw.Stop();
-        PlmLogger.Log("***************************");
         PlmLogger.Log("Command Time");
         PlmLogger.Log($"{sw.Elapsed.TotalSeconds}");
 
