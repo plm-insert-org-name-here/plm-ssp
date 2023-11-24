@@ -116,10 +116,10 @@ public class Detector : IBaseEntity
             }
             else{
                 if(Location == null){
-                    State = DetectorState.Locating
+                    State = DetectorState.Locating;
                 }
                 else if(Location.OngoingTask != null){
-                    State = DetectorState.Monitoring
+                    State = DetectorState.Monitoring;
                 }
                 else{
                     State = DetectorState.Standby;
