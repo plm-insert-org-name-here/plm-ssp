@@ -40,7 +40,14 @@ public class Command : Endpoint<Command.Req, EmptyResponse>
         Stopwatch sw = new Stopwatch();
         sw.Start();
 
+        Stopwatch q = new Stopwatch();
+        q.Start();
+
         var detector = await DetectorRepo.GetByIdAsync(req.Id, ct);
+        
+        q.Stop();
+        PlmLogger.Log("Command Query Time");
+        PlmLogger.Log($"{sw.Elapsed.TotalSeconds}");
 
         if (detector is null)
         {
