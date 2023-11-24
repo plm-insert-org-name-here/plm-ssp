@@ -115,7 +115,15 @@ public class Detector : IBaseEntity
                 Location.OngoingTask = null;
             }
             else{
-                State = DetectorState.Standby;
+                if(Location == null){
+                    State = DetectorState.Locating
+                }
+                else if(Location.OngoingTask != null){
+                    State = DetectorState.Monitoring
+                }
+                else{
+                    State = DetectorState.Standby;
+                }
             }
         }
         
