@@ -40,18 +40,12 @@ public class Command : Endpoint<Command.Req, EmptyResponse>
         Stopwatch sw = new Stopwatch();
         sw.Start();
 
-        var detector = await DetectorRepo.FirstOrDefaultAsync(new DetectorByIdWithLocationSpec(req.Id), ct);
+        var detector = await DetectorRepo.GetByIdAsync(req.Id, ct);
 
         if (detector is null)
         {
             await SendNotFoundAsync(ct);
             return;
-        }
-
-        if (detector.Location is null)
-        {
-            await SendNotFoundAsync(ct);
-            return; 
         }
 
         var result = await CommandService.HandleCommand(detector, req.Command, ct);
